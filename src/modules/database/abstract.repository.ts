@@ -91,15 +91,6 @@ export abstract class AbstractRepository<EntityType extends AbstractEntity> {
     try {
       await this.repository.softDelete(id);
     } catch (error) {
-      this.logError('delete', error);
-      throw new BadRequestException('Une erreur est survenue lors de la suppression');
-    }
-  }
-
-  async softDeleteEntity(id: string): Promise<void> {
-    try {
-      await this.repository.softDelete(id);
-    } catch (error) {
       this.logError('soft delete', error);
       throw new BadRequestException('Une erreur est survenue lors de la suppression');
     }
