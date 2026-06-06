@@ -48,7 +48,13 @@ export class UsersService extends AbstractRepository<User> {
 
   async signUp(dto: SignUpDto): Promise<User> {
     try {
-      return this.createSignUpUser(dto);
+      const role = await this.rolesService.findByName('user');
+      const newUser = await this.createEntity({
+        email: dto.email,
+        password: dto.password,
+        roles: [{ id: role.id }]
+      });
+      return await this.findByEmail(newUser.email);
     } catch {
       throw new BadRequestException('Cet utilisateur existe déjà');
     }
@@ -127,7 +133,10 @@ export class UsersService extends AbstractRepository<User> {
 
   async findOneByEmail(email: string): Promise<User> {
     try {
-      return await this.findEntity({ where: { email }, relations: ['roles'] });
+      return await this.findEntity({
+        where: { email },
+        relations: ['roles']
+      });
     } catch {
       throw new NotFoundException("Cet utilisateur n'existe pas");
     }
@@ -183,15 +192,5 @@ export class UsersService extends AbstractRepository<User> {
   private mapUserRoles(user: User): User {
     const roles = user.roles.map((role) => role.name);
     return { ...user, roles } as unknown as User;
-  }
-
-  private async createSignUpUser(dto: SignUpDto): Promise<User> {
-    const role = await this.rolesService.findByName('user');
-    const newUser = await this.repository.save({
-      email: dto.email,
-      password: dto.password,
-      roles: [{ id: role.id }]
-    });
-    return await this.findByEmail(newUser.email);
   }
 }
