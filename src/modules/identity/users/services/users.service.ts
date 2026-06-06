@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { promises } from 'fs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -9,6 +10,8 @@ import { FilterUsersInterface } from '../interfaces/filter-users.interface';
 import { SignUpDto } from '../../../auth/dto/sign-up.dto';
 import { parseUsersCsv } from '@/modules/identity/users/helpers/user-csv.helper';
 import { AbstractRepository } from '@/modules/database/abstract.repository';
+import { format } from 'fast-csv';
+import { Response } from 'express';
 
 @Injectable()
 export class UsersService extends AbstractRepository<User> {
@@ -75,6 +78,16 @@ export class UsersService extends AbstractRepository<User> {
     }
   }
 
+  async addAvatar(currentUser: User, file: Express.Multer.File): Promise<User> {
+    try {
+      if (currentUser.avatar) await promises.unlink(`./uploads/profiles/${currentUser.avatar}`);
+      await this.update(currentUser.id, { profile: file.filename });
+      return this.findByEmail(currentUser.email);
+    } catch {
+      throw new BadRequestException("Ajout d'image impossible");
+    }
+  }
+
   async findByEmailWithPassword(email: string): Promise<User> {
     try {
       const user = await this.repository
@@ -87,6 +100,28 @@ export class UsersService extends AbstractRepository<User> {
       return this.mapUserRoles(user);
     } catch {
       throw new NotFoundException("Cet utilisateur n'existe pas");
+    }
+  }
+
+  async exportCSV(queryParams: FilterUsersInterface, res: Response): Promise<void> {
+    try {
+      const { q } = queryParams;
+      const query = this.repository
+        .createQueryBuilder('user')
+        .select(['user.name', 'user.email', 'user.phone_number'])
+        .orderBy('user.updated_at', 'DESC');
+      if (q) {
+        query.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
+      }
+      const users = await query.getMany();
+      const csvStream = format({ headers: ['Name', 'Email', 'Phone Number'] });
+      csvStream.pipe(res);
+      users.forEach((user) => {
+        csvStream.write({ Name: user.name, Email: user.email });
+      });
+      csvStream.end();
+    } catch {
+      throw new BadRequestException('Export des utilisateurs impossible');
     }
   }
 

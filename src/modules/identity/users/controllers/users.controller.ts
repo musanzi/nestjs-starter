@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common';
@@ -17,8 +18,10 @@ import { FilterUsersInterface } from '../interfaces/filter-users.interface';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import { UsersService } from '../services/users.service';
-import { Public, Roles } from '@/modules/auth/decorators';
+import { CurrentUser, Public, Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
+import { createDiskUploadOptions } from '@/shared/helpers/upload.helper';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -37,6 +40,12 @@ export class UsersController {
     return this.usersService.importCsv(file);
   }
 
+  @Get('export/users.csv')
+  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  async exportCSV(@Query() query: FilterUsersInterface, @Res() res: Response): Promise<void> {
+    await this.usersService.exportCSV(query, res);
+  }
+
   @Get()
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
   findAll(@Query() query: FilterUsersInterface): Promise<[User[], number]> {
@@ -53,6 +62,12 @@ export class UsersController {
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
   update(@Param('userId') userId: string, @Body() dto: UpdateUserDto): Promise<User> {
     return this.usersService.update(userId, dto);
+  }
+
+  @Post('me/profile-image')
+  @UseInterceptors(FileInterceptor('profile', createDiskUploadOptions('./uploads/profiles')))
+  uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<User> {
+    return this.usersService.addAvatar(user, file);
   }
 
   @Delete('id/:userId')
