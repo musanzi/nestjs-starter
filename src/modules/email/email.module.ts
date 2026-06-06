@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
+        isGlobal: true,
         transport: {
           host: config.get('MAIL_HOST'),
           port: +config.get('MAIL_PORT'),
@@ -18,8 +19,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         },
         defaults: {
           from: `Starter Support <${config.get('MAIL_USERNAME')}>`
-        },
-        isGlobal: true
+        }
       })
     })
   ]
