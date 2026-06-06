@@ -5,7 +5,6 @@ import { TransformInterceptor } from '@/shared/interceptors/transform.intercepto
 import { RolesModule, UsersModule } from './modules/identity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DatabaseModule } from './modules/database/database.module';
-import { EmailModule } from './modules/email/email.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
@@ -14,6 +13,7 @@ import { AuthGuard } from './modules/auth/guards/auth.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -47,8 +47,24 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
         signOptions: { expiresIn: '1d' }
       })
     }),
+    MailerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        isGlobal: true,
+        transport: {
+          host: config.get('MAIL_HOST'),
+          port: +config.get('MAIL_PORT'),
+          auth: {
+            user: config.get('MAIL_USERNAME'),
+            pass: config.get('MAIL_PASSWORD')
+          }
+        },
+        defaults: {
+          from: `Starter Support <${config.get('MAIL_USERNAME')}>`
+        }
+      })
+    }),
     DatabaseModule,
-    EmailModule,
     AuthModule,
     UsersModule,
     RolesModule
