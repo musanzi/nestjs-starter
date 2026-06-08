@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Role } from '@/modules/identity/roles/entities/role.entity';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { ImportUsersCsvCommand } from '../impl/import-users-csv.command';
 
 @CommandHandler(ImportUsersCsvCommand)
@@ -40,7 +40,7 @@ export class ImportUsersCsvHandler implements ICommandHandler<ImportUsersCsvComm
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logUserHandlerError(this.logger, 'Import users csv', error);
+      logHandlerError(this.logger, 'Import users csv', error);
       throw new BadRequestException('Import des utilisateurs impossible');
     }
   }

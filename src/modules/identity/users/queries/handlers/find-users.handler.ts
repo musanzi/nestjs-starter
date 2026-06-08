@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapUsersRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { FindUsersQuery } from '../impl/find-users.query';
 
 @QueryHandler(FindUsersQuery)
@@ -40,7 +40,7 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [User[], 
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logUserHandlerError(this.logger, 'Find users', error, `page="${page}" q="${q ?? ''}"`);
+      logHandlerError(this.logger, 'Find users', error, `page="${page}" q="${q ?? ''}"`);
       throw new BadRequestException('Utilisateurs introuvables');
     }
   }

@@ -13,14 +13,14 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createCsvUploadOptions } from '@/shared/helpers/csv-upload.helper';
+import { createCsvUploadOptions } from '@/shared/helpers';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { IFilterUsers } from '../interfaces/filter-users.interface';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import { CurrentUser, Public, Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
-import { createDiskUploadOptions } from '@/shared/helpers/upload.helper';
+import { createDiskUploadOptions } from '@/shared/helpers';
 import { Response } from 'express';
 import {
   CreateUserCommand,

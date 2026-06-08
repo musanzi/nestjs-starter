@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'fast-csv';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { ExportUsersCsvQuery } from '../impl/export-users-csv.query';
 
 @QueryHandler(ExportUsersCsvQuery)
@@ -36,7 +36,7 @@ export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsvQuery,
       });
       csvStream.end();
     } catch (error) {
-      logUserHandlerError(this.logger, 'Export users csv', error, `q="${q ?? ''}"`);
+      logHandlerError(this.logger, 'Export users csv', error, `q="${q ?? ''}"`);
       throw new BadRequestException('Export des utilisateurs impossible');
     }
   }

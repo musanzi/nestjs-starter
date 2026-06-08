@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapRoleIds, mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { UpdateUserCommand } from '../impl/update-user.command';
 
 @CommandHandler(UpdateUserCommand)
@@ -35,7 +35,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logUserHandlerError(this.logger, 'Update user', error, `id="${command.id}"`);
+      logHandlerError(this.logger, 'Update user', error, `id="${command.id}"`);
       throw new BadRequestException('Mise à jour impossible');
     }
   }

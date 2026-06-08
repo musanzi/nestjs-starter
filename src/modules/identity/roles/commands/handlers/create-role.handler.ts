@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 import { CreateRoleCommand } from '../impl/create-role.command';
-import { logRoleHandlerError } from '../../common/log-role-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 
 @CommandHandler(CreateRoleCommand)
 export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand, Role> {
@@ -29,7 +29,7 @@ export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand, Rol
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 
-      logRoleHandlerError(this.logger, 'Create role', error, `name="${name}"`);
+      logHandlerError(this.logger, 'Create role', error, `name="${name}"`);
       throw new BadRequestException('Création du rôle impossible');
     }
   }

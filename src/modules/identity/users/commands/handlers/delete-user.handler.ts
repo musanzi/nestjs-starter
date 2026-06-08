@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { DeleteUserCommand } from '../impl/delete-user.command';
 
 @CommandHandler(DeleteUserCommand)
@@ -26,7 +26,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logUserHandlerError(this.logger, 'Delete user', error, `id="${command.id}"`);
+      logHandlerError(this.logger, 'Delete user', error, `id="${command.id}"`);
       throw new BadRequestException('Suppression impossible');
     }
   }

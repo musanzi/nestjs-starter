@@ -2,7 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { logRoleHandlerError } from '../../common/log-role-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { FindRoleByNameQuery } from '../impl/find-role-by-name.query';
 
@@ -26,7 +26,7 @@ export class FindRoleByNameHandler implements IQueryHandler<FindRoleByNameQuery,
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logRoleHandlerError(this.logger, 'Find role by name', error, `name="${query.name}"`);
+      logHandlerError(this.logger, 'Find role by name', error, `name="${query.name}"`);
       throw new BadRequestException('Recherche du rôle impossible');
     }
   }

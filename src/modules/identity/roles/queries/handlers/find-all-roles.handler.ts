@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { logRoleHandlerError } from '../../common/log-role-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { FindAllRolesQuery } from '../impl/find-all-roles.query';
 
@@ -21,7 +21,7 @@ export class FindAllRolesHandler implements IQueryHandler<FindAllRolesQuery, Rol
         order: { updated_at: 'DESC' }
       });
     } catch (error) {
-      logRoleHandlerError(this.logger, 'Find all roles', error);
+      logHandlerError(this.logger, 'Find all roles', error);
       throw new BadRequestException('Rôles introuvables');
     }
   }

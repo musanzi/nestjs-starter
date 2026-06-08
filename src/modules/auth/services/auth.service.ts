@@ -12,6 +12,7 @@ import { compare } from 'bcryptjs';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
+import { createAuthToken } from '../common/create-auth-token';
 
 @Injectable()
 export class AuthService {
@@ -93,7 +94,7 @@ export class AuthService {
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
     try {
       const user = await this.usersService.findByEmail(dto.email);
-      const token = await this.generateToken(user, '15m');
+      const token = await createAuthToken(this.jwtService, this.configService, user, '15m');
       const frontendUri = this.configService.get<string>('FRONTEND_URI');
       const link = `${frontendUri}/reset-password?token=${token}`;
       this.eventEmitter.emit('user.reset-password', { user, link });
@@ -111,13 +112,5 @@ export class AuthService {
     } catch {
       throw new BadRequestException('Mot de passe invalide');
     }
-  }
-
-  private async generateToken(user: User, expiresIn: number | string = '1d'): Promise<string> {
-    const secret = this.configService.get<string>('JWT_SECRET');
-    const payload = { sub: user.id, name: user.name, email: user.email };
-    const options: Record<string, unknown> = { secret };
-    options['expiresIn'] = expiresIn;
-    return this.jwtService.signAsync(payload, options);
   }
 }

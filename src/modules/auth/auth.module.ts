@@ -8,12 +8,23 @@ import { AuthEmailService } from './services/auth-email.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { SessionSerializer } from './session.serializer';
+import { CqrsModule } from '@nestjs/cqrs';
+import { CommandHandlers } from './commands/handlers';
+import { QueryHandlers } from './queries/handlers';
 
 @Global()
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule],
+  imports: [CqrsModule, UsersModule, PassportModule, JwtModule],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, GoogleStrategy, SessionSerializer, AuthEmailService],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    GoogleStrategy,
+    SessionSerializer,
+    AuthEmailService,
+    ...CommandHandlers,
+    ...QueryHandlers
+  ],
   exports: [AuthService]
 })
 export class AuthModule {}

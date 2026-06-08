@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { logRoleHandlerError } from '../../common/log-role-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { FindPaginatedRolesQuery } from '../impl/find-paginated-roles.query';
 
@@ -35,7 +35,7 @@ export class FindPaginatedRolesHandler implements IQueryHandler<FindPaginatedRol
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logRoleHandlerError(this.logger, 'Find paginated roles', error, `page="${page}" q="${q ?? ''}"`);
+      logHandlerError(this.logger, 'Find paginated roles', error, `page="${page}" q="${q ?? ''}"`);
       throw new BadRequestException('Rôles introuvables');
     }
   }

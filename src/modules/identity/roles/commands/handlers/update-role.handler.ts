@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { logRoleHandlerError } from '../../common/log-role-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { UpdateRoleCommand } from '../impl/update-role.command';
 
 @CommandHandler(UpdateRoleCommand)
@@ -33,7 +33,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
     } catch (error) {
       if (error instanceof ConflictException || error instanceof NotFoundException) throw error;
 
-      logRoleHandlerError(this.logger, 'Update role', error, `id="${command.id}"`);
+      logHandlerError(this.logger, 'Update role', error, `id="${command.id}"`);
       throw new BadRequestException('Mise à jour du rôle impossible');
     }
   }

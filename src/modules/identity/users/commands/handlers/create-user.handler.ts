@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapRoleIds, mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
 
 @CommandHandler(CreateUserCommand)
@@ -30,7 +30,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
       });
       return mapUserRoles(savedUser ?? createdUser);
     } catch (error) {
-      logUserHandlerError(this.logger, 'Create user', error, `email="${command.dto.email}"`);
+      logHandlerError(this.logger, 'Create user', error, `email="${command.dto.email}"`);
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
   }

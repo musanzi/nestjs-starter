@@ -5,7 +5,7 @@ import { promises } from 'fs';
 import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { logHandlerError } from '@/shared/helpers';
 import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
 
 @CommandHandler(UploadUserAvatarCommand)
@@ -36,7 +36,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logUserHandlerError(this.logger, 'Upload user avatar', error, `id="${command.currentUser.id}"`);
+      logHandlerError(this.logger, 'Upload user avatar', error, `id="${command.currentUser.id}"`);
       throw new BadRequestException("Ajout d'image impossible");
     }
   }
