@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../../identity/users/entities/user.entity';
 import { UsersService } from '../../identity/users/services/users.service';
@@ -13,12 +13,13 @@ import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { createAuthToken } from '../common/create-auth-token';
+import { ResetPasswordRequestedEvent } from '../events';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly eventBus: EventBus,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
   ) {}
@@ -97,7 +98,7 @@ export class AuthService {
       const token = await createAuthToken(this.jwtService, this.configService, user, '15m');
       const frontendUri = this.configService.get<string>('FRONTEND_URI');
       const link = `${frontendUri}/reset-password?token=${token}`;
-      this.eventEmitter.emit('user.reset-password', { user, link });
+      this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
     } catch {
       throw new BadRequestException('Demande invalide');
     }

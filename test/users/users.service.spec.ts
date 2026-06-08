@@ -35,9 +35,8 @@ describe('UsersService', () => {
       delete: jest.fn()
     } as any;
     const queryBus = { execute: jest.fn() } as any;
-    const eventEmitter = { emit: jest.fn() } as any;
     const service = new UsersService(userRepository, queryBus);
-    return { service, userRepository, queryBus, eventEmitter, queryBuilder };
+    return { service, userRepository, queryBus, queryBuilder };
   };
 
   it('creates user with defaults', async () => {

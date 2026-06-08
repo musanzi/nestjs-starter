@@ -17,12 +17,16 @@ import { GoogleRedirectHandler } from '@/modules/auth/queries/handlers/google-re
 import { ProfileHandler } from '@/modules/auth/queries/handlers/profile.handler';
 import { SignInHandler } from '@/modules/auth/queries/handlers/sign-in.handler';
 import { GoogleRedirectQuery, ProfileQuery, SignInQuery } from '@/modules/auth/queries';
+import { ResetPasswordRequestedEvent, WelcomeUserEvent } from '@/modules/auth/events';
+import { SendResetPasswordEmailHandler } from '@/modules/auth/events/handlers/send-reset-password-email.handler';
+import { SendWelcomeEmailHandler } from '@/modules/auth/events/handlers/send-welcome-email.handler';
 
 describe('Auth CQRS handlers', () => {
   let usersService: any;
-  let eventEmitter: any;
+  let eventBus: any;
   let jwtService: any;
   let configService: any;
+  let mailerService: any;
 
   beforeEach(() => {
     usersService = {
@@ -30,7 +34,7 @@ describe('Auth CQRS handlers', () => {
       update: jest.fn(),
       findByEmail: jest.fn()
     };
-    eventEmitter = { emit: jest.fn() };
+    eventBus = { publish: jest.fn() };
     jwtService = {
       signAsync: jest.fn().mockResolvedValue('token'),
       verifyAsync: jest.fn()
@@ -42,6 +46,7 @@ describe('Auth CQRS handlers', () => {
         return undefined;
       })
     };
+    mailerService = { sendMail: jest.fn() };
   });
 
   describe('commands', () => {
@@ -99,19 +104,21 @@ describe('Auth CQRS handlers', () => {
       expect(usersService.findByEmail).toHaveBeenCalledWith('ada@example.com');
     });
 
-    it('emits reset password email payloads with a short-lived token', async () => {
+    it('publishes reset password email events with a short-lived token', async () => {
       usersService.findByEmail.mockResolvedValue({ id: 'u1', name: 'Ada', email: 'ada@example.com' });
-      const handler = new ForgotPasswordHandler(usersService, eventEmitter, jwtService, configService);
+      const handler = new ForgotPasswordHandler(usersService, eventBus, jwtService, configService);
 
       await expect(handler.execute(new ForgotPasswordCommand({ email: 'ada@example.com' }))).resolves.toBeUndefined();
       expect(jwtService.signAsync).toHaveBeenCalledWith(
         { sub: 'u1', name: 'Ada', email: 'ada@example.com' },
         { secret: 'secret', expiresIn: '15m' }
       );
-      expect(eventEmitter.emit).toHaveBeenCalledWith('user.reset-password', {
-        user: { id: 'u1', name: 'Ada', email: 'ada@example.com' },
-        link: 'https://app.example.com/reset-password?token=token'
-      });
+      expect(eventBus.publish).toHaveBeenCalledWith(
+        new ResetPasswordRequestedEvent(
+          { id: 'u1', name: 'Ada', email: 'ada@example.com' } as any,
+          'https://app.example.com/reset-password?token=token'
+        )
+      );
     });
 
     it('resets passwords from valid tokens', async () => {
@@ -149,6 +156,46 @@ describe('Auth CQRS handlers', () => {
       await expect(handler.execute(new ProfileQuery({ email: 'ada@example.com' } as any))).resolves.toEqual({
         id: 'u1',
         email: 'ada@example.com'
+      });
+    });
+  });
+
+  describe('events', () => {
+    it('sends welcome emails from welcome user events', async () => {
+      const handler = new SendWelcomeEmailHandler(mailerService);
+
+      await handler.handle(new WelcomeUserEvent({ id: 'u1', name: 'Ada', email: 'ada@example.com' } as any));
+
+      expect(mailerService.sendMail).toHaveBeenCalledWith({
+        to: 'ada@example.com',
+        subject: 'Bienvenue sur Starter',
+        text: ['Bonjour Ada,', '', 'Bienvenue sur Starter.', '', "L'equipe Starter"].join('\n')
+      });
+    });
+
+    it('sends reset password emails from reset password requested events', async () => {
+      const handler = new SendResetPasswordEmailHandler(mailerService);
+
+      await handler.handle(
+        new ResetPasswordRequestedEvent(
+          { id: 'u1', name: 'Ada', email: 'ada@example.com' } as any,
+          'https://app.example.com/reset-password?token=token'
+        )
+      );
+
+      expect(mailerService.sendMail).toHaveBeenCalledWith({
+        to: 'ada@example.com',
+        subject: 'Réinitialisation du mot de passe',
+        text: [
+          'Bonjour Ada,',
+          '',
+          'Vous avez demande la reinitialisation de votre mot de passe.',
+          'Lien: https://app.example.com/reset-password?token=token',
+          '',
+          "Si vous n'etes pas a l'origine de cette demande, ignorez cet email.",
+          '',
+          "L'equipe Starter"
+        ].join('\n')
       });
     });
   });

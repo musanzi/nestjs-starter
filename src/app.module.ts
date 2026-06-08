@@ -3,7 +3,6 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
 import { TransformInterceptor } from '@/shared/interceptors/transform.interceptor';
 import { RolesModule, UsersModule } from './modules/identity';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DatabaseModule } from './modules/database/database.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -18,7 +17,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
-    EventEmitterModule.forRoot(),
     CqrsModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true
