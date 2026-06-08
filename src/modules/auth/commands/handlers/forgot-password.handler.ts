@@ -1,8 +1,8 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '@/modules/identity/users/services/users.service';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { createAuthToken } from '../../common/create-auth-token';
 import { logHandlerError } from '@/shared/helpers';
 import { ForgotPasswordCommand } from '../impl/forgot-password.command';
@@ -13,7 +13,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
   private readonly logger = new Logger(ForgotPasswordHandler.name);
 
   constructor(
-    private readonly usersService: UsersService,
+    private readonly queryBus: QueryBus,
     private readonly eventBus: EventBus,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
@@ -21,7 +21,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
 
   async execute(command: ForgotPasswordCommand): Promise<void> {
     try {
-      const user = await this.usersService.findByEmail(command.dto.email);
+      const user = await this.queryBus.execute(new FindUserByEmailQuery(command.dto.email));
       const token = await createAuthToken(this.jwtService, this.configService, user, '15m');
       const frontendUri = this.configService.get<string>('FRONTEND_URI');
       const link = `${frontendUri}/reset-password?token=${token}`;

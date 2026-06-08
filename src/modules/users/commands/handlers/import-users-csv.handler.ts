@@ -2,7 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Role } from '@/modules/identity/roles/entities/role.entity';
+import { Role } from '@/modules/roles/entities/role.entity';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
 import { User } from '../../entities/user.entity';
 import { logHandlerError } from '@/shared/helpers';

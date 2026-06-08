@@ -3,7 +3,10 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { UsersModule } from '../identity/users/users.module';
+import { UsersModule } from '../users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Role } from '../roles/entities/role.entity';
+import { User } from '../users/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { SessionSerializer } from './session.serializer';
@@ -14,7 +17,7 @@ import { EventHandlers } from './events/handlers';
 
 @Global()
 @Module({
-  imports: [CqrsModule, UsersModule, PassportModule, JwtModule],
+  imports: [CqrsModule, UsersModule, TypeOrmModule.forFeature([User, Role]), PassportModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,

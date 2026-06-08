@@ -1,13 +1,13 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { UsersService } from '@/modules/identity/users/services/users.service';
-import { User } from '@/modules/identity/users/entities/user.entity';
+import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
+import { User } from '@/modules/users/entities/user.entity';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { ProfileQuery } from '../impl/profile.query';
 
 @QueryHandler(ProfileQuery)
 export class ProfileHandler implements IQueryHandler<ProfileQuery, User> {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly queryBus: QueryBus) {}
 
   execute(query: ProfileQuery): Promise<User> {
-    return this.usersService.findByEmail(query.currentUser.email);
+    return this.queryBus.execute(new FindUserByEmailQuery(query.currentUser.email));
   }
 }

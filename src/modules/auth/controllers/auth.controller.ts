@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
-import { User } from '../../identity/users/entities/user.entity';
-import { UpdateUserDto } from '../../identity/users/dto/update-user.dto';
+import { User } from '../../users/entities/user.entity';
+import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { SignUpDto } from '../dto/sign-up.dto';
 import { UpdatePasswordDto } from '@/modules/auth/dto/update-password.dto';
 import { ForgotPasswordDto } from '@/modules/auth/dto/forgot-password.dto';

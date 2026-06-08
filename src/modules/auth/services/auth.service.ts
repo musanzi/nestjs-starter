@@ -1,40 +1,46 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { EventBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
-import { User } from '../../identity/users/entities/user.entity';
-import { UsersService } from '../../identity/users/services/users.service';
+import { User } from '../../users/entities/user.entity';
 import { SignUpDto } from '../dto/sign-up.dto';
-import { CreateUserDto } from '../../identity/users/dto/create-user.dto';
-import { UpdateUserDto } from '../../identity/users/dto/update-user.dto';
+import { CreateUserDto } from '../../users/dto/create-user.dto';
+import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { compare } from 'bcryptjs';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
-import { createAuthToken } from '../common/create-auth-token';
-import { ResetPasswordRequestedEvent } from '../events';
+import { FindOrCreateUserCommand } from '@/modules/users/commands';
+import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery, FindUserByIdQuery } from '@/modules/users/queries';
+import {
+  ForgotPasswordCommand,
+  ResetPasswordCommand,
+  SignUpCommand,
+  UpdatePasswordCommand,
+  UpdateProfileCommand
+} from '../commands';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly eventBus: EventBus,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.usersService.findByEmailWithPassword(email);
+    const user = await this.queryBus.execute(new FindUserByEmailWithPasswordQuery(email));
     if (!user || !user.password) throw new UnauthorizedException('Les identifiants saisis sont invalides');
     const isPasswordValid = await compare(password, user.password);
     if (!isPasswordValid) throw new UnauthorizedException('Les identifiants saisis sont invalides');
-    return await this.usersService.findByEmail(user.email);
+    return await this.queryBus.execute(new FindUserByEmailQuery(user.email));
   }
 
   async findOrCreate(dto: CreateUserDto): Promise<User> {
     try {
-      return await this.usersService.findOrCreate(dto);
+      return await this.commandBus.execute(new FindOrCreateUserCommand(dto));
     } catch {
       throw new BadRequestException('Requête invalide');
     }
@@ -51,7 +57,7 @@ export class AuthService {
 
   async signUp(dto: SignUpDto): Promise<User> {
     try {
-      return await this.usersService.signUp(dto);
+      return await this.commandBus.execute(new SignUpCommand(dto));
     } catch (error) {
       throw new BadRequestException(error['message']);
     }
@@ -65,19 +71,19 @@ export class AuthService {
     try {
       const secret = this.configService.get<string>('JWT_SECRET');
       const payload = await this.jwtService.verifyAsync(token, { secret });
-      return await this.usersService.findOne(payload.sub);
+      return await this.queryBus.execute(new FindUserByIdQuery(payload.sub));
     } catch {
       throw new UnauthorizedException('Non autorisé');
     }
   }
 
   async profile(user: User): Promise<User> {
-    return this.usersService.findByEmail(user.email);
+    return this.queryBus.execute(new FindUserByEmailQuery(user.email));
   }
 
   async updateProfile(user: User, dto: UpdateUserDto): Promise<User> {
     try {
-      return await this.usersService.update(user.id, dto);
+      return await this.commandBus.execute(new UpdateProfileCommand(user, dto));
     } catch {
       throw new BadRequestException('Requête invalide');
     }
@@ -85,8 +91,7 @@ export class AuthService {
 
   async updatePassword(currentUser: User, dto: UpdatePasswordDto): Promise<User> {
     try {
-      await this.usersService.update(currentUser.id, { password: dto.password });
-      return await this.usersService.findByEmail(currentUser.email);
+      return await this.commandBus.execute(new UpdatePasswordCommand(currentUser, dto));
     } catch {
       throw new BadRequestException('Mise à jour impossible');
     }
@@ -94,22 +99,15 @@ export class AuthService {
 
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
     try {
-      const user = await this.usersService.findByEmail(dto.email);
-      const token = await createAuthToken(this.jwtService, this.configService, user, '15m');
-      const frontendUri = this.configService.get<string>('FRONTEND_URI');
-      const link = `${frontendUri}/reset-password?token=${token}`;
-      this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
+      await this.commandBus.execute(new ForgotPasswordCommand(dto));
     } catch {
       throw new BadRequestException('Demande invalide');
     }
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<User> {
-    const { token, password } = resetPasswordDto;
     try {
-      const secret = this.configService.get<string>('JWT_SECRET');
-      const payload = await this.jwtService.verifyAsync(token, { secret });
-      return await this.usersService.update(payload.sub, { password });
+      return await this.commandBus.execute(new ResetPasswordCommand(resetPasswordDto));
     } catch {
       throw new BadRequestException('Mot de passe invalide');
     }

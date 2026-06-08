@@ -1,4 +1,4 @@
-import { User } from '@/modules/identity/users/entities/user.entity';
+import { User } from '@/modules/users/entities/user.entity';
 import { UpdatePasswordDto } from '../../dto/update-password.dto';
 
 export class UpdatePasswordCommand {

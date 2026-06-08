@@ -1,5 +1,5 @@
-import { User } from '@/modules/identity/users/entities/user.entity';
-import { UpdateUserDto } from '@/modules/identity/users/dto/update-user.dto';
+import { User } from '@/modules/users/entities/user.entity';
+import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
 
 export class UpdateProfileCommand {
   constructor(

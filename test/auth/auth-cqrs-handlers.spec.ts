@@ -20,20 +20,28 @@ import { GoogleRedirectQuery, ProfileQuery, SignInQuery } from '@/modules/auth/q
 import { ResetPasswordRequestedEvent, WelcomeUserEvent } from '@/modules/auth/events';
 import { SendResetPasswordEmailHandler } from '@/modules/auth/events/handlers/send-reset-password-email.handler';
 import { SendWelcomeEmailHandler } from '@/modules/auth/events/handlers/send-welcome-email.handler';
+import { UpdateUserCommand } from '@/modules/users/commands';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 
 describe('Auth CQRS handlers', () => {
-  let usersService: any;
+  let userRepository: any;
+  let roleRepository: any;
+  let commandBus: any;
+  let queryBus: any;
   let eventBus: any;
   let jwtService: any;
   let configService: any;
   let mailerService: any;
 
   beforeEach(() => {
-    usersService = {
-      signUp: jest.fn(),
-      update: jest.fn(),
-      findByEmail: jest.fn()
+    userRepository = {
+      create: jest.fn((dto) => dto),
+      save: jest.fn(),
+      findOne: jest.fn()
     };
+    roleRepository = { findOne: jest.fn() };
+    commandBus = { execute: jest.fn() };
+    queryBus = { execute: jest.fn() };
     eventBus = { publish: jest.fn() };
     jwtService = {
       signAsync: jest.fn().mockResolvedValue('token'),
@@ -50,24 +58,40 @@ describe('Auth CQRS handlers', () => {
   });
 
   describe('commands', () => {
-    it('signs users up through the users facade', async () => {
-      usersService.signUp.mockResolvedValue({ id: 'u1' });
-      const handler = new SignUpHandler(usersService);
+    it('signs users up through the user repository', async () => {
+      userRepository.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce({
+        id: 'u1',
+        email: 'ada@example.com',
+        roles: [{ name: 'user' }]
+      });
+      roleRepository.findOne.mockResolvedValue({ id: 'role-user', name: 'user' });
+      userRepository.save.mockResolvedValue({ id: 'u1' });
+      const handler = new SignUpHandler(userRepository, roleRepository, eventBus);
 
       await expect(
-        handler.execute(new SignUpCommand({ email: 'ada@example.com', password: 'secret123' }))
+        handler.execute(new SignUpCommand({ name: 'Ada', email: 'ada@example.com', password: 'secret123' }))
       ).resolves.toEqual({
-        id: 'u1'
+        id: 'u1',
+        email: 'ada@example.com',
+        roles: ['user']
       });
-      expect(usersService.signUp).toHaveBeenCalledWith({ email: 'ada@example.com', password: 'secret123' });
+      expect(userRepository.create).toHaveBeenCalledWith({
+        name: 'Ada',
+        email: 'ada@example.com',
+        password: 'secret123',
+        roles: [{ id: 'role-user' }]
+      });
+      expect(eventBus.publish).toHaveBeenCalledWith(
+        new WelcomeUserEvent({ id: 'u1', email: 'ada@example.com', roles: ['user'] } as any)
+      );
     });
 
     it('maps sign up failures to bad requests', async () => {
-      usersService.signUp.mockRejectedValue(new Error('Cet utilisateur existe déjà'));
-      const handler = new SignUpHandler(usersService);
+      userRepository.findOne.mockRejectedValue(new Error('database unavailable'));
+      const handler = new SignUpHandler(userRepository, roleRepository, eventBus);
 
       await expect(
-        handler.execute(new SignUpCommand({ email: 'ada@example.com', password: 'secret123' }))
+        handler.execute(new SignUpCommand({ name: 'Ada', email: 'ada@example.com', password: 'secret123' }))
       ).rejects.toBeInstanceOf(BadRequestException);
     });
 
@@ -80,35 +104,36 @@ describe('Auth CQRS handlers', () => {
     });
 
     it('updates the current user profile', async () => {
-      usersService.update.mockResolvedValue({ id: 'u1', name: 'Ada' });
-      const handler = new UpdateProfileHandler(usersService);
+      commandBus.execute.mockResolvedValue({ id: 'u1', name: 'Ada' });
+      const handler = new UpdateProfileHandler(commandBus);
 
       await expect(handler.execute(new UpdateProfileCommand({ id: 'u1' } as any, { name: 'Ada' }))).resolves.toEqual({
         id: 'u1',
         name: 'Ada'
       });
-      expect(usersService.update).toHaveBeenCalledWith('u1', { name: 'Ada' });
+      expect(commandBus.execute).toHaveBeenCalledWith(new UpdateUserCommand('u1', { name: 'Ada' }));
     });
 
     it('updates the current user password and reloads the user', async () => {
-      usersService.update.mockResolvedValue({ id: 'u1' });
-      usersService.findByEmail.mockResolvedValue({ id: 'u1', email: 'ada@example.com' });
-      const handler = new UpdatePasswordHandler(usersService);
+      commandBus.execute.mockResolvedValue({ id: 'u1' });
+      queryBus.execute.mockResolvedValue({ id: 'u1', email: 'ada@example.com' });
+      const handler = new UpdatePasswordHandler(commandBus, queryBus);
 
       await expect(
         handler.execute(
           new UpdatePasswordCommand({ id: 'u1', email: 'ada@example.com' } as any, { password: 'secret123' })
         )
       ).resolves.toEqual({ id: 'u1', email: 'ada@example.com' });
-      expect(usersService.update).toHaveBeenCalledWith('u1', { password: 'secret123' });
-      expect(usersService.findByEmail).toHaveBeenCalledWith('ada@example.com');
+      expect(commandBus.execute).toHaveBeenCalledWith(new UpdateUserCommand('u1', { password: 'secret123' }));
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
     });
 
     it('publishes reset password email events with a short-lived token', async () => {
-      usersService.findByEmail.mockResolvedValue({ id: 'u1', name: 'Ada', email: 'ada@example.com' });
-      const handler = new ForgotPasswordHandler(usersService, eventBus, jwtService, configService);
+      queryBus.execute.mockResolvedValue({ id: 'u1', name: 'Ada', email: 'ada@example.com' });
+      const handler = new ForgotPasswordHandler(queryBus, eventBus, jwtService, configService);
 
       await expect(handler.execute(new ForgotPasswordCommand({ email: 'ada@example.com' }))).resolves.toBeUndefined();
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
       expect(jwtService.signAsync).toHaveBeenCalledWith(
         { sub: 'u1', name: 'Ada', email: 'ada@example.com' },
         { secret: 'secret', expiresIn: '15m' }
@@ -123,14 +148,14 @@ describe('Auth CQRS handlers', () => {
 
     it('resets passwords from valid tokens', async () => {
       jwtService.verifyAsync.mockResolvedValue({ sub: 'u1' });
-      usersService.update.mockResolvedValue({ id: 'u1' });
-      const handler = new ResetPasswordHandler(usersService, jwtService, configService);
+      commandBus.execute.mockResolvedValue({ id: 'u1' });
+      const handler = new ResetPasswordHandler(commandBus, jwtService, configService);
 
       await expect(
         handler.execute(new ResetPasswordCommand({ token: 'token', password: 'secret123' }))
       ).resolves.toEqual({ id: 'u1' });
       expect(jwtService.verifyAsync).toHaveBeenCalledWith('token', { secret: 'secret' });
-      expect(usersService.update).toHaveBeenCalledWith('u1', { password: 'secret123' });
+      expect(commandBus.execute).toHaveBeenCalledWith(new UpdateUserCommand('u1', { password: 'secret123' }));
     });
   });
 
@@ -150,13 +175,14 @@ describe('Auth CQRS handlers', () => {
     });
 
     it('loads the current user profile by email', async () => {
-      usersService.findByEmail.mockResolvedValue({ id: 'u1', email: 'ada@example.com' });
-      const handler = new ProfileHandler(usersService);
+      queryBus.execute.mockResolvedValue({ id: 'u1', email: 'ada@example.com' });
+      const handler = new ProfileHandler(queryBus);
 
       await expect(handler.execute(new ProfileQuery({ email: 'ada@example.com' } as any))).resolves.toEqual({
         id: 'u1',
         email: 'ada@example.com'
       });
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
     });
   });
 

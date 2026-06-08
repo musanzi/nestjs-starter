@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany } from 'typeorm';
-import { Role } from '../../../identity/roles/entities/role.entity';
+import { Role } from '../../roles/entities/role.entity';
 import { AbstractEntity } from '@/modules/database/abstract.entity';
 
 @Entity()

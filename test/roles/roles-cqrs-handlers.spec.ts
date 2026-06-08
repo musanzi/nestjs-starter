@@ -1,18 +1,18 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
-import { CreateRoleHandler } from '@/modules/identity/roles/commands/handlers/create-role.handler';
-import { DeleteRoleHandler } from '@/modules/identity/roles/commands/handlers/delete-role.handler';
-import { UpdateRoleHandler } from '@/modules/identity/roles/commands/handlers/update-role.handler';
-import { CreateRoleCommand, DeleteRoleCommand, UpdateRoleCommand } from '@/modules/identity/roles/commands';
-import { FindAllRolesHandler } from '@/modules/identity/roles/queries/handlers/find-all-roles.handler';
-import { FindPaginatedRolesHandler } from '@/modules/identity/roles/queries/handlers/find-paginated-roles.handler';
-import { FindRoleByIdHandler } from '@/modules/identity/roles/queries/handlers/find-role-by-id.handler';
-import { FindRoleByNameHandler } from '@/modules/identity/roles/queries/handlers/find-role-by-name.handler';
+import { CreateRoleHandler } from '@/modules/roles/commands/handlers/create-role.handler';
+import { DeleteRoleHandler } from '@/modules/roles/commands/handlers/delete-role.handler';
+import { UpdateRoleHandler } from '@/modules/roles/commands/handlers/update-role.handler';
+import { CreateRoleCommand, DeleteRoleCommand, UpdateRoleCommand } from '@/modules/roles/commands';
+import { FindAllRolesHandler } from '@/modules/roles/queries/handlers/find-all-roles.handler';
+import { FindPaginatedRolesHandler } from '@/modules/roles/queries/handlers/find-paginated-roles.handler';
+import { FindRoleByIdHandler } from '@/modules/roles/queries/handlers/find-role-by-id.handler';
+import { FindRoleByNameHandler } from '@/modules/roles/queries/handlers/find-role-by-name.handler';
 import {
   FindAllRolesQuery,
   FindPaginatedRolesQuery,
   FindRoleByIdQuery,
   FindRoleByNameQuery
-} from '@/modules/identity/roles/queries';
+} from '@/modules/roles/queries';
 
 function createQueryBuilder(result: [any[], number]) {
   return {

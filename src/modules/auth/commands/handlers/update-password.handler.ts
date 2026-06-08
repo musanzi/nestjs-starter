@@ -1,7 +1,8 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersService } from '@/modules/identity/users/services/users.service';
-import { User } from '@/modules/identity/users/entities/user.entity';
+import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
+import { User } from '@/modules/users/entities/user.entity';
+import { UpdateUserCommand } from '@/modules/users/commands';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
 
@@ -9,12 +10,15 @@ import { UpdatePasswordCommand } from '../impl/update-password.command';
 export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordCommand, User> {
   private readonly logger = new Logger(UpdatePasswordHandler.name);
 
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
+  ) {}
 
   async execute(command: UpdatePasswordCommand): Promise<User> {
     try {
-      await this.usersService.update(command.currentUser.id, { password: command.dto.password });
-      return await this.usersService.findByEmail(command.currentUser.email);
+      await this.commandBus.execute(new UpdateUserCommand(command.currentUser.id, { password: command.dto.password }));
+      return await this.queryBus.execute(new FindUserByEmailQuery(command.currentUser.email));
     } catch (error) {
       logHandlerError(this.logger, 'Update password', error, `id="${command.currentUser?.id ?? ''}"`);
       throw new BadRequestException('Mise à jour impossible');

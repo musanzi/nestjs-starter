@@ -1,24 +1,24 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { CreateUserHandler } from '@/modules/identity/users/commands/handlers/create-user.handler';
-import { DeleteUserHandler } from '@/modules/identity/users/commands/handlers/delete-user.handler';
-import { ImportUsersCsvHandler } from '@/modules/identity/users/commands/handlers/import-users-csv.handler';
-import { UpdateUserHandler } from '@/modules/identity/users/commands/handlers/update-user.handler';
-import { UploadUserAvatarHandler } from '@/modules/identity/users/commands/handlers/upload-user-avatar.handler';
+import { CreateUserHandler } from '@/modules/users/commands/handlers/create-user.handler';
+import { DeleteUserHandler } from '@/modules/users/commands/handlers/delete-user.handler';
+import { ImportUsersCsvHandler } from '@/modules/users/commands/handlers/import-users-csv.handler';
+import { UpdateUserHandler } from '@/modules/users/commands/handlers/update-user.handler';
+import { UploadUserAvatarHandler } from '@/modules/users/commands/handlers/upload-user-avatar.handler';
 import {
   CreateUserCommand,
   DeleteUserCommand,
   ImportUsersCsvCommand,
   UpdateUserCommand,
   UploadUserAvatarCommand
-} from '@/modules/identity/users/commands';
-import { ExportUsersCsvHandler } from '@/modules/identity/users/queries/handlers/export-users-csv.handler';
-import { FindUserByEmailHandler } from '@/modules/identity/users/queries/handlers/find-user-by-email.handler';
-import { FindUsersHandler } from '@/modules/identity/users/queries/handlers/find-users.handler';
-import { ExportUsersCsvQuery, FindUserByEmailQuery, FindUsersQuery } from '@/modules/identity/users/queries';
-import { parseUsersCsv } from '@/modules/identity/users/helpers/user-csv.helper';
+} from '@/modules/users/commands';
+import { ExportUsersCsvHandler } from '@/modules/users/queries/handlers/export-users-csv.handler';
+import { FindUserByEmailHandler } from '@/modules/users/queries/handlers/find-user-by-email.handler';
+import { FindUsersHandler } from '@/modules/users/queries/handlers/find-users.handler';
+import { ExportUsersCsvQuery, FindUserByEmailQuery, FindUsersQuery } from '@/modules/users/queries';
+import { parseUsersCsv } from '@/modules/users/helpers/user-csv.helper';
 import { PassThrough } from 'stream';
 
-jest.mock('@/modules/identity/users/helpers/user-csv.helper', () => ({
+jest.mock('@/modules/users/helpers/user-csv.helper', () => ({
   parseUsersCsv: jest.fn()
 }));
 

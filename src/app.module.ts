@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
 import { TransformInterceptor } from '@/shared/interceptors/transform.interceptor';
-import { RolesModule, UsersModule } from './modules/identity';
 import { DatabaseModule } from './modules/database/database.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -14,6 +13,8 @@ import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RolesModule } from './modules/roles/roles.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
