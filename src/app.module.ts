@@ -14,10 +14,12 @@ import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
+    CqrsModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true
     }),

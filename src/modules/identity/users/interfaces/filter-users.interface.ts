@@ -1,5 +1,5 @@
-import { PaginationInterface } from '@/modules/database/interfaces/pagination.interface';
+import { IPagination } from '@/modules/database/interfaces/pagination.interface';
 
-export interface FilterUsersInterface extends PaginationInterface {
+export interface IFilterUsers extends IPagination {
   q?: string;
 }

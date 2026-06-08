@@ -7,7 +7,7 @@ import {
   Repository,
   SelectQueryBuilder
 } from 'typeorm';
-import { PaginationInterface } from './interfaces/pagination.interface';
+import { IPagination } from './interfaces/pagination.interface';
 import { AbstractEntity } from './abstract.entity';
 
 export abstract class AbstractRepository<EntityType extends AbstractEntity> {
@@ -47,7 +47,7 @@ export abstract class AbstractRepository<EntityType extends AbstractEntity> {
 
   async findPaginatedEntities(
     query: SelectQueryBuilder<EntityType>,
-    { page = 1, take = 20 }: PaginationInterface = {}
+    { page = 1, take = 20 }: IPagination = {}
   ): Promise<[EntityType[], number]> {
     try {
       const pageNumber = Number(page);

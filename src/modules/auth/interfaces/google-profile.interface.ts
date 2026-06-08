@@ -1,4 +1,4 @@
-export interface GoogleProfileInterface {
+export interface IGoogleProfile {
   emails: string[];
   photos: string[];
   name: string[];

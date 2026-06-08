@@ -14,7 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createCsvUploadOptions } from '@/shared/helpers/csv-upload.helper';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { FilterUsersInterface } from '../interfaces/filter-users.interface';
+import { IFilterUsers } from '../interfaces/filter-users.interface';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import { UsersService } from '../services/users.service';
@@ -42,13 +42,13 @@ export class UsersController {
 
   @Get('export/users.csv')
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  async exportCSV(@Query() query: FilterUsersInterface, @Res() res: Response): Promise<void> {
+  async exportCSV(@Query() query: IFilterUsers, @Res() res: Response): Promise<void> {
     await this.usersService.exportCSV(query, res);
   }
 
   @Get()
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  findAll(@Query() query: FilterUsersInterface): Promise<[User[], number]> {
+  findAll(@Query() query: IFilterUsers): Promise<[User[], number]> {
     return this.usersService.findAll(query);
   }
 

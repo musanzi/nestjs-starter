@@ -34,10 +34,10 @@ describe('UsersService', () => {
       softDelete: jest.fn(),
       delete: jest.fn()
     } as any;
-    const rolesService = { findByName: jest.fn() } as any;
+    const queryBus = { execute: jest.fn() } as any;
     const eventEmitter = { emit: jest.fn() } as any;
-    const service = new UsersService(userRepository, rolesService);
-    return { service, userRepository, rolesService, eventEmitter, queryBuilder };
+    const service = new UsersService(userRepository, queryBus);
+    return { service, userRepository, queryBus, eventEmitter, queryBuilder };
   };
 
   it('creates user with defaults', async () => {
@@ -106,9 +106,9 @@ describe('UsersService', () => {
   });
 
   it('creates user when not existing', async () => {
-    const { service, userRepository, rolesService } = setup();
+    const { service, userRepository, queryBus } = setup();
     userRepository.findOne.mockResolvedValue(null);
-    rolesService.findByName.mockResolvedValue({ id: 'role-user' });
+    queryBus.execute.mockResolvedValue({ id: 'role-user' });
     userRepository.save.mockResolvedValue({ id: 'u-new' });
     jest.spyOn(service, 'findOne').mockResolvedValue({ id: 'u-new' } as any);
     await expect(service.findOrCreate({ email: 'n@n.com' } as any)).resolves.toEqual({ id: 'u-new' });

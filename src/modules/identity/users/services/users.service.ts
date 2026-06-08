@@ -5,20 +5,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
-import { RolesService } from '../../roles/services/roles.service';
-import { FilterUsersInterface } from '../interfaces/filter-users.interface';
+import { IFilterUsers } from '../interfaces/filter-users.interface';
 import { SignUpDto } from '../../../auth/dto/sign-up.dto';
 import { parseUsersCsv } from '@/modules/identity/users/helpers/user-csv.helper';
 import { AbstractRepository } from '@/modules/database/abstract.repository';
 import { format } from 'fast-csv';
 import { Response } from 'express';
+import { QueryBus } from '@nestjs/cqrs';
+import { FindRoleByNameQuery } from '../../roles/queries';
+import { Role } from '../../roles/entities/role.entity';
 
 @Injectable()
 export class UsersService extends AbstractRepository<User> {
   constructor(
     @InjectRepository(User)
     repository: Repository<User>,
-    private rolesService: RolesService
+    private readonly queryBus: QueryBus
   ) {
     super(repository);
   }
@@ -35,7 +37,7 @@ export class UsersService extends AbstractRepository<User> {
     }
   }
 
-  async findAll(queryParams: FilterUsersInterface): Promise<[User[], number]> {
+  async findAll(queryParams: IFilterUsers): Promise<[User[], number]> {
     try {
       const { page, q } = queryParams;
       const query = this.repository.createQueryBuilder('u');
@@ -48,14 +50,15 @@ export class UsersService extends AbstractRepository<User> {
 
   async signUp(dto: SignUpDto): Promise<User> {
     try {
-      const role = await this.rolesService.findByName('user');
+      const role = await this.queryBus.execute<FindRoleByNameQuery, Role>(new FindRoleByNameQuery('user'));
       const newUser = await this.createEntity({
         email: dto.email,
         password: dto.password,
         roles: [{ id: role.id }]
       });
       return await this.findByEmail(newUser.email);
-    } catch {
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
       throw new BadRequestException('Cet utilisateur existe déjà');
     }
   }
@@ -109,7 +112,7 @@ export class UsersService extends AbstractRepository<User> {
     }
   }
 
-  async exportCSV(queryParams: FilterUsersInterface, res: Response): Promise<void> {
+  async exportCSV(queryParams: IFilterUsers, res: Response): Promise<void> {
     try {
       const { q } = queryParams;
       const query = this.repository
@@ -152,13 +155,14 @@ export class UsersService extends AbstractRepository<User> {
           avatar: !user.avatar && dto.avatar
         });
       }
-      const role = await this.rolesService.findByName('user');
+      const role = await this.queryBus.execute<FindRoleByNameQuery, Role>(new FindRoleByNameQuery('user'));
       const newUser = await this.createEntity({
         ...dto,
         roles: [role]
       });
       return await this.findOne(newUser.id);
-    } catch {
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
   }
