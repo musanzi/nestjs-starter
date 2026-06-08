@@ -1,0 +1,43 @@
+import { BadRequestException, Logger } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { format } from 'fast-csv';
+import { Repository } from 'typeorm';
+import { User } from '../../entities/user.entity';
+import { logUserHandlerError } from '../../common/log-user-handler-error';
+import { ExportUsersCsvQuery } from '../impl/export-users-csv.query';
+
+@QueryHandler(ExportUsersCsvQuery)
+export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsvQuery, void> {
+  private readonly logger = new Logger(ExportUsersCsvHandler.name);
+
+  constructor(
+    @InjectRepository(User)
+    private readonly repository: Repository<User>
+  ) {}
+
+  async execute(query: ExportUsersCsvQuery): Promise<void> {
+    const { q } = query.params;
+
+    try {
+      const queryBuilder = this.repository
+        .createQueryBuilder('user')
+        .select(['user.name', 'user.email'])
+        .orderBy('user.updated_at', 'DESC');
+      if (q) {
+        queryBuilder.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
+      }
+
+      const users = await queryBuilder.getMany();
+      const csvStream = format({ headers: ['Name', 'Email'] });
+      csvStream.pipe(query.response);
+      users.forEach((user) => {
+        csvStream.write({ Name: user.name, Email: user.email });
+      });
+      csvStream.end();
+    } catch (error) {
+      logUserHandlerError(this.logger, 'Export users csv', error, `q="${q ?? ''}"`);
+      throw new BadRequestException('Export des utilisateurs impossible');
+    }
+  }
+}
