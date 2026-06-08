@@ -7,7 +7,7 @@ import {
   Repository,
   SelectQueryBuilder
 } from 'typeorm';
-import { IPagination } from './interfaces/pagination.interface';
+import { IPagination } from '../../shared/interfaces/pagination.interface';
 import { AbstractEntity } from './abstract.entity';
 
 export abstract class AbstractRepository<EntityType extends AbstractEntity> {

@@ -1,4 +1,4 @@
-import { IPagination } from '@/modules/database/interfaces/pagination.interface';
+import { IPagination } from '@/shared/interfaces/pagination.interface';
 
 export interface IFilterRoles extends IPagination {
   q?: string;
