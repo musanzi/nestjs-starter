@@ -4,9 +4,11 @@ import { DeleteUserHandler } from '@/modules/users/commands/handlers/delete-user
 import { ImportUsersCsvHandler } from '@/modules/users/commands/handlers/import-users-csv.handler';
 import { UpdateUserHandler } from '@/modules/users/commands/handlers/update-user.handler';
 import { UploadUserAvatarHandler } from '@/modules/users/commands/handlers/upload-user-avatar.handler';
+import { FindOrCreateUserHandler } from '@/modules/users/commands/handlers/find-or-create-user.handler';
 import {
   CreateUserCommand,
   DeleteUserCommand,
+  FindOrCreateUserCommand,
   ImportUsersCsvCommand,
   UpdateUserCommand,
   UploadUserAvatarCommand
@@ -14,7 +16,7 @@ import {
 import { ExportUsersCsvHandler } from '@/modules/users/queries/handlers/export-users-csv.handler';
 import { FindUserByEmailHandler } from '@/modules/users/queries/handlers/find-user-by-email.handler';
 import { FindUsersHandler } from '@/modules/users/queries/handlers/find-users.handler';
-import { ExportUsersCsvQuery, FindUserByEmailQuery, FindUsersQuery } from '@/modules/users/queries';
+import { ExportUsersCsvQuery, FindUserByEmailQuery, FindUserByIdQuery, FindUsersQuery } from '@/modules/users/queries';
 import { parseUsersCsv } from '@/modules/users/helpers/user-csv.helper';
 import { PassThrough } from 'stream';
 
@@ -37,7 +39,8 @@ function createUsersQueryBuilder(result: [any[], number] = [[{ id: 'u1', roles: 
 
 describe('Users CQRS handlers', () => {
   let userRepository: any;
-  let roleRepository: any;
+  let commandBus: any;
+  let queryBus: any;
 
   beforeEach(() => {
     userRepository = {
@@ -48,16 +51,19 @@ describe('Users CQRS handlers', () => {
       createQueryBuilder: jest.fn(),
       softDelete: jest.fn()
     };
-    roleRepository = {
-      findOne: jest.fn()
+    commandBus = {
+      execute: jest.fn()
+    };
+    queryBus = {
+      execute: jest.fn()
     };
   });
 
   describe('commands', () => {
     it('creates users with a default password and role id stubs', async () => {
       userRepository.save.mockResolvedValue({ id: 'u1', roles: [{ id: 'r1' }] });
-      userRepository.findOne.mockResolvedValue({ id: 'u1', roles: [{ name: 'staff' }] });
-      const handler = new CreateUserHandler(userRepository);
+      queryBus.execute.mockResolvedValue({ id: 'u1', roles: ['staff'] });
+      const handler = new CreateUserHandler(userRepository, queryBus);
 
       await expect(
         handler.execute(new CreateUserCommand({ email: 'ada@example.com', name: 'Ada', roles: ['r1'] }))
@@ -68,36 +74,64 @@ describe('Users CQRS handlers', () => {
           roles: [{ id: 'r1' }]
         })
       );
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('u1'));
     });
 
     it('updates users and normalizes roles', async () => {
-      userRepository.findOne.mockResolvedValue({ id: 'u1', roles: [{ name: 'user' }] });
-      userRepository.save.mockResolvedValue({ id: 'u1', name: 'Ada', roles: [{ name: 'admin' }] });
-      const handler = new UpdateUserHandler(userRepository);
+      queryBus.execute
+        .mockResolvedValueOnce({ id: 'u1', roles: ['user'] })
+        .mockResolvedValueOnce({ id: 'u1', name: 'Ada', roles: ['admin'] });
+      userRepository.save.mockResolvedValue({ id: 'u1' });
+      const handler = new UpdateUserHandler(userRepository, queryBus);
 
       await expect(handler.execute(new UpdateUserCommand('u1', { roles: ['r1'] }))).resolves.toEqual(
         expect.objectContaining({ roles: ['admin'] })
       );
-      expect(userRepository.merge).toHaveBeenCalledWith(
-        { id: 'u1', roles: [{ name: 'user' }] },
-        { roles: [{ id: 'r1' }] }
-      );
+      expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByIdQuery('u1'));
+      expect(userRepository.save).toHaveBeenCalledWith({ id: 'u1', roles: [{ id: 'r1' }] });
+      expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByIdQuery('u1'));
     });
 
     it('throws not found when updating a missing user', async () => {
-      userRepository.findOne.mockResolvedValue(null);
-      const handler = new UpdateUserHandler(userRepository);
+      queryBus.execute.mockRejectedValue(new NotFoundException('Utilisateur introuvable'));
+      const handler = new UpdateUserHandler(userRepository, queryBus);
 
       await expect(handler.execute(new UpdateUserCommand('missing', {}))).rejects.toBeInstanceOf(NotFoundException);
     });
 
     it('soft deletes existing users', async () => {
-      userRepository.findOne.mockResolvedValue({ id: 'u1' });
+      queryBus.execute.mockResolvedValue({ id: 'u1' });
       userRepository.softDelete.mockResolvedValue({ affected: 1 });
-      const handler = new DeleteUserHandler(userRepository);
+      const handler = new DeleteUserHandler(userRepository, queryBus);
 
       await expect(handler.execute(new DeleteUserCommand('u1'))).resolves.toBeUndefined();
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('u1'));
       expect(userRepository.softDelete).toHaveBeenCalledWith('u1');
+    });
+
+    it('updates existing users when finding or creating by email', async () => {
+      queryBus.execute.mockResolvedValue({ id: 'u-existing', email: 'existing@example.com', roles: ['user'] });
+      commandBus.execute.mockResolvedValue({ id: 'u-existing', name: 'Existing', roles: ['admin'] });
+      const handler = new FindOrCreateUserHandler(commandBus, queryBus);
+
+      await expect(
+        handler.execute(new FindOrCreateUserCommand({ email: 'existing@example.com', name: 'Existing' }))
+      ).resolves.toEqual(expect.objectContaining({ roles: ['admin'] }));
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('existing@example.com'));
+      expect(commandBus.execute).toHaveBeenCalledWith(
+        new UpdateUserCommand('u-existing', { email: 'existing@example.com', name: 'Existing' })
+      );
+    });
+
+    it('creates users when finding or creating by missing email', async () => {
+      queryBus.execute.mockRejectedValue(new NotFoundException("Cet utilisateur n'existe pas"));
+      commandBus.execute.mockResolvedValue({ id: 'u-new', roles: ['user'] });
+      const handler = new FindOrCreateUserHandler(commandBus, queryBus);
+
+      await expect(
+        handler.execute(new FindOrCreateUserCommand({ email: 'new@example.com', name: 'New' }))
+      ).resolves.toEqual(expect.objectContaining({ id: 'u-new' }));
+      expect(commandBus.execute).toHaveBeenCalledWith(new CreateUserCommand({ email: 'new@example.com', name: 'New' }));
     });
 
     it('imports only missing users from csv', async () => {
@@ -105,36 +139,36 @@ describe('Users CQRS handlers', () => {
         { email: 'existing@example.com', name: 'Existing' },
         { email: 'new@example.com', name: 'New' }
       ]);
-      roleRepository.findOne.mockResolvedValue({ id: 'role-user', name: 'user' });
-      userRepository.findOne.mockResolvedValueOnce({ id: 'u-existing' }).mockResolvedValueOnce(null);
-      userRepository.save.mockResolvedValue({ id: 'u-new' });
-      const handler = new ImportUsersCsvHandler(userRepository, roleRepository);
+      queryBus.execute
+        .mockResolvedValueOnce({ id: 'u-existing' })
+        .mockRejectedValueOnce(new NotFoundException("Cet utilisateur n'existe pas"));
+      commandBus.execute.mockResolvedValue({ id: 'u-new' });
+      const handler = new ImportUsersCsvHandler(commandBus, queryBus);
 
       await expect(
         handler.execute(new ImportUsersCsvCommand({ buffer: Buffer.from('csv') } as any))
       ).resolves.toBeUndefined();
-      expect(userRepository.save).toHaveBeenCalledTimes(1);
-      expect(userRepository.create).toHaveBeenCalledWith({
-        email: 'new@example.com',
-        name: 'New',
-        roles: [{ id: 'role-user' }]
-      });
+      expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByEmailQuery('existing@example.com'));
+      expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByEmailQuery('new@example.com'));
+      expect(commandBus.execute).toHaveBeenCalledTimes(1);
+      expect(commandBus.execute).toHaveBeenCalledWith(new CreateUserCommand({ email: 'new@example.com', name: 'New' }));
     });
 
     it('uploads avatars to the avatar field', async () => {
-      userRepository.findOne.mockResolvedValue({ id: 'u1', avatar: null, roles: [{ name: 'user' }] });
-      userRepository.save.mockResolvedValue({ id: 'u1', avatar: 'avatar.png', roles: [{ name: 'user' }] });
-      const handler = new UploadUserAvatarHandler(userRepository);
+      queryBus.execute
+        .mockResolvedValueOnce({ id: 'u1', avatar: null, roles: ['user'] })
+        .mockResolvedValueOnce({ id: 'u1', avatar: 'avatar.png', roles: ['user'] });
+      userRepository.save.mockResolvedValue({ id: 'u1', avatar: 'avatar.png' });
+      const handler = new UploadUserAvatarHandler(userRepository, queryBus);
 
       await expect(
         handler.execute(
           new UploadUserAvatarCommand({ id: 'u1', avatar: null } as any, { filename: 'avatar.png' } as any)
         )
       ).resolves.toEqual(expect.objectContaining({ avatar: 'avatar.png', roles: ['user'] }));
-      expect(userRepository.merge).toHaveBeenCalledWith(
-        { id: 'u1', avatar: null, roles: [{ name: 'user' }] },
-        { avatar: 'avatar.png' }
-      );
+      expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByIdQuery('u1'));
+      expect(userRepository.save).toHaveBeenCalledWith({ id: 'u1', avatar: 'avatar.png' });
+      expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByIdQuery('u1'));
     });
   });
 

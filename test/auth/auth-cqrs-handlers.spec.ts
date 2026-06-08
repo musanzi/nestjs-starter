@@ -22,8 +22,8 @@ import { GoogleRedirectQuery, ProfileQuery, SignInQuery, ValidateCredentialsQuer
 import { ResetPasswordRequestedEvent, WelcomeUserEvent } from '@/modules/auth/events';
 import { SendResetPasswordEmailHandler } from '@/modules/auth/events/handlers/send-reset-password-email.handler';
 import { SendWelcomeEmailHandler } from '@/modules/auth/events/handlers/send-welcome-email.handler';
-import { UpdateUserCommand } from '@/modules/users/commands';
-import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery } from '@/modules/users/queries';
+import { CreateUserCommand, UpdateUserCommand } from '@/modules/users/commands';
+import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery, FindUserByIdQuery } from '@/modules/users/queries';
 
 jest.mock('bcryptjs', () => ({
   compare: jest.fn()
@@ -67,15 +67,14 @@ describe('Auth CQRS handlers', () => {
   });
 
   describe('commands', () => {
-    it('signs users up through the user repository', async () => {
-      userRepository.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce({
+    it('signs users up through the command and query buses', async () => {
+      queryBus.execute.mockResolvedValueOnce(null).mockResolvedValueOnce({
         id: 'u1',
         email: 'ada@example.com',
-        roles: [{ name: 'user' }]
+        roles: ['user']
       });
-      roleRepository.findOne.mockResolvedValue({ id: 'role-user', name: 'user' });
-      userRepository.save.mockResolvedValue({ id: 'u1' });
-      const handler = new SignUpHandler(userRepository, roleRepository, eventBus);
+      commandBus.execute.mockResolvedValue({ id: 'u1' });
+      const handler = new SignUpHandler(commandBus, queryBus, eventBus);
 
       await expect(
         handler.execute(new SignUpCommand({ name: 'Ada', email: 'ada@example.com', password: 'secret123' }))
@@ -84,20 +83,17 @@ describe('Auth CQRS handlers', () => {
         email: 'ada@example.com',
         roles: ['user']
       });
-      expect(userRepository.create).toHaveBeenCalledWith({
-        name: 'Ada',
-        email: 'ada@example.com',
-        password: 'secret123',
-        roles: [{ id: 'role-user' }]
-      });
-      expect(eventBus.publish).toHaveBeenCalledWith(
-        new WelcomeUserEvent({ id: 'u1', email: 'ada@example.com', roles: ['user'] } as any)
+      expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByEmailQuery('ada@example.com'));
+      expect(commandBus.execute).toHaveBeenCalledWith(
+        new CreateUserCommand({ name: 'Ada', email: 'ada@example.com', password: 'secret123' })
       );
+      expect(eventBus.publish).toHaveBeenCalledWith(new WelcomeUserEvent({ id: 'u1' } as any));
+      expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByIdQuery('u1'));
     });
 
     it('maps sign up failures to bad requests', async () => {
-      userRepository.findOne.mockRejectedValue(new Error('database unavailable'));
-      const handler = new SignUpHandler(userRepository, roleRepository, eventBus);
+      queryBus.execute.mockRejectedValue(new Error('database unavailable'));
+      const handler = new SignUpHandler(commandBus, queryBus, eventBus);
 
       await expect(
         handler.execute(new SignUpCommand({ name: 'Ada', email: 'ada@example.com', password: 'secret123' }))

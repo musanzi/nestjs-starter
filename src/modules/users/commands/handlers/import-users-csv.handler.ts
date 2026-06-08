@@ -1,41 +1,33 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Role } from '@/modules/roles/entities/role.entity';
+import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
-import { User } from '../../entities/user.entity';
+import { FindUserByEmailQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { ImportUsersCsvCommand } from '../impl/import-users-csv.command';
+import { CreateUserCommand } from '../impl/create-user.command';
 
 @CommandHandler(ImportUsersCsvCommand)
 export class ImportUsersCsvHandler implements ICommandHandler<ImportUsersCsvCommand, void> {
   private readonly logger = new Logger(ImportUsersCsvHandler.name);
 
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
   ) {}
 
   async execute(command: ImportUsersCsvCommand): Promise<void> {
     try {
       const rows = await parseUsersCsv(command.file.buffer);
-      const defaultRole = await this.roleRepository.findOne({ where: { name: 'user' } });
-      if (!defaultRole) {
-        throw new NotFoundException('Rôle introuvable');
-      }
 
       for (const row of rows) {
-        const existingUser = await this.userRepository.findOne({ where: { email: row.email } });
-        if (existingUser) continue;
+        try {
+          await this.queryBus.execute(new FindUserByEmailQuery(row.email));
+          continue;
+        } catch (error) {
+          if (!(error instanceof NotFoundException)) throw error;
+        }
 
-        const user = this.userRepository.create({
-          ...row,
-          roles: [{ id: defaultRole.id }]
-        });
-        await this.userRepository.save(user);
+        await this.commandBus.execute(new CreateUserCommand(row));
       }
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

@@ -1,10 +1,11 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { logHandlerError } from '@/shared/helpers';
 import { DeleteUserCommand } from '../impl/delete-user.command';
+import { FindUserByIdQuery } from '../../queries';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, void> {
@@ -12,15 +13,13 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
 
   constructor(
     @InjectRepository(User)
-    private readonly repository: Repository<User>
+    private readonly repository: Repository<User>,
+    private readonly queryBus: QueryBus
   ) {}
 
   async execute(command: DeleteUserCommand): Promise<void> {
     try {
-      const user = await this.repository.findOne({ where: { id: command.id } });
-      if (!user) {
-        throw new NotFoundException('Utilisateur introuvable');
-      }
+      await this.queryBus.execute(new FindUserByIdQuery(command.id));
 
       await this.repository.softDelete(command.id);
     } catch (error) {

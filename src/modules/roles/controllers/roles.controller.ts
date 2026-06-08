@@ -3,6 +3,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateRoleDto } from '../dto/create-role.dto';
 import { UpdateRoleDto } from '../dto/update-role.dto';
 import { IFilterRoles } from '../interfaces/filter-roles.interface';
+import { Role } from '../entities/role.entity';
 import { Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
 import { CreateRoleCommand, DeleteRoleCommand, UpdateRoleCommand } from '../commands';
@@ -17,37 +18,37 @@ export class RolesController {
 
   @Post()
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  create(@Body() dto: CreateRoleDto) {
+  create(@Body() dto: CreateRoleDto): Promise<Role> {
     return this.commandBus.execute(new CreateRoleCommand(dto));
   }
 
   @Get('paginated')
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  findPaginated(@Query() query: IFilterRoles) {
+  findPaginated(@Query() query: IFilterRoles): Promise<[Role[], number]> {
     return this.queryBus.execute(new FindPaginatedRolesQuery(query));
   }
 
   @Get()
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  findAll() {
+  findAll(): Promise<Role[]> {
     return this.queryBus.execute(new FindAllRolesQuery());
   }
 
   @Get('id/:id')
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<Role> {
     return this.queryBus.execute(new FindRoleByIdQuery(id));
   }
 
   @Patch('id/:id')
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
     return this.commandBus.execute(new UpdateRoleCommand(id, updateRoleDto));
   }
 
   @Delete('id/:id')
   @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<void> {
     return this.commandBus.execute(new DeleteRoleCommand(id));
   }
 }

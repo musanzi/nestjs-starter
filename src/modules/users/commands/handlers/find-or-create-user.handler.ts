@@ -1,53 +1,33 @@
-import { BadRequestException, Logger } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Role } from '@/modules/roles/entities/role.entity';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { logHandlerError } from '@/shared/helpers';
-import { mapUserRoles } from '../../common/user-mappers';
-import { User } from '../../entities/user.entity';
+import { UserResponse } from '../../interfaces';
+import { FindUserByEmailQuery } from '../../queries';
 import { FindOrCreateUserCommand } from '../impl/find-or-create-user.command';
+import { UpdateUserCommand } from '../impl/update-user.command';
+import { CreateUserCommand } from '../impl/create-user.command';
 
 @CommandHandler(FindOrCreateUserCommand)
-export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUserCommand, User> {
+export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUserCommand, UserResponse> {
   private readonly logger = new Logger(FindOrCreateUserHandler.name);
 
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: FindOrCreateUserCommand): Promise<User> {
+  async execute(command: FindOrCreateUserCommand): Promise<UserResponse> {
     const { dto } = command;
 
     try {
-      const existingUser = await this.userRepository.findOne({
-        where: { email: dto.email },
-        relations: ['roles']
-      });
-
-      if (existingUser) {
-        const updatedUser = this.userRepository.merge(existingUser, {
-          name: dto.name ?? existingUser.name,
-          avatar: dto.avatar ?? existingUser.avatar
-        });
-        return mapUserRoles(await this.userRepository.save(updatedUser));
+      try {
+        const existingUser = await this.queryBus.execute(new FindUserByEmailQuery(dto.email));
+        return this.commandBus.execute(new UpdateUserCommand(existingUser.id, dto));
+      } catch (error) {
+        if (!(error instanceof NotFoundException)) throw error;
       }
 
-      const defaultRole = await this.roleRepository.findOne({ where: { name: 'user' } });
-      const user = this.userRepository.create({
-        ...dto,
-        roles: defaultRole ? [{ id: defaultRole.id }] : undefined
-      });
-      const savedUser = await this.userRepository.save(user);
-      const createdUser = await this.userRepository.findOne({
-        where: { id: savedUser.id },
-        relations: ['roles']
-      });
-
-      return mapUserRoles(createdUser ?? savedUser);
+      return await this.commandBus.execute(new CreateUserCommand(dto));
     } catch (error) {
       logHandlerError(this.logger, 'Find or create user', error, `email="${dto.email}"`);
       throw new BadRequestException('Requête invalide');

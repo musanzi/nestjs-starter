@@ -1,37 +1,35 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { mapRoleIds, mapUserRoles } from '../../common/user-mappers';
+import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
+import { UserResponse } from '../../interfaces';
+import { FindUserByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdateUserCommand } from '../impl/update-user.command';
 
 @CommandHandler(UpdateUserCommand)
-export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, User> {
+export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, UserResponse> {
   private readonly logger = new Logger(UpdateUserHandler.name);
 
   constructor(
     @InjectRepository(User)
-    private readonly repository: Repository<User>
+    private readonly repository: Repository<User>,
+    private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: UpdateUserCommand): Promise<User> {
+  async execute(command: UpdateUserCommand): Promise<UserResponse> {
     try {
-      const user = await this.repository.findOne({
-        where: { id: command.id },
-        relations: ['roles']
-      });
-      if (!user) {
-        throw new NotFoundException('Utilisateur introuvable');
-      }
+      await this.queryBus.execute(new FindUserByIdQuery(command.id));
 
       const { roles, ...dto } = command.dto;
-      const updatedUser = this.repository.merge(user, {
+      await this.repository.save({
+        id: command.id,
         ...dto,
         roles: roles ? mapRoleIds(roles) : undefined
       });
-      return mapUserRoles(await this.repository.save(updatedUser));
+      return await this.queryBus.execute(new FindUserByIdQuery(command.id));
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 

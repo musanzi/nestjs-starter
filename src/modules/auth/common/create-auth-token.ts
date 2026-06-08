@@ -2,10 +2,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@/modules/users/entities/user.entity';
 
+type AuthTokenUser = Pick<User, 'id' | 'name' | 'email'>;
+
 export function createAuthToken(
   jwtService: JwtService,
   configService: ConfigService,
-  user: User,
+  user: AuthTokenUser,
   expiresIn: number | string = '1d'
 ): Promise<string> {
   const secret = configService.get<string>('JWT_SECRET');

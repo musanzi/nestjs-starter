@@ -2,13 +2,13 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@/modules/users/entities/user.entity';
+import { UserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { logHandlerError } from '@/shared/helpers';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
 
 @CommandHandler(ResetPasswordCommand)
-export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand, User> {
+export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand, UserResponse> {
   private readonly logger = new Logger(ResetPasswordHandler.name);
 
   constructor(
@@ -17,7 +17,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
     private readonly configService: ConfigService
   ) {}
 
-  async execute(command: ResetPasswordCommand): Promise<User> {
+  async execute(command: ResetPasswordCommand): Promise<UserResponse> {
     const { token, password } = command.dto;
 
     try {

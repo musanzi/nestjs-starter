@@ -1,17 +1,18 @@
 import { Role } from '../../roles/entities/role.entity';
 import { User } from '../entities/user.entity';
+import { UserResponse } from '../interfaces';
 
 export function mapRoleIds(roleIds?: string[] | null): Pick<Role, 'id'>[] | undefined {
   if (!roleIds) return undefined;
   return roleIds.map((id) => ({ id }));
 }
 
-export function mapUserRoles(user: User): User {
-  if (!user?.roles) return user;
+export function mapUserRoles(user: User): UserResponse {
+  if (!user?.roles) return { ...user, roles: [] };
   const roles = user.roles.map((role) => role.name);
-  return { ...user, roles } as unknown as User;
+  return { ...user, roles };
 }
 
-export function mapUsersRoles(users: User[]): User[] {
+export function mapUsersRoles(users: User[]): UserResponse[] {
   return users.map(mapUserRoles);
 }

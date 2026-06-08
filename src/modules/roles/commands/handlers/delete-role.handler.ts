@@ -1,8 +1,9 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
+import { FindRoleByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { DeleteRoleCommand } from '../impl/delete-role.command';
 
@@ -12,15 +13,13 @@ export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand, voi
 
   constructor(
     @InjectRepository(Role)
-    private readonly repository: Repository<Role>
+    private readonly repository: Repository<Role>,
+    private readonly queryBus: QueryBus
   ) {}
 
   async execute(command: DeleteRoleCommand): Promise<void> {
     try {
-      const role = await this.repository.findOne({ where: { id: command.id } });
-      if (!role) {
-        throw new NotFoundException('Rôle introuvable');
-      }
+      await this.queryBus.execute(new FindRoleByIdQuery(command.id));
 
       await this.repository.delete(command.id);
     } catch (error) {

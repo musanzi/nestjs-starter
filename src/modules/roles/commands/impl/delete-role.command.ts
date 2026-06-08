@@ -1,3 +1,7 @@
-export class DeleteRoleCommand {
-  constructor(public readonly id: string) {}
+import { Command } from '@nestjs/cqrs';
+
+export class DeleteRoleCommand extends Command<void> {
+  constructor(public readonly id: string) {
+    super();
+  }
 }

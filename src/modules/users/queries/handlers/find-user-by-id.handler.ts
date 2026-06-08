@@ -4,11 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
+import { UserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
 import { FindUserByIdQuery } from '../impl/find-user-by-id.query';
 
 @QueryHandler(FindUserByIdQuery)
-export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, User> {
+export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, UserResponse> {
   private readonly logger = new Logger(FindUserByIdHandler.name);
 
   constructor(
@@ -16,7 +17,7 @@ export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, Use
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUserByIdQuery): Promise<User> {
+  async execute(query: FindUserByIdQuery): Promise<UserResponse> {
     try {
       const user = await this.repository.findOne({
         where: { id: query.id },
@@ -31,7 +32,7 @@ export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, Use
       if (error instanceof NotFoundException) throw error;
 
       logHandlerError(this.logger, 'Find user by id', error, `id="${query.id}"`);
-      throw new BadRequestException('Recherche de l’utilisateur impossible');
+      throw new BadRequestException("Recherche de l'utilisateur impossible");
     }
   }
 }

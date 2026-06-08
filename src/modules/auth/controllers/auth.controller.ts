@@ -2,6 +2,7 @@ import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 import { User } from '../../users/entities/user.entity';
+import { UserResponse } from '../../users/interfaces';
 import { UpdateUserDto } from '../../users/dto/update-user.dto';
 import { SignUpDto } from '../dto/sign-up.dto';
 import { UpdatePasswordDto } from '@/modules/auth/dto/update-password.dto';
@@ -30,14 +31,14 @@ export class AuthController {
 
   @Post('signup')
   @Public()
-  signUp(@Body() dto: SignUpDto): Promise<User> {
+  signUp(@Body() dto: SignUpDto): Promise<UserResponse> {
     return this.commandBus.execute(new SignUpCommand(dto));
   }
 
   @Post('signin')
   @Public()
   @UseGuards(LocalAuthGuard)
-  signIn(@Req() req: Request): Promise<User> {
+  signIn(@Req() req: Request): Promise<UserResponse> {
     return this.queryBus.execute(new SignInQuery(req));
   }
 
@@ -54,22 +55,22 @@ export class AuthController {
   }
 
   @Post('signout')
-  signOut(@Req() req: Request) {
+  signOut(@Req() req: Request): Promise<void> {
     return this.commandBus.execute(new SignOutCommand(req));
   }
 
   @Get('me')
-  profile(@CurrentUser() user: User): Promise<User> {
+  profile(@CurrentUser() user: User): Promise<UserResponse> {
     return this.queryBus.execute(new ProfileQuery(user));
   }
 
   @Patch('me')
-  updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<User> {
+  updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<UserResponse> {
     return this.commandBus.execute(new UpdateProfileCommand(user, dto));
   }
 
   @Patch('me/password')
-  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<User> {
+  updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<UserResponse> {
     return this.commandBus.execute(new UpdatePasswordCommand(user, dto));
   }
 
@@ -80,7 +81,7 @@ export class AuthController {
   }
 
   @Post('password/reset')
-  resetPassword(@Body() dto: ResetPasswordDto): Promise<User> {
+  resetPassword(@Body() dto: ResetPasswordDto): Promise<UserResponse> {
     return this.commandBus.execute(new ResetPasswordCommand(dto));
   }
 }

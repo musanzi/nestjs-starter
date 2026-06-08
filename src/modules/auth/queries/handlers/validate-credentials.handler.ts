@@ -1,15 +1,15 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { compare } from 'bcryptjs';
-import { User } from '@/modules/users/entities/user.entity';
+import { UserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery } from '@/modules/users/queries';
 import { ValidateCredentialsQuery } from '../impl/validate-credentials.query';
 
 @QueryHandler(ValidateCredentialsQuery)
-export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredentialsQuery, User> {
+export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredentialsQuery, UserResponse> {
   constructor(private readonly queryBus: QueryBus) {}
 
-  async execute(query: ValidateCredentialsQuery): Promise<User> {
+  async execute(query: ValidateCredentialsQuery): Promise<UserResponse> {
     const unauthorized = new UnauthorizedException('Les identifiants saisis sont invalides');
 
     try {

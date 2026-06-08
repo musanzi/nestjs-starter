@@ -6,6 +6,7 @@ import { Strategy } from 'passport-google-oauth20';
 import { IGoogleProfile } from '../interfaces/google-profile.interface';
 import { CommandBus } from '@nestjs/cqrs';
 import { FindOrCreateUserCommand } from '@/modules/users/commands';
+import { UserResponse } from '@/modules/users/interfaces';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
@@ -21,7 +22,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(_accessToken: string, _refreshToken: string, profile: IGoogleProfile) {
+  async validate(_accessToken: string, _refreshToken: string, profile: IGoogleProfile): Promise<UserResponse> {
     const { emails, name, photos } = profile;
     const userDto: CreateUserDto = {
       email: emails[0]['value'],

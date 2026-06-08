@@ -26,6 +26,7 @@ function createQueryBuilder(result: [any[], number]) {
 
 describe('Roles CQRS handlers', () => {
   let repository: any;
+  let queryBus: any;
 
   beforeEach(() => {
     repository = {
@@ -37,32 +38,36 @@ describe('Roles CQRS handlers', () => {
       createQueryBuilder: jest.fn(),
       delete: jest.fn()
     };
+    queryBus = {
+      execute: jest.fn()
+    };
   });
 
   describe('CreateRoleHandler', () => {
     it('creates role when name is available', async () => {
-      repository.findOne.mockResolvedValue(null);
+      queryBus.execute.mockRejectedValue(new NotFoundException('Rôle introuvable'));
       repository.save.mockResolvedValue({ id: 'r1', name: 'staff' });
-      const handler = new CreateRoleHandler(repository);
+      const handler = new CreateRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new CreateRoleCommand({ name: 'staff' }))).resolves.toEqual({
         id: 'r1',
         name: 'staff'
       });
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleByNameQuery('staff'));
       expect(repository.create).toHaveBeenCalledWith({ name: 'staff' });
     });
 
     it('throws conflict when role name exists', async () => {
-      repository.findOne.mockResolvedValue({ id: 'r1', name: 'staff' });
-      const handler = new CreateRoleHandler(repository);
+      queryBus.execute.mockResolvedValue({ id: 'r1', name: 'staff' });
+      const handler = new CreateRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new CreateRoleCommand({ name: 'staff' }))).rejects.toBeInstanceOf(ConflictException);
     });
 
     it('maps unexpected persistence errors', async () => {
-      repository.findOne.mockResolvedValue(null);
+      queryBus.execute.mockRejectedValue(new NotFoundException('Rôle introuvable'));
       repository.save.mockRejectedValue(new Error('database unavailable'));
-      const handler = new CreateRoleHandler(repository);
+      const handler = new CreateRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new CreateRoleCommand({ name: 'staff' }))).rejects.toBeInstanceOf(
         BadRequestException
@@ -72,20 +77,24 @@ describe('Roles CQRS handlers', () => {
 
   describe('UpdateRoleHandler', () => {
     it('updates role with fetch merge save flow', async () => {
-      repository.findOne.mockResolvedValueOnce({ id: 'r1', name: 'user' }).mockResolvedValueOnce(null);
+      queryBus.execute
+        .mockResolvedValueOnce({ id: 'r1', name: 'user' })
+        .mockRejectedValueOnce(new NotFoundException('Rôle introuvable'));
       repository.save.mockResolvedValue({ id: 'r1', name: 'mentor' });
-      const handler = new UpdateRoleHandler(repository);
+      const handler = new UpdateRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new UpdateRoleCommand('r1', { name: 'mentor' }))).resolves.toEqual({
         id: 'r1',
         name: 'mentor'
       });
+      expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindRoleByIdQuery('r1'));
+      expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindRoleByNameQuery('mentor'));
       expect(repository.merge).toHaveBeenCalledWith({ id: 'r1', name: 'user' }, { name: 'mentor' });
     });
 
     it('throws not found when role is missing', async () => {
-      repository.findOne.mockResolvedValue(null);
-      const handler = new UpdateRoleHandler(repository);
+      queryBus.execute.mockRejectedValue(new NotFoundException('Rôle introuvable'));
+      const handler = new UpdateRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new UpdateRoleCommand('missing', { name: 'mentor' }))).rejects.toBeInstanceOf(
         NotFoundException
@@ -93,11 +102,10 @@ describe('Roles CQRS handlers', () => {
     });
 
     it('throws conflict when another role has the requested name', async () => {
-      repository.findOne.mockResolvedValueOnce({ id: 'r1', name: 'user' }).mockResolvedValueOnce({
-        id: 'r2',
-        name: 'mentor'
-      });
-      const handler = new UpdateRoleHandler(repository);
+      queryBus.execute
+        .mockResolvedValueOnce({ id: 'r1', name: 'user' })
+        .mockResolvedValueOnce({ id: 'r2', name: 'mentor' });
+      const handler = new UpdateRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new UpdateRoleCommand('r1', { name: 'mentor' }))).rejects.toBeInstanceOf(
         ConflictException
@@ -107,17 +115,18 @@ describe('Roles CQRS handlers', () => {
 
   describe('DeleteRoleHandler', () => {
     it('hard deletes existing role', async () => {
-      repository.findOne.mockResolvedValue({ id: 'r1', name: 'staff' });
+      queryBus.execute.mockResolvedValue({ id: 'r1', name: 'staff' });
       repository.delete.mockResolvedValue({ affected: 1 });
-      const handler = new DeleteRoleHandler(repository);
+      const handler = new DeleteRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new DeleteRoleCommand('r1'))).resolves.toBeUndefined();
+      expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleByIdQuery('r1'));
       expect(repository.delete).toHaveBeenCalledWith('r1');
     });
 
     it('throws not found before deleting missing role', async () => {
-      repository.findOne.mockResolvedValue(null);
-      const handler = new DeleteRoleHandler(repository);
+      queryBus.execute.mockRejectedValue(new NotFoundException('Rôle introuvable'));
+      const handler = new DeleteRoleHandler(repository, queryBus);
 
       await expect(handler.execute(new DeleteRoleCommand('missing'))).rejects.toBeInstanceOf(NotFoundException);
       expect(repository.delete).not.toHaveBeenCalled();

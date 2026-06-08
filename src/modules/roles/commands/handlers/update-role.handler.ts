@@ -1,8 +1,9 @@
 import { BadRequestException, ConflictException, Logger, NotFoundException } from '@nestjs/common';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
+import { FindRoleByIdQuery, FindRoleByNameQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdateRoleCommand } from '../impl/update-role.command';
 
@@ -12,20 +13,22 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
 
   constructor(
     @InjectRepository(Role)
-    private readonly repository: Repository<Role>
+    private readonly repository: Repository<Role>,
+    private readonly queryBus: QueryBus
   ) {}
 
   async execute(command: UpdateRoleCommand): Promise<Role> {
     try {
-      const role = await this.repository.findOne({ where: { id: command.id } });
-      if (!role) {
-        throw new NotFoundException('Rôle introuvable');
-      }
+      const role = await this.queryBus.execute(new FindRoleByIdQuery(command.id));
 
       if (command.dto.name) {
-        const existingRole = await this.repository.findOne({ where: { name: command.dto.name } });
-        if (existingRole && existingRole.id !== command.id) {
-          throw new ConflictException('Ce rôle existe déjà');
+        try {
+          const existingRole = await this.queryBus.execute(new FindRoleByNameQuery(command.dto.name));
+          if (existingRole.id !== command.id) {
+            throw new ConflictException('Ce rôle existe déjà');
+          }
+        } catch (error) {
+          if (!(error instanceof NotFoundException)) throw error;
         }
       }
 

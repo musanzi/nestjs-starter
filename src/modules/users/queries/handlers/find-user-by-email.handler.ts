@@ -4,11 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
+import { UserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
 import { FindUserByEmailQuery } from '../impl/find-user-by-email.query';
 
 @QueryHandler(FindUserByEmailQuery)
-export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuery, User> {
+export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuery, UserResponse> {
   private readonly logger = new Logger(FindUserByEmailHandler.name);
 
   constructor(
@@ -16,7 +17,7 @@ export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuer
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUserByEmailQuery): Promise<User> {
+  async execute(query: FindUserByEmailQuery): Promise<UserResponse> {
     try {
       const user = await this.repository.findOne({
         where: { email: query.email },
@@ -31,7 +32,7 @@ export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuer
       if (error instanceof NotFoundException) throw error;
 
       logHandlerError(this.logger, 'Find user by email', error, `email="${query.email}"`);
-      throw new BadRequestException('Recherche de l’utilisateur impossible');
+      throw new BadRequestException("Recherche de l'utilisateur impossible");
     }
   }
 }

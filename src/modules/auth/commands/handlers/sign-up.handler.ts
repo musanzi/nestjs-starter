@@ -1,48 +1,33 @@
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Role } from '@/modules/roles/entities/role.entity';
-import { User } from '@/modules/users/entities/user.entity';
+import { CommandBus, CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
+import { UserResponse } from '@/modules/users/interfaces';
 import { logHandlerError } from '@/shared/helpers';
-import { mapUserRoles } from '@/modules/users/common/user-mappers';
 import { WelcomeUserEvent } from '../../events';
 import { SignUpCommand } from '../impl/sign-up.command';
+import { FindUserByEmailQuery, FindUserByIdQuery } from '@/modules/users/queries';
+import { CreateUserCommand } from '@/modules/users/commands';
 
 @CommandHandler(SignUpCommand)
-export class SignUpHandler implements ICommandHandler<SignUpCommand, User> {
+export class SignUpHandler implements ICommandHandler<SignUpCommand, UserResponse> {
   private readonly logger = new Logger(SignUpHandler.name);
 
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
     private readonly eventBus: EventBus
   ) {}
 
-  async execute(command: SignUpCommand): Promise<User> {
+  async execute(command: SignUpCommand): Promise<UserResponse> {
     const { dto } = command;
 
     try {
-      const existingUser = await this.userRepository.findOne({ where: { email: dto.email } });
+      const existingUser = await this.queryBus.execute(new FindUserByEmailQuery(dto.email));
       if (existingUser) {
         throw new ConflictException('Cet utilisateur existe déjà');
       }
-
-      const defaultRole = await this.roleRepository.findOne({ where: { name: 'user' } });
-      const user = this.userRepository.create({
-        ...dto,
-        roles: defaultRole ? [{ id: defaultRole.id }] : undefined
-      });
-      const savedUser = await this.userRepository.save(user);
-      const createdUser = await this.userRepository.findOne({
-        where: { id: savedUser.id },
-        relations: ['roles']
-      });
-      const result = mapUserRoles(createdUser ?? savedUser);
-      this.eventBus.publish(new WelcomeUserEvent(result));
-      return result;
+      const savedUser = await this.commandBus.execute(new CreateUserCommand(dto));
+      this.eventBus.publish(new WelcomeUserEvent(savedUser));
+      return await this.queryBus.execute(new FindUserByIdQuery(savedUser.id));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 
