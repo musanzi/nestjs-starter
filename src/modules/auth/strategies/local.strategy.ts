@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
 import { PassportStrategy } from '@nestjs/passport';
-import { AuthService } from '../services/auth.service';
 import { Strategy } from 'passport-local';
+import { ValidateCredentialsQuery } from '../queries';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+  constructor(private readonly queryBus: QueryBus) {
     super({
       usernameField: 'email'
     });
   }
 
   async validate(email: string, password: string) {
-    return this.authService.validateUser(email, password);
+    return this.queryBus.execute(new ValidateCredentialsQuery(email, password));
   }
 }

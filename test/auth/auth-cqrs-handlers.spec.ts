@@ -1,4 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { compare } from 'bcryptjs';
 import { ForgotPasswordHandler } from '@/modules/auth/commands/handlers/forgot-password.handler';
 import { ResetPasswordHandler } from '@/modules/auth/commands/handlers/reset-password.handler';
 import { SignOutHandler } from '@/modules/auth/commands/handlers/sign-out.handler';
@@ -16,12 +17,19 @@ import {
 import { GoogleRedirectHandler } from '@/modules/auth/queries/handlers/google-redirect.handler';
 import { ProfileHandler } from '@/modules/auth/queries/handlers/profile.handler';
 import { SignInHandler } from '@/modules/auth/queries/handlers/sign-in.handler';
-import { GoogleRedirectQuery, ProfileQuery, SignInQuery } from '@/modules/auth/queries';
+import { ValidateCredentialsHandler } from '@/modules/auth/queries/handlers/validate-credentials.handler';
+import { GoogleRedirectQuery, ProfileQuery, SignInQuery, ValidateCredentialsQuery } from '@/modules/auth/queries';
 import { ResetPasswordRequestedEvent, WelcomeUserEvent } from '@/modules/auth/events';
 import { SendResetPasswordEmailHandler } from '@/modules/auth/events/handlers/send-reset-password-email.handler';
 import { SendWelcomeEmailHandler } from '@/modules/auth/events/handlers/send-welcome-email.handler';
 import { UpdateUserCommand } from '@/modules/users/commands';
-import { FindUserByEmailQuery } from '@/modules/users/queries';
+import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery } from '@/modules/users/queries';
+
+jest.mock('bcryptjs', () => ({
+  compare: jest.fn()
+}));
+
+const compareMock = compare as jest.MockedFunction<typeof compare>;
 
 describe('Auth CQRS handlers', () => {
   let userRepository: any;
@@ -55,6 +63,7 @@ describe('Auth CQRS handlers', () => {
       })
     };
     mailerService = { sendMail: jest.fn() };
+    compareMock.mockReset();
   });
 
   describe('commands', () => {
@@ -183,6 +192,33 @@ describe('Auth CQRS handlers', () => {
         email: 'ada@example.com'
       });
       expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
+    });
+
+    it('validates credentials and returns the sanitized user', async () => {
+      queryBus.execute
+        .mockResolvedValueOnce({ id: 'u1', email: 'ada@example.com', password: 'hashed-password' })
+        .mockResolvedValueOnce({ id: 'u1', email: 'ada@example.com', roles: ['user'] });
+      compareMock.mockResolvedValue(true);
+      const handler = new ValidateCredentialsHandler(queryBus);
+
+      await expect(handler.execute(new ValidateCredentialsQuery('ada@example.com', 'secret123'))).resolves.toEqual({
+        id: 'u1',
+        email: 'ada@example.com',
+        roles: ['user']
+      });
+      expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByEmailWithPasswordQuery('ada@example.com'));
+      expect(compareMock).toHaveBeenCalledWith('secret123', 'hashed-password');
+      expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByEmailQuery('ada@example.com'));
+    });
+
+    it('maps credential validation failures to unauthorized errors', async () => {
+      queryBus.execute.mockResolvedValue({ id: 'u1', email: 'ada@example.com', password: 'hashed-password' });
+      compareMock.mockResolvedValue(false);
+      const handler = new ValidateCredentialsHandler(queryBus);
+
+      await expect(handler.execute(new ValidateCredentialsQuery('ada@example.com', 'bad-password'))).rejects.toEqual(
+        new UnauthorizedException('Les identifiants saisis sont invalides')
+      );
     });
   });
 

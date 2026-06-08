@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from '../services/auth.service';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { IGoogleProfile } from '../interfaces/google-profile.interface';
+import { CommandBus } from '@nestjs/cqrs';
+import { FindOrCreateUserCommand } from '@/modules/users/commands';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private authService: AuthService,
-    configService: ConfigService
+    configService: ConfigService,
+    private readonly commandBus: CommandBus
   ) {
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
@@ -27,6 +28,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       name: `${name['givenName']} ${name['familyName']}`,
       avatar: photos[0]['value']
     };
-    return await this.authService.findOrCreate(userDto);
+    return await this.commandBus.execute(new FindOrCreateUserCommand(userDto));
   }
 }
