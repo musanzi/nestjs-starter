@@ -19,9 +19,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
 
   async execute(command: DeleteUserCommand): Promise<void> {
     try {
-      await this.queryBus.execute(
-        new FindUserQuery({ id: command.id })
-      );
+      await this.queryBus.execute(new FindUserQuery({ id: command.id }));
 
       await this.repository.softDelete(command.id);
     } catch (error) {
