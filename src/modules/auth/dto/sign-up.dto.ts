@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class SignUpDto {
   @IsString()
@@ -9,7 +9,4 @@ export class SignUpDto {
 
   @MinLength(6)
   password: string;
-
-  @IsOptional()
-  referral_code: string;
 }
