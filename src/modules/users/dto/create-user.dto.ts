@@ -12,6 +12,10 @@ export class CreateUserDto {
   avatar?: string;
 
   @IsOptional()
+  @IsString()
+  password?: string;
+
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   roles?: string[];
