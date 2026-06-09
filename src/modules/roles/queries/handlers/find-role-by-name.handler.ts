@@ -1,4 +1,4 @@
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,17 +17,10 @@ export class FindRoleByNameHandler implements IQueryHandler<FindRoleByNameQuery,
 
   async execute(query: FindRoleByNameQuery): Promise<Role> {
     try {
-      const role = await this.repository.findOne({ where: { name: query.name } });
-      if (!role) {
-        throw new NotFoundException('Rôle introuvable');
-      }
-
-      return role;
+      return await this.repository.findOneOrFail({ where: { name: query.name } });
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-
       logHandlerError(this.logger, 'Find role by name', error, `name="${query.name}"`);
-      throw new BadRequestException('Recherche du rôle impossible');
+      throw new NotFoundException('Rôle introuvable');
     }
   }
 }
