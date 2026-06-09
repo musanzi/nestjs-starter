@@ -1,4 +1,4 @@
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { randomInt } from 'crypto';
 import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,21 +26,28 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
   async execute(command: CreateUserCommand): Promise<UserResponse> {
     const { roles, ...dto } = command.dto;
     const hasPassword = Boolean(dto.password);
-    const generatedPassword = hasPassword ? undefined : this.generatePassword();
+    const generatedPassword = hasPassword && this.generatePassword();
     const password = hasPassword ? dto.password : generatedPassword;
 
     try {
+      const existingUser = await this.repository.findOne({
+        where: { email: dto.email }
+      });
+
+      if (existingUser) {
+        throw new ConflictException('Cet utilisateur existe déjà');
+      }
+
       const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByNameQuery('user'))];
       const user = this.repository.create({
         ...dto,
         password,
         roles: userRoles
       });
+
       const createdUser = await this.repository.save(user);
 
-      if (generatedPassword) {
-        this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
-      }
+      this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
 
       return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));
     } catch (error) {

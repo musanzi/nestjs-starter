@@ -1,17 +1,15 @@
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
-import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@/modules/users/commands';
 import { UserResponse } from '@/modules/users/interfaces';
-import { FindUserByEmailQuery, FindUserByIdQuery } from '@/modules/users/queries';
+import { FindUserByIdQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
-import { WelcomeUserEvent } from '../../events';
 import { SignUpCommand } from '../impl/sign-up.command';
 import { SignUpHandler } from '../handlers/sign-up.handler';
 
 describe('SignUpHandler', () => {
   let commandBus: jest.Mocked<Pick<CommandBus, 'execute'>>;
   let queryBus: jest.Mocked<Pick<QueryBus, 'execute'>>;
-  let eventBus: jest.Mocked<Pick<EventBus, 'publish'>>;
   let handler: SignUpHandler;
   let loggerErrorSpy: jest.SpyInstance;
 
@@ -22,12 +20,7 @@ describe('SignUpHandler', () => {
   beforeEach(() => {
     commandBus = { execute: jest.fn() };
     queryBus = { execute: jest.fn() };
-    eventBus = { publish: jest.fn() };
-    handler = new SignUpHandler(
-      mockDependency<CommandBus>(commandBus),
-      mockDependency<QueryBus>(queryBus),
-      mockDependency<EventBus>(eventBus)
-    );
+    handler = new SignUpHandler(mockDependency<CommandBus>(commandBus), mockDependency<QueryBus>(queryBus));
     loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
   });
 
@@ -35,31 +28,27 @@ describe('SignUpHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
-  it('creates a user, publishes a welcome event, and returns the fresh user', async () => {
-    queryBus.execute.mockResolvedValueOnce(undefined).mockResolvedValueOnce(freshUser);
+  it('creates a user and returns the fresh user', async () => {
     commandBus.execute.mockResolvedValueOnce(savedUser);
+    queryBus.execute.mockResolvedValueOnce(freshUser);
 
     const result = await handler.execute(new SignUpCommand(dto));
 
     expect(result).toBe(freshUser);
-    expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByEmailQuery('ada@example.com'));
     expect(commandBus.execute).toHaveBeenCalledWith(new CreateUserCommand(dto));
-    expect(eventBus.publish).toHaveBeenCalledWith(new WelcomeUserEvent(savedUser));
-    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByIdQuery('user-id'));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('user-id'));
   });
 
   it('throws ConflictException unchanged when the email already exists', async () => {
-    queryBus.execute.mockResolvedValueOnce(savedUser);
+    commandBus.execute.mockRejectedValueOnce(new ConflictException('Cet utilisateur existe déjà'));
     const promise = handler.execute(new SignUpCommand(dto));
 
     await expect(promise).rejects.toThrow(ConflictException);
     await expect(promise).rejects.toThrow('Cet utilisateur existe déjà');
-    expect(commandBus.execute).not.toHaveBeenCalled();
-    expect(eventBus.publish).not.toHaveBeenCalled();
+    expect(queryBus.execute).not.toHaveBeenCalled();
   });
 
   it('throws BadRequestException when sign up handling fails unexpectedly', async () => {
-    queryBus.execute.mockResolvedValueOnce(undefined);
     commandBus.execute.mockRejectedValueOnce(new Error('create failed'));
     const promise = handler.execute(new SignUpCommand(dto));
 
