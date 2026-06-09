@@ -2,7 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { promises } from 'fs';
 import { Repository } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';

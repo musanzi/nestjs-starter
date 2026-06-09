@@ -1,6 +1,6 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { FindPaginatedRolesQuery } from '../impl/find-paginated-roles.query';
 import { FindPaginatedRolesHandler } from '../handlers/find-paginated-roles.handler';

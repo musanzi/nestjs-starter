@@ -1,6 +1,6 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { FindUsersQuery } from '../impl/find-users.query';
 import { FindUsersHandler } from '../handlers/find-users.handler';

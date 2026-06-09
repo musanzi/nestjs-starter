@@ -3,7 +3,7 @@ import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@/modules/users/commands';
 import { UserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery, FindUserByIdQuery } from '@/modules/users/queries';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { WelcomeUserEvent } from '../../events';
 import { SignUpCommand } from '../impl/sign-up.command';
 import { SignUpHandler } from '../handlers/sign-up.handler';

@@ -1,7 +1,7 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { FindRoleByIdQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
 import { DeleteRoleCommand } from '../impl/delete-role.command';

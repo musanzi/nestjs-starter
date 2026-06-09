@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { WelcomeUserEvent } from '@/modules/auth/events';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';

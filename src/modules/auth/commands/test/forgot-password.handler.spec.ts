@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { createAuthToken } from '../../common/create-auth-token';
 import { ResetPasswordRequestedEvent } from '../../events';
 import { ForgotPasswordCommand } from '../impl/forgot-password.command';

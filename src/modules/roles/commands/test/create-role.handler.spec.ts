@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { CreateRoleCommand } from '../impl/create-role.command';
 import { CreateRoleHandler } from '../handlers/create-role.handler';

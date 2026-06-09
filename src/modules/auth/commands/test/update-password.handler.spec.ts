@@ -4,7 +4,7 @@ import { UpdateUserCommand } from '@/modules/users/commands';
 import { User } from '@/modules/users/entities/user.entity';
 import { UserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
 import { UpdatePasswordHandler } from '../handlers/update-password.handler';
 

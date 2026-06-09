@@ -2,7 +2,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { User } from '@/modules/users/entities/user.entity';
 import { UserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { ProfileQuery } from '../impl/profile.query';
 import { ProfileHandler } from '../handlers/profile.handler';
 

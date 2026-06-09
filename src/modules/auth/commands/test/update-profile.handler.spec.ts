@@ -3,7 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { User } from '@/modules/users/entities/user.entity';
 import { UserResponse } from '@/modules/users/interfaces';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { UpdateProfileCommand } from '../impl/update-profile.command';
 import { UpdateProfileHandler } from '../handlers/update-profile.handler';
 

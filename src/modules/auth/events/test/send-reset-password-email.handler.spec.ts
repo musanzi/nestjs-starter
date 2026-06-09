@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { ResetPasswordRequestedEvent } from '../impl';
 import { SendResetPasswordEmailHandler } from '../handlers/send-reset-password-email.handler';
 

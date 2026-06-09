@@ -1,7 +1,7 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
 import { CreateUserCommand } from '../impl/create-user.command';

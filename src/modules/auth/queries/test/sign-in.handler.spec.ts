@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { UserResponse } from '@/modules/users/interfaces';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { SignInQuery } from '../impl/sign-in.query';
 import { SignInHandler } from '../handlers/sign-in.handler';
 

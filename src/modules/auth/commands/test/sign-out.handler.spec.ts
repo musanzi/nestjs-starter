@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { SignOutCommand } from '../impl/sign-out.command';
 import { SignOutHandler } from '../handlers/sign-out.handler';
 

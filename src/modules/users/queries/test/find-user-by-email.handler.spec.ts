@@ -1,6 +1,6 @@
 import { Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { FindUserByEmailQuery } from '../impl/find-user-by-email.query';
 import { FindUserByEmailHandler } from '../handlers/find-user-by-email.handler';

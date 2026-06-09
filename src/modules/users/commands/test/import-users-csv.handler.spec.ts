@@ -1,6 +1,6 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
 import { FindOrCreateUserCommand } from '../impl/find-or-create-user.command';
 import { ImportUsersCsvCommand } from '../impl/import-users-csv.command';

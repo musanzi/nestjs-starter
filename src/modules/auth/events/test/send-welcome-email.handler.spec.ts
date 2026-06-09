@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { WelcomeUserEvent } from '../impl';
 import { SendWelcomeEmailHandler } from '../handlers/send-welcome-email.handler';
 

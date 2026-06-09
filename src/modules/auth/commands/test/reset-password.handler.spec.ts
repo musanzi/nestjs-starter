@@ -4,7 +4,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { UserResponse } from '@/modules/users/interfaces';
-import { mockDependency } from '../../../../../test/mock-dependency';
+import { mockDependency } from '@/shared/helpers';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
 import { ResetPasswordHandler } from '../handlers/reset-password.handler';
 
