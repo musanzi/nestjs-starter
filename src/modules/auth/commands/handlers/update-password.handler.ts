@@ -16,11 +16,14 @@ export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordComm
   ) {}
 
   async execute(command: UpdatePasswordCommand): Promise<UserResponse> {
+    const { currentUser, dto } = command;
+
     try {
-      await this.commandBus.execute(new UpdateUserCommand(command.currentUser.id, { password: command.dto.password }));
-      return await this.queryBus.execute(new FindUserByEmailQuery(command.currentUser.email));
+      await this.commandBus.execute(new UpdateUserCommand(currentUser.id, { password: dto.password }));
+
+      return await this.queryBus.execute(new FindUserByEmailQuery(currentUser.email));
     } catch (error) {
-      logHandlerError(this.logger, 'Update password', error, `id="${command.currentUser?.id ?? ''}"`);
+      logHandlerError(this.logger, 'Update password', error, `id="${currentUser?.id ?? ''}"`);
       throw new BadRequestException('Mise à jour impossible');
     }
   }
