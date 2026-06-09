@@ -16,7 +16,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>,
-    private readonly queryBuse: QueryBus
+    private readonly queryBus: QueryBus
   ) {}
 
   async execute(command: UploadUserAvatarCommand): Promise<UserResponse> {
@@ -31,7 +31,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
         avatar: file.filename
       });
 
-      return await this.queryBuse.execute(new FindUserByIdQuery(currentUser.id));
+      return await this.queryBus.execute(new FindUserByIdQuery(currentUser.id));
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
