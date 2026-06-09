@@ -1,21 +1,21 @@
 # Starter API
 
-NestJS 11 API starter with session authentication, Google OAuth, role-based access, users, roles, local uploads, email flows, CQRS handlers, and MySQL persistence through TypeORM.
+NestJS API starter for session-based authentication, Google OAuth, role-based access control, user management, role management, CSV import/export, local avatar uploads, password reset emails, and MariaDB persistence with TypeORM.
 
 ## Stack
 
-- NestJS, TypeScript, Express
-- TypeORM with MySQL or MariaDB
-- Passport local, session, and Google OAuth strategies
-- Nest CQRS for commands, queries, and events
-- Nodemailer via `@nestjs-modules/mailer`
+- NestJS 11, TypeScript, Express
+- TypeORM with MariaDB
+- Passport local, session, and Google OAuth
+- Nest CQRS
+- Nodemailer
 - Jest, ESLint, Prettier, pnpm
 
 ## Requirements
 
 - Node.js 18+
 - pnpm
-- MySQL or MariaDB
+- MariaDB
 
 ## Setup
 
@@ -24,7 +24,7 @@ pnpm install
 cp .env.example .env
 ```
 
-Fill in `.env`:
+Configure `.env`:
 
 ```env
 PORT=8000
@@ -52,50 +52,53 @@ GOOGLE_REDIRECT_URI=
 FRONTEND_URI=
 ```
 
-Build before running database commands because TypeORM reads compiled files from `dist/`.
+Run migrations and start the API:
 
 ```bash
-pnpm build
 pnpm db:up
+pnpm db:seed
 pnpm start:dev
 ```
 
 The API listens on `PORT`, or `3000` when `PORT` is not set.
 
+Seed credentials for local development:
+
+- `admin@admin.com` / `admin1234`
+- `user@user.com` / `user1234`
+
 ## Scripts
 
 ```bash
-pnpm start:dev       # run in watch mode
-pnpm build           # compile to dist/
-pnpm start:prod      # run dist/main
-pnpm lint            # eslint with fixes
-pnpm format          # prettier on src/**/*.ts
-pnpm test            # run Jest
-pnpm test:cov        # run Jest with coverage
-pnpm db:migrate --name=my_change
-pnpm db:up
-pnpm db:down
+pnpm start:dev          # run in watch mode
+pnpm build              # compile to dist/
+pnpm start:prod         # run compiled app
+pnpm lint               # run ESLint with fixes
+pnpm format             # run Prettier
+pnpm test               # run unit tests
+pnpm test:cov           # run tests with coverage
+name=my_migration pnpm db:migrate
+pnpm db:up              # apply migrations
+pnpm db:down            # revert last migration
+pnpm db:seed            # seed local roles and users
 ```
 
-## Runtime Behavior
+## Runtime Notes
 
-- Global validation uses `ValidationPipe` with DTO transformation.
+- Requests are validated with a global `ValidationPipe`.
+- Responses are wrapped as `{ data: ... }`.
 - CORS allows credentialed requests from `http://localhost:4200` and `http://localhost:4000`.
-- `express-session` and Passport provide server-side login sessions.
-- `JwtModule` requires `JWT_SECRET` at startup.
-- Global guards apply roles, authentication, and rate limiting.
-- `@Public()` marks routes that bypass the auth guard.
-- Successful responses are wrapped as `{ data: ... }`.
-- Static files under `uploads/` are served from `/uploads`.
-- Database synchronization is disabled.
+- Sessions use `express-session` and Passport.
+- Auth, roles, and throttling guards are global.
+- `@Public()` marks unauthenticated routes.
+- Uploaded files are served from `/uploads`.
+- Database synchronization is disabled; use migrations.
 
-## API Surface
+## API
 
-Protected routes require an authenticated session unless marked public. Admin-only routes use `@Roles([RoleEnum.ADMIN])`.
+Protected routes require an authenticated session. Admin routes require the `admin` role.
 
 ### Auth
-
-Base path: `/auth`
 
 - `POST /auth/signup` public
 - `POST /auth/signin` public
@@ -110,20 +113,16 @@ Base path: `/auth`
 
 ### Users
 
-Base path: `/users`
-
 - `POST /users` admin
-- `POST /users/import-csv` admin, multipart field `file`
+- `POST /users/import-csv` admin, multipart `file`
 - `GET /users/export/users.csv` admin
 - `GET /users` admin
 - `GET /users/by-email/:email` public
 - `PATCH /users/id/:userId` admin
-- `POST /users/me/profile-image` multipart field `profile`
+- `POST /users/me/profile-image` multipart `profile`
 - `DELETE /users/id/:userId` admin
 
 ### Roles
-
-Base path: `/roles`
 
 - `POST /roles` admin
 - `GET /roles/paginated` admin
@@ -136,35 +135,15 @@ Base path: `/roles`
 
 ```text
 src/
-  app.module.ts
   main.ts
+  app.module.ts
   modules/
-    auth/       # auth controllers, guards, strategies, DTOs, CQRS handlers, events
-    database/   # TypeORM module, data source config, base entity
-    roles/      # role entity, controller, DTOs, CQRS handlers
-    users/      # user entity, controller, DTOs, CSV/avatar helpers, CQRS handlers
+    auth/
+    database/
+    roles/
+    users/
   shared/
-    helpers/
-    interceptors/
-    interfaces/
-test/
-  jest.setup.ts
 ```
-
-## Database
-
-Runtime database config is in `src/modules/database/database.module.ts`. CLI data source config is in `src/modules/database/orm.config.ts`.
-
-Both use MySQL, compiled entities from `dist/**/*.entity.js`, and `synchronize: false`.
-
-## Testing
-
-```bash
-pnpm test
-pnpm test:cov
-```
-
-Unit tests live beside their handlers in `commands/test`, `queries/test`, and `events/test`.
 
 ## License
 
