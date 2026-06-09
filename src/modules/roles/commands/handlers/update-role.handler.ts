@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByIdQuery, FindRoleByNameQuery } from '../../queries';
+import { FindRoleByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdateRoleCommand } from '../impl/update-role.command';
 
@@ -18,25 +18,26 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
   ) {}
 
   async execute(command: UpdateRoleCommand): Promise<Role> {
-    try {
-      const role = await this.queryBus.execute(new FindRoleByIdQuery(command.id));
+    const { dto, id } = command;
 
-      if (command.dto.name) {
-        try {
-          const existingRole = await this.queryBus.execute(new FindRoleByNameQuery(command.dto.name));
-          if (existingRole.id !== command.id) {
-            throw new ConflictException('Ce rôle existe déjà');
-          }
-        } catch (error) {
-          if (!(error instanceof NotFoundException)) throw error;
+    try {
+      const role = await this.queryBus.execute(new FindRoleByIdQuery(id));
+
+      if (dto.name && dto.name !== role.name) {
+        const existingRole = await this.repository.findOne({
+          where: { name: dto.name }
+        });
+
+        if (existingRole) {
+          throw new ConflictException('Ce rôle existe déjà');
         }
       }
 
-      return await this.repository.save(this.repository.merge(role, command.dto));
+      return await this.repository.save(this.repository.merge(role, dto));
     } catch (error) {
       if (error instanceof ConflictException || error instanceof NotFoundException) throw error;
 
-      logHandlerError(this.logger, 'Update role', error, `id="${command.id}"`);
+      logHandlerError(this.logger, 'Update role', error, `id="${id}"`);
       throw new BadRequestException('Mise à jour du rôle impossible');
     }
   }
