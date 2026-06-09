@@ -30,7 +30,7 @@ describe('DeleteRoleHandler', () => {
 
     await handler.execute(new DeleteRoleCommand('role-id'));
 
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleQuery({ where: { id: 'role-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleQuery({ id: 'role-id' }));
     expect(repository.delete).toHaveBeenCalledWith('role-id');
   });
 

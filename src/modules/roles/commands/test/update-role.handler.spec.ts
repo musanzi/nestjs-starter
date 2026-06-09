@@ -40,7 +40,7 @@ describe('UpdateRoleHandler', () => {
     const result = await handler.execute(new UpdateRoleCommand('role-id', { name: 'manager' }));
 
     expect(result).toBe(updatedRole);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleQuery({ where: { id: 'role-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleQuery({ id: 'role-id' }));
     expect(repository.findOne).toHaveBeenCalledWith({ where: { name: 'manager' } });
     expect(repository.merge).toHaveBeenCalledWith(role, { name: 'manager' });
     expect(repository.save).toHaveBeenCalledWith(updatedRole);

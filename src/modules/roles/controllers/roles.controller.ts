@@ -32,9 +32,7 @@ export class RolesController {
   @Roles([RoleEnum.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
     return this.queryBus.execute(
-      new FindRoleQuery({
-        where: { id }
-      })
+      new FindRoleQuery({ id })
     );
   }
 

@@ -1,9 +1,9 @@
 import { Query } from '@nestjs/cqrs';
-import { FindOneOptions } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 
 export class FindRoleQuery extends Query<Role> {
-  constructor(public readonly options: FindOneOptions<Role>) {
+  constructor(public readonly where: FindOptionsWhere<Role>) {
     super();
   }
 }

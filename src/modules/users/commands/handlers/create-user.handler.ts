@@ -38,9 +38,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
         throw new ConflictException('Cet utilisateur existe déjà');
       }
 
-      const userRoles = roles
-        ? mapRoleIds(roles)
-        : [await this.queryBus.execute(new FindRoleQuery({ where: { name: 'user' } }))];
+      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleQuery({ name: 'user' }))];
       const user = this.repository.create({
         ...dto,
         password,

@@ -36,12 +36,7 @@ export class FindRolesHandler implements IQueryHandler<FindRolesQuery, [Role[], 
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logHandlerError(
-        this.logger,
-        'Find roles',
-        error,
-        `page="${query.params.page ?? ''}" limit="${query.params.limit ?? query.params.take ?? ''}" q="${q ?? ''}"`
-      );
+      logHandlerError(this.logger, 'Find roles', error, `params="${JSON.stringify(query.params)}"`);
       throw new BadRequestException('Rôles introuvables');
     }
   }

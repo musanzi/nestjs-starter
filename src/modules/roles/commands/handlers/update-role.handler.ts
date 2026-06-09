@@ -22,9 +22,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
 
     try {
       const role = await this.queryBus.execute(
-        new FindRoleQuery({
-          where: { id }
-        })
+        new FindRoleQuery({ id })
       );
 
       if (dto.name && dto.name !== role.name) {

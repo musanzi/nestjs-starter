@@ -67,9 +67,7 @@ describe('CreateUserHandler', () => {
     expect(eventBus.publish).toHaveBeenCalledWith(new WelcomeUserEvent(createdUser));
     expect(queryBus.execute).toHaveBeenNthCalledWith(
       1,
-      new FindRoleQuery({
-        where: { name: 'user' }
-      })
+      new FindRoleQuery({ name: 'user' })
     );
     expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ where: { id: 'user-id' } }));
   });

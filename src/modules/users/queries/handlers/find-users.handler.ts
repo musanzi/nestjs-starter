@@ -18,9 +18,8 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [UserResp
   ) {}
 
   async execute(query: FindUsersQuery): Promise<[UserResponse[], number]> {
-    const { page = 1, limit, take, q } = query.params;
-
     try {
+      const { q } = query.params;
       const { pageNumber, limitNumber } = parsePaginationParams(query.params);
 
       const queryBuilder = this.repository
@@ -37,7 +36,7 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [UserResp
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logHandlerError(this.logger, 'Find users', error, `page="${page}" limit="${limit ?? take ?? ''}" q="${q ?? ''}"`);
+      logHandlerError(this.logger, 'Find users', error, `options="${JSON.stringify(query.params)}"`);
       throw new BadRequestException('Utilisateurs introuvables');
     }
   }
