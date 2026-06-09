@@ -8,6 +8,7 @@ import { UserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
+import { FindRoleByNameQuery } from '@/modules/roles/queries';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand, UserResponse> {
@@ -20,16 +21,19 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
   ) {}
 
   async execute(command: CreateUserCommand): Promise<UserResponse> {
+    const { roles, ...dto } = command.dto;
+
     try {
+      const defaultRole = await this.queryBus.execute(new FindRoleByNameQuery('user'));
       const user = this.repository.create({
-        ...command.dto,
+        ...dto,
         password: 'user1234',
-        roles: mapRoleIds(command.dto.roles)
+        roles: roles ? mapRoleIds(roles) : [defaultRole]
       });
       const createdUser = await this.repository.save(user);
       return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));
     } catch (error) {
-      logHandlerError(this.logger, 'Create user', error, `email="${command.dto.email}"`);
+      logHandlerError(this.logger, 'Create user', error, `email="${dto.email}"`);
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
   }
