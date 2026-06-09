@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { mapUsersRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
-import { logHandlerError } from '@/shared/helpers';
+import { logHandlerError, parsePaginationParams } from '@/shared/helpers';
 import { FindUsersQuery } from '../impl/find-users.query';
 
 @QueryHandler(FindUsersQuery)
@@ -18,14 +18,10 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [UserResp
   ) {}
 
   async execute(query: FindUsersQuery): Promise<[UserResponse[], number]> {
-    const { page = 1, q } = query.params;
+    const { page = 1, limit, take, q } = query.params;
 
     try {
-      const pageNumber = Number(page);
-      const takeNumber = 50;
-      if (!Number.isInteger(pageNumber) || pageNumber < 1) {
-        throw new BadRequestException('Les paramètres de pagination sont invalides');
-      }
+      const { pageNumber, limitNumber } = parsePaginationParams(query.params);
 
       const queryBuilder = this.repository
         .createQueryBuilder('user')
@@ -34,14 +30,14 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [UserResp
       if (q) queryBuilder.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
 
       const [users, total] = await queryBuilder
-        .skip((pageNumber - 1) * takeNumber)
-        .take(takeNumber)
+        .skip((pageNumber - 1) * limitNumber)
+        .take(limitNumber)
         .getManyAndCount();
       return [mapUsersRoles(users), total];
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logHandlerError(this.logger, 'Find users', error, `page="${page}" q="${q ?? ''}"`);
+      logHandlerError(this.logger, 'Find users', error, `page="${page}" limit="${limit ?? take ?? ''}" q="${q ?? ''}"`);
       throw new BadRequestException('Utilisateurs introuvables');
     }
   }

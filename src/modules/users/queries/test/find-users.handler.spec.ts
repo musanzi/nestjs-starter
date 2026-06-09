@@ -47,18 +47,18 @@ describe('FindUsersHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
-  it('returns paginated mapped users using the requested page and search query', async () => {
+  it('returns paginated mapped users using the requested page, limit, and search query', async () => {
     queryBuilder.getManyAndCount.mockResolvedValueOnce([users, 1]);
 
-    const result = await handler.execute(new FindUsersQuery({ page: 2, q: 'ada' }));
+    const result = await handler.execute(new FindUsersQuery({ page: 2, limit: 25, q: 'ada' }));
 
     expect(result).toEqual([[{ ...users[0], roles: ['admin'] }], 1]);
     expect(repository.createQueryBuilder).toHaveBeenCalledWith('user');
     expect(queryBuilder.leftJoinAndSelect).toHaveBeenCalledWith('user.roles', 'roles');
     expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.updated_at', 'DESC');
     expect(queryBuilder.where).toHaveBeenCalledWith('user.name LIKE :q OR user.email LIKE :q', { q: '%ada%' });
-    expect(queryBuilder.skip).toHaveBeenCalledWith(50);
-    expect(queryBuilder.take).toHaveBeenCalledWith(50);
+    expect(queryBuilder.skip).toHaveBeenCalledWith(25);
+    expect(queryBuilder.take).toHaveBeenCalledWith(25);
     expect(queryBuilder.getManyAndCount).toHaveBeenCalledTimes(1);
   });
 
@@ -70,11 +70,27 @@ describe('FindUsersHandler', () => {
     expect(result).toEqual([[{ ...users[0], roles: ['admin'] }], 1]);
     expect(queryBuilder.where).not.toHaveBeenCalled();
     expect(queryBuilder.skip).toHaveBeenCalledWith(0);
-    expect(queryBuilder.take).toHaveBeenCalledWith(50);
+    expect(queryBuilder.take).toHaveBeenCalledWith(20);
   });
 
-  it('throws BadRequestException when pagination parameters are invalid', async () => {
-    const promise = handler.execute(new FindUsersQuery({ page: 0 }));
+  it('accepts take as a legacy alias for limit', async () => {
+    queryBuilder.getManyAndCount.mockResolvedValueOnce([users, 1]);
+
+    await handler.execute(new FindUsersQuery({ page: 3, take: 10 }));
+
+    expect(queryBuilder.skip).toHaveBeenCalledWith(20);
+    expect(queryBuilder.take).toHaveBeenCalledWith(10);
+  });
+
+  it.each([
+    { page: 0 },
+    { page: 1, limit: 0 },
+    { page: 1, limit: -1 },
+    { page: 1, limit: 2.5 },
+    { page: 1, limit: 'abc' },
+    { page: 1, limit: 101 }
+  ])('throws BadRequestException when pagination parameters are invalid: %p', async (params) => {
+    const promise = handler.execute(new FindUsersQuery(params));
 
     await expect(promise).rejects.toThrow(BadRequestException);
     await expect(promise).rejects.toThrow('Les paramètres de pagination sont invalides');

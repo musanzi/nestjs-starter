@@ -38,17 +38,17 @@ describe('FindPaginatedRolesHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
-  it('returns paginated roles using the requested page and search query', async () => {
+  it('returns paginated roles using the requested page, limit, and search query', async () => {
     queryBuilder.getManyAndCount.mockResolvedValueOnce([roles, 1]);
 
-    const result = await handler.execute(new FindPaginatedRolesQuery({ page: 2, q: 'adm' }));
+    const result = await handler.execute(new FindPaginatedRolesQuery({ page: 2, limit: 25, q: 'adm' }));
 
     expect(result).toEqual([roles, 1]);
     expect(repository.createQueryBuilder).toHaveBeenCalledWith('role');
     expect(queryBuilder.orderBy).toHaveBeenCalledWith('role.updated_at', 'DESC');
     expect(queryBuilder.where).toHaveBeenCalledWith('role.name LIKE :name', { name: '%adm%' });
-    expect(queryBuilder.skip).toHaveBeenCalledWith(40);
-    expect(queryBuilder.take).toHaveBeenCalledWith(40);
+    expect(queryBuilder.skip).toHaveBeenCalledWith(25);
+    expect(queryBuilder.take).toHaveBeenCalledWith(25);
     expect(queryBuilder.getManyAndCount).toHaveBeenCalledTimes(1);
   });
 
@@ -60,11 +60,27 @@ describe('FindPaginatedRolesHandler', () => {
     expect(result).toEqual([roles, 1]);
     expect(queryBuilder.where).not.toHaveBeenCalled();
     expect(queryBuilder.skip).toHaveBeenCalledWith(0);
-    expect(queryBuilder.take).toHaveBeenCalledWith(40);
+    expect(queryBuilder.take).toHaveBeenCalledWith(20);
   });
 
-  it('throws BadRequestException when pagination parameters are invalid', async () => {
-    const promise = handler.execute(new FindPaginatedRolesQuery({ page: 0 }));
+  it('accepts take as a legacy alias for limit', async () => {
+    queryBuilder.getManyAndCount.mockResolvedValueOnce([roles, 1]);
+
+    await handler.execute(new FindPaginatedRolesQuery({ page: 3, take: 10 }));
+
+    expect(queryBuilder.skip).toHaveBeenCalledWith(20);
+    expect(queryBuilder.take).toHaveBeenCalledWith(10);
+  });
+
+  it.each([
+    { page: 0 },
+    { page: 1, limit: 0 },
+    { page: 1, limit: -1 },
+    { page: 1, limit: 2.5 },
+    { page: 1, limit: 'abc' },
+    { page: 1, limit: 101 }
+  ])('throws BadRequestException when pagination parameters are invalid: %p', async (params) => {
+    const promise = handler.execute(new FindPaginatedRolesQuery(params));
 
     await expect(promise).rejects.toThrow(BadRequestException);
     await expect(promise).rejects.toThrow('Les paramètres de pagination sont invalides');
