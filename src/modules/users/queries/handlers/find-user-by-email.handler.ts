@@ -1,4 +1,4 @@
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,20 +19,16 @@ export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuer
 
   async execute(query: FindUserByEmailQuery): Promise<UserResponse> {
     try {
-      const user = await this.repository.findOne({
+      const user = await this.repository.findOneOrFail({
         where: { email: query.email },
         relations: ['roles']
       });
-      if (!user) {
-        throw new NotFoundException("Cet utilisateur n'existe pas");
-      }
-
       return mapUserRoles(user);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
       logHandlerError(this.logger, 'Find user by email', error, `email="${query.email}"`);
-      throw new BadRequestException("Recherche de l'utilisateur impossible");
+      throw new NotFoundException("Cet utilisateur n'existe pas");
     }
   }
 }
