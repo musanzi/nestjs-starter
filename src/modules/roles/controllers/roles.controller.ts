@@ -7,7 +7,7 @@ import { Role } from '../entities/role.entity';
 import { Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
 import { CreateRoleCommand, DeleteRoleCommand, UpdateRoleCommand } from '../commands';
-import { FindAllRolesQuery, FindPaginatedRolesQuery, FindRoleByIdQuery } from '../queries';
+import { FindRoleQuery, FindRolesQuery } from '../queries';
 
 @Controller('roles')
 export class RolesController {
@@ -22,22 +22,16 @@ export class RolesController {
     return this.commandBus.execute(new CreateRoleCommand(dto));
   }
 
-  @Get('paginated')
-  @Roles([RoleEnum.ADMIN])
-  findPaginated(@Query() query: IFilterRoles): Promise<[Role[], number]> {
-    return this.queryBus.execute(new FindPaginatedRolesQuery(query));
-  }
-
   @Get()
   @Roles([RoleEnum.ADMIN])
-  findAll(): Promise<Role[]> {
-    return this.queryBus.execute(new FindAllRolesQuery());
+  findAll(@Query() query: IFilterRoles): Promise<[Role[], number]> {
+    return this.queryBus.execute(new FindRolesQuery(query));
   }
 
   @Get('id/:id')
   @Roles([RoleEnum.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
-    return this.queryBus.execute(new FindRoleByIdQuery(id));
+    return this.queryBus.execute(new FindRoleQuery({ id }));
   }
 
   @Patch('id/:id')

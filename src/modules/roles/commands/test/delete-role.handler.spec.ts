@@ -2,7 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
-import { FindRoleByIdQuery } from '../../queries';
+import { FindRoleQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
 import { DeleteRoleCommand } from '../impl/delete-role.command';
 import { DeleteRoleHandler } from '../handlers/delete-role.handler';
@@ -30,7 +30,7 @@ describe('DeleteRoleHandler', () => {
 
     await handler.execute(new DeleteRoleCommand('role-id'));
 
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleByIdQuery('role-id'));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleQuery({ where: { id: 'role-id' } }));
     expect(repository.delete).toHaveBeenCalledWith('role-id');
   });
 

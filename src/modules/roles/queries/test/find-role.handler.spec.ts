@@ -2,19 +2,19 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByNameQuery } from '../impl/find-role-by-name.query';
-import { FindRoleByNameHandler } from '../handlers/find-role-by-name.handler';
+import { FindRoleQuery } from '../impl/find-role.query';
+import { FindRoleHandler } from '../handlers/find-role.handler';
 
-describe('FindRoleByNameHandler', () => {
+describe('FindRoleHandler', () => {
   let repository: jest.Mocked<Pick<Repository<Role>, 'findOneOrFail'>>;
-  let handler: FindRoleByNameHandler;
+  let handler: FindRoleHandler;
   let loggerErrorSpy: jest.SpyInstance;
 
   const role = { id: 'role-id', name: 'admin' } as Role;
 
   beforeEach(() => {
     repository = { findOneOrFail: jest.fn() };
-    handler = new FindRoleByNameHandler(mockDependency<Repository<Role>>(repository));
+    handler = new FindRoleHandler(mockDependency<Repository<Role>>(repository));
     loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation();
   });
 
@@ -22,18 +22,29 @@ describe('FindRoleByNameHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
-  it('returns a role by name', async () => {
+  it('returns a role using TypeORM find one options', async () => {
+    const options = { where: { id: 'role-id' } };
     repository.findOneOrFail.mockResolvedValueOnce(role);
 
-    const result = await handler.execute(new FindRoleByNameQuery('admin'));
+    const result = await handler.execute(new FindRoleQuery(options));
 
     expect(result).toBe(role);
-    expect(repository.findOneOrFail).toHaveBeenCalledWith({ where: { name: 'admin' } });
+    expect(repository.findOneOrFail).toHaveBeenCalledWith(options);
+  });
+
+  it('supports looking up a role by name', async () => {
+    const options = { where: { name: 'admin' } };
+    repository.findOneOrFail.mockResolvedValueOnce(role);
+
+    const result = await handler.execute(new FindRoleQuery(options));
+
+    expect(result).toBe(role);
+    expect(repository.findOneOrFail).toHaveBeenCalledWith(options);
   });
 
   it('throws NotFoundException when the role cannot be found', async () => {
     repository.findOneOrFail.mockRejectedValueOnce(new Error('not found'));
-    const promise = handler.execute(new FindRoleByNameQuery('admin'));
+    const promise = handler.execute(new FindRoleQuery({ where: { id: 'role-id' } }));
 
     await expect(promise).rejects.toThrow(NotFoundException);
     await expect(promise).rejects.toThrow('Rôle introuvable');

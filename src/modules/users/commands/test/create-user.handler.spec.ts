@@ -2,7 +2,6 @@ import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { Role } from '@/modules/roles/entities/role.entity';
-import { FindRoleByNameQuery } from '@/modules/roles/queries';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
@@ -10,6 +9,7 @@ import { FindUserQuery } from '../../queries';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { CreateUserHandler } from '../handlers/create-user.handler';
 import { WelcomeUserEvent } from '../../events';
+import { FindRoleQuery } from '@/modules/roles/queries';
 
 describe('CreateUserHandler', () => {
   let repository: jest.Mocked<Pick<Repository<User>, 'findOne' | 'create' | 'save'>>;
@@ -65,7 +65,12 @@ describe('CreateUserHandler', () => {
       roles: [defaultRole]
     });
     expect(eventBus.publish).toHaveBeenCalledWith(new WelcomeUserEvent(createdUser));
-    expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindRoleByNameQuery('user'));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(
+      1,
+      new FindRoleQuery({
+        where: { name: 'user' }
+      })
+    );
     expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ where: { id: 'user-id' } }));
   });
 
