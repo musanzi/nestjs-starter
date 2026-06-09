@@ -1,0 +1,17 @@
+import { Request } from 'express';
+import { UserResponse } from '@/modules/users/interfaces';
+import { mockDependency } from '../../../../../test/mock-dependency';
+import { SignInQuery } from '../impl/sign-in.query';
+import { SignInHandler } from './sign-in.handler';
+
+describe('SignInHandler', () => {
+  it('returns the authenticated request user', async () => {
+    const user = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
+    const request = mockDependency<Request>({ user });
+    const handler = new SignInHandler();
+
+    const result = await handler.execute(new SignInQuery(request));
+
+    expect(result).toBe(user);
+  });
+});
