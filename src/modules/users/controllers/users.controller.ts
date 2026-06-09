@@ -39,26 +39,26 @@ export class UsersController {
   ) {}
 
   @Post()
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   create(@Body() dto: CreateUserDto): Promise<UserResponse> {
     return this.commandBus.execute(new CreateUserCommand(dto));
   }
 
   @Post('import-csv')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   @UseInterceptors(FileInterceptor('file', createCsvUploadOptions()))
   importCsv(@UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.commandBus.execute(new ImportUsersCsvCommand(file));
   }
 
   @Get('export/users.csv')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   async exportCSV(@Query() query: IFilterUsers, @Res() res: Response): Promise<void> {
     await this.queryBus.execute(new ExportUsersCsvQuery(query, res));
   }
 
   @Get()
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   findAll(@Query() query: IFilterUsers): Promise<[UserResponse[], number]> {
     return this.queryBus.execute(new FindUsersQuery(query));
   }
@@ -70,7 +70,7 @@ export class UsersController {
   }
 
   @Patch('id/:userId')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   update(@Param('userId') userId: string, @Body() dto: UpdateUserDto): Promise<UserResponse> {
     return this.commandBus.execute(new UpdateUserCommand(userId, dto));
   }
@@ -82,7 +82,7 @@ export class UsersController {
   }
 
   @Delete('id/:userId')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   remove(@Param('userId') userId: string): Promise<void> {
     return this.commandBus.execute(new DeleteUserCommand(userId));
   }
