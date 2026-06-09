@@ -26,8 +26,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
   async execute(command: CreateUserCommand): Promise<UserResponse> {
     const { roles, ...dto } = command.dto;
     const hasPassword = Boolean(dto.password);
-    const generatedPassword = hasPassword && this.generatePassword();
-    const password = hasPassword ? dto.password : generatedPassword;
+    const generatedPassword = hasPassword ? undefined : this.generatePassword();
+    const password = dto.password ?? generatedPassword;
 
     try {
       const existingUser = await this.repository.findOne({
@@ -51,6 +51,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
 
       return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));
     } catch (error) {
+      if (error instanceof ConflictException) throw error;
+
       logHandlerError(this.logger, 'Create user', error, `email="${dto.email}"`);
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
