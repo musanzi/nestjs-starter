@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { User } from '@/modules/users/entities/user.entity';
-import { UserResponse } from '@/modules/users/interfaces';
+import { IUserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '@/shared/helpers';
 import { UpdateProfileCommand } from '../impl/update-profile.command';
 import { UpdateProfileHandler } from '../handlers/update-profile.handler';
@@ -14,7 +14,7 @@ describe('UpdateProfileHandler', () => {
 
   const currentUser = { id: 'user-id', email: 'ada@example.com' } as User;
   const dto = { name: 'Ada Lovelace' };
-  const updatedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
+  const updatedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as IUserResponse;
 
   beforeEach(() => {
     commandBus = { execute: jest.fn() };

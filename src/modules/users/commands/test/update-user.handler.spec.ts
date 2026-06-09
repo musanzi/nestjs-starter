@@ -3,7 +3,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { FindUserQuery } from '../../queries';
 import { UpdateUserCommand } from '../impl/update-user.command';
 import { UpdateUserHandler } from '../handlers/update-user.handler';
@@ -16,7 +16,7 @@ describe('UpdateUserHandler', () => {
 
   const user = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com' } as User;
   const updatedUser = { id: 'user-id', name: 'Ada Byron', email: 'ada@example.com' } as User;
-  const userResponse = { ...updatedUser, roles: ['admin'] } as UserResponse;
+  const userResponse = { ...updatedUser, roles: ['admin'] } as IUserResponse;
 
   beforeEach(() => {
     repository = {

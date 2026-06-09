@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { FindUserQuery } from '../../queries';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { CreateUserHandler } from '../handlers/create-user.handler';
@@ -20,7 +20,7 @@ describe('CreateUserHandler', () => {
 
   const defaultRole = { id: 'role-id', name: 'user' } as Role;
   const createdUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com' } as User;
-  const userResponse = { ...createdUser, roles: ['user'] } as UserResponse;
+  const userResponse = { ...createdUser, roles: ['user'] } as IUserResponse;
 
   beforeEach(() => {
     repository = {
@@ -65,10 +65,7 @@ describe('CreateUserHandler', () => {
       roles: [defaultRole]
     });
     expect(eventBus.publish).toHaveBeenCalledWith(new WelcomeUserEvent(createdUser));
-    expect(queryBus.execute).toHaveBeenNthCalledWith(
-      1,
-      new FindRoleQuery({ name: 'user' })
-    );
+    expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindRoleQuery({ name: 'user' }));
     expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ id: 'user-id' }));
   });
 

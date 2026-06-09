@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { User } from '@/modules/users/entities/user.entity';
-import { UserResponse } from '@/modules/users/interfaces';
+import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
@@ -15,7 +15,7 @@ describe('UpdatePasswordHandler', () => {
   let loggerErrorSpy: jest.SpyInstance;
 
   const currentUser = { id: 'user-id', email: 'ada@example.com' } as User;
-  const updatedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
+  const updatedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as IUserResponse;
 
   beforeEach(() => {
     commandBus = { execute: jest.fn() };

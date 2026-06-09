@@ -1,8 +1,8 @@
 import { Command } from '@nestjs/cqrs';
 import { UpdateUserDto } from '../../dto/update-user.dto';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 
-export class UpdateUserCommand extends Command<UserResponse> {
+export class UpdateUserCommand extends Command<IUserResponse> {
   constructor(
     public readonly id: string,
     public readonly dto: UpdateUserDto

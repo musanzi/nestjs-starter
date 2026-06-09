@@ -1,7 +1,7 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { logHandlerError } from '@/shared/helpers';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { FindOrCreateUserCommand } from '../impl/find-or-create-user.command';
 import { UpdateUserCommand } from '../impl/update-user.command';
 import { CreateUserCommand } from '../impl/create-user.command';
@@ -10,7 +10,7 @@ import { User } from '../../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @CommandHandler(FindOrCreateUserCommand)
-export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUserCommand, UserResponse> {
+export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUserCommand, IUserResponse> {
   private readonly logger = new Logger(FindOrCreateUserHandler.name);
 
   constructor(
@@ -19,7 +19,7 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
     private readonly commandBus: CommandBus
   ) {}
 
-  async execute(command: FindOrCreateUserCommand): Promise<UserResponse> {
+  async execute(command: FindOrCreateUserCommand): Promise<IUserResponse> {
     const { dto } = command;
 
     try {

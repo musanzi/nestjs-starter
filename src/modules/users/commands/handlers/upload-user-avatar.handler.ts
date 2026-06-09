@@ -1,7 +1,7 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { promises } from 'fs';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
 import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
 import { Repository } from 'typeorm';
@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindUserQuery } from '../../queries';
 
 @CommandHandler(UploadUserAvatarCommand)
-export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatarCommand, UserResponse> {
+export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatarCommand, IUserResponse> {
   private readonly logger = new Logger(UploadUserAvatarHandler.name);
 
   constructor(
@@ -19,7 +19,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: UploadUserAvatarCommand): Promise<UserResponse> {
+  async execute(command: UploadUserAvatarCommand): Promise<IUserResponse> {
     const { currentUser, file } = command;
 
     try {
@@ -31,9 +31,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
         avatar: file.filename
       });
 
-      return await this.queryBus.execute(
-        new FindUserQuery({ id: currentUser.id })
-      );
+      return await this.queryBus.execute(new FindUserQuery({ id: currentUser.id }));
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 

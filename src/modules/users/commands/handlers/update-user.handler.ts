@@ -4,13 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { FindUserQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdateUserCommand } from '../impl/update-user.command';
 
 @CommandHandler(UpdateUserCommand)
-export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, UserResponse> {
+export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, IUserResponse> {
   private readonly logger = new Logger(UpdateUserHandler.name);
 
   constructor(
@@ -19,7 +19,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: UpdateUserCommand): Promise<UserResponse> {
+  async execute(command: UpdateUserCommand): Promise<IUserResponse> {
     const { roles, ...dto } = command.dto;
 
     try {
@@ -47,9 +47,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
           roles: roles ? mapRoleIds(roles) : undefined
         })
       );
-      return this.queryBus.execute(
-        new FindUserQuery({ id: updatedUser.id })
-      );
+      return this.queryBus.execute(new FindUserQuery({ id: updatedUser.id }));
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
 

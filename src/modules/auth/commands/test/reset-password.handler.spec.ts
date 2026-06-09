@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateUserCommand } from '@/modules/users/commands';
-import { UserResponse } from '@/modules/users/interfaces';
+import { IUserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '@/shared/helpers';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
 import { ResetPasswordHandler } from '../handlers/reset-password.handler';
@@ -15,7 +15,7 @@ describe('ResetPasswordHandler', () => {
   let handler: ResetPasswordHandler;
   let loggerErrorSpy: jest.SpyInstance;
 
-  const updatedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
+  const updatedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as IUserResponse;
 
   beforeEach(() => {
     commandBus = { execute: jest.fn() };

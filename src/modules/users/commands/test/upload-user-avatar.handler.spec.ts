@@ -4,7 +4,7 @@ import { promises } from 'fs';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { FindUserQuery } from '../../queries';
 import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
 import { UploadUserAvatarHandler } from '../handlers/upload-user-avatar.handler';
@@ -17,7 +17,12 @@ describe('UploadUserAvatarHandler', () => {
   let unlinkSpy: jest.SpyInstance;
 
   const file = { filename: 'new-avatar.png' } as Express.Multer.File;
-  const userResponse = { id: 'user-id', email: 'ada@example.com', avatar: 'new-avatar.png', roles: [] } as UserResponse;
+  const userResponse = {
+    id: 'user-id',
+    email: 'ada@example.com',
+    avatar: 'new-avatar.png',
+    roles: []
+  } as IUserResponse;
 
   beforeEach(() => {
     repository = { update: jest.fn() };

@@ -15,7 +15,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createCsvUploadOptions } from '@/shared/helpers';
 import { CreateUserDto } from '../dto/create-user.dto';
-import { IFilterUsers, UserResponse } from '../interfaces';
+import { IFilterUsers, IUserResponse } from '../interfaces';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
 import { CurrentUser, Public, Roles } from '@/modules/auth/decorators';
@@ -40,7 +40,7 @@ export class UsersController {
 
   @Post()
   @Roles([RoleEnum.ADMIN])
-  create(@Body() dto: CreateUserDto): Promise<UserResponse> {
+  create(@Body() dto: CreateUserDto): Promise<IUserResponse> {
     return this.commandBus.execute(new CreateUserCommand(dto));
   }
 
@@ -59,25 +59,25 @@ export class UsersController {
 
   @Get()
   @Roles([RoleEnum.ADMIN])
-  findAll(@Query() query: IFilterUsers): Promise<[UserResponse[], number]> {
+  findAll(@Query() query: IFilterUsers): Promise<[IUserResponse[], number]> {
     return this.queryBus.execute(new FindUsersQuery(query));
   }
 
   @Get('by-email/:email')
   @Public()
-  findOneByEmail(@Param('email') email: string): Promise<UserResponse> {
+  findOneByEmail(@Param('email') email: string): Promise<IUserResponse> {
     return this.queryBus.execute(new FindUserQuery({ email }));
   }
 
   @Patch('id/:userId')
   @Roles([RoleEnum.ADMIN])
-  update(@Param('userId') userId: string, @Body() dto: UpdateUserDto): Promise<UserResponse> {
+  update(@Param('userId') userId: string, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
     return this.commandBus.execute(new UpdateUserCommand(userId, dto));
   }
 
   @Post('me/profile-image')
   @UseInterceptors(FileInterceptor('profile', createDiskUploadOptions('./uploads/profiles')))
-  uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<UserResponse> {
+  uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<IUserResponse> {
     return this.commandBus.execute(new UploadUserAvatarCommand(user, file));
   }
 

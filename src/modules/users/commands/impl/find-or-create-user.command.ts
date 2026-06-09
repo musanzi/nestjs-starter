@@ -1,8 +1,8 @@
 import { Command } from '@nestjs/cqrs';
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 
-export class FindOrCreateUserCommand extends Command<UserResponse> {
+export class FindOrCreateUserCommand extends Command<IUserResponse> {
   constructor(public readonly dto: CreateUserDto) {
     super();
   }

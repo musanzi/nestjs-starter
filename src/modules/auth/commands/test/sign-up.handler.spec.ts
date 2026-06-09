@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@/modules/users/commands';
-import { UserResponse } from '@/modules/users/interfaces';
+import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { SignUpCommand } from '../impl/sign-up.command';
@@ -14,8 +14,8 @@ describe('SignUpHandler', () => {
   let loggerErrorSpy: jest.SpyInstance;
 
   const dto = { name: 'Ada Lovelace', email: 'ada@example.com', password: 'password', referral_code: 'REF' };
-  const savedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
-  const freshUser = { ...savedUser, avatar: 'avatar.png' } as UserResponse;
+  const savedUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as IUserResponse;
+  const freshUser = { ...savedUser, avatar: 'avatar.png' } as IUserResponse;
 
   beforeEach(() => {
     commandBus = { execute: jest.fn() };

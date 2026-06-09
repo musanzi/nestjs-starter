@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
 import { FindUserQuery } from '../impl/find-user.query';
 
 @QueryHandler(FindUserQuery)
-export class FindUserHandler implements IQueryHandler<FindUserQuery, UserResponse> {
+export class FindUserHandler implements IQueryHandler<FindUserQuery, IUserResponse> {
   private readonly logger = new Logger(FindUserHandler.name);
 
   constructor(
@@ -17,7 +17,7 @@ export class FindUserHandler implements IQueryHandler<FindUserQuery, UserRespons
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUserQuery): Promise<UserResponse> {
+  async execute(query: FindUserQuery): Promise<IUserResponse> {
     try {
       const user = await this.repository.findOneOrFail({
         ...query.options,

@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestj
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateRoleDto } from '../dto/create-role.dto';
 import { UpdateRoleDto } from '../dto/update-role.dto';
-import { IFilterRoles } from '../interfaces/filter-roles.interface';
+import { IFilterRoles } from '../interfaces';
 import { Role } from '../entities/role.entity';
 import { Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
@@ -31,9 +31,7 @@ export class RolesController {
   @Get('id/:id')
   @Roles([RoleEnum.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
-    return this.queryBus.execute(
-      new FindRoleQuery({ id })
-    );
+    return this.queryBus.execute(new FindRoleQuery({ id }));
   }
 
   @Patch('id/:id')

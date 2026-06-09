@@ -3,7 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { FindOrCreateUserCommand } from '../impl/find-or-create-user.command';
 import { UpdateUserCommand } from '../impl/update-user.command';
@@ -16,7 +16,7 @@ describe('FindOrCreateUserHandler', () => {
   let loggerErrorSpy: jest.SpyInstance;
 
   const existingUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as User;
-  const userResponse = { ...existingUser, roles: [] } as UserResponse;
+  const userResponse = { ...existingUser, roles: [] } as IUserResponse;
   const createDto = () => ({ name: 'Ada Lovelace', email: 'ada@example.com', avatar: 'google-avatar.png' });
 
   beforeEach(() => {

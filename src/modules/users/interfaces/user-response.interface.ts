@@ -1,5 +1,5 @@
 import { User } from '../entities/user.entity';
 
-export type UserResponse = Omit<User, 'roles'> & {
+export type IUserResponse = Omit<User, 'roles'> & {
   roles: string[];
 };

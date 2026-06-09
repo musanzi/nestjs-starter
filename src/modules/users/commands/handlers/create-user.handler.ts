@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { FindUserQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
@@ -13,7 +13,7 @@ import { WelcomeUserEvent } from '../../events';
 import { FindRoleQuery } from '@/modules/roles/queries';
 
 @CommandHandler(CreateUserCommand)
-export class CreateUserHandler implements ICommandHandler<CreateUserCommand, UserResponse> {
+export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUserResponse> {
   private readonly logger = new Logger(CreateUserHandler.name);
 
   constructor(
@@ -23,7 +23,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: CreateUserCommand): Promise<UserResponse> {
+  async execute(command: CreateUserCommand): Promise<IUserResponse> {
     const { roles, ...dto } = command.dto;
     const hasPassword = Boolean(dto.password);
     const generatedPassword = hasPassword ? undefined : this.generatePassword();
@@ -49,9 +49,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
 
       this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
 
-      return await this.queryBus.execute(
-        new FindUserQuery({ id: createdUser.id })
-      );
+      return await this.queryBus.execute(new FindUserQuery({ id: createdUser.id }));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

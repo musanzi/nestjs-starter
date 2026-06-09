@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { compare } from 'bcryptjs';
 import { User } from '@/modules/users/entities/user.entity';
-import { UserResponse } from '@/modules/users/interfaces';
+import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { ValidateCredentialsQuery } from '../impl/validate-credentials.query';
@@ -23,7 +23,7 @@ describe('ValidateCredentialsHandler', () => {
     email: 'ada@example.com',
     password: 'hashed-password'
   } as User;
-  const publicUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
+  const publicUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as IUserResponse;
 
   beforeEach(() => {
     queryBus = { execute: jest.fn() };

@@ -1,12 +1,12 @@
 import { Request } from 'express';
-import { UserResponse } from '@/modules/users/interfaces';
+import { IUserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '@/shared/helpers';
 import { SignInQuery } from '../impl/sign-in.query';
 import { SignInHandler } from '../handlers/sign-in.handler';
 
 describe('SignInHandler', () => {
   it('returns the authenticated request user', async () => {
-    const user = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as UserResponse;
+    const user = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as IUserResponse;
     const request = mockDependency<Request>({ user });
     const handler = new SignInHandler();
 

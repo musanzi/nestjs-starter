@@ -4,12 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapUsersRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
-import { UserResponse } from '../../interfaces';
+import { IUserResponse } from '../../interfaces';
 import { logHandlerError, parsePaginationParams } from '@/shared/helpers';
 import { FindUsersQuery } from '../impl/find-users.query';
 
 @QueryHandler(FindUsersQuery)
-export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [UserResponse[], number]> {
+export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserResponse[], number]> {
   private readonly logger = new Logger(FindUsersHandler.name);
 
   constructor(
@@ -17,7 +17,7 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [UserResp
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUsersQuery): Promise<[UserResponse[], number]> {
+  async execute(query: FindUsersQuery): Promise<[IUserResponse[], number]> {
     try {
       const { q } = query.params;
       const { pageNumber, limitNumber } = parsePaginationParams(query.params);
