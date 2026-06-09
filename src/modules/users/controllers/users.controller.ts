@@ -44,6 +44,12 @@ export class UsersController {
     return this.commandBus.execute(new CreateUserCommand(dto));
   }
 
+  @Get()
+  @Roles([RoleEnum.ADMIN])
+  findAll(@Query() query: IFilterUsers): Promise<[IUserResponse[], number]> {
+    return this.queryBus.execute(new FindUsersQuery(query));
+  }
+
   @Post('import-csv')
   @Roles([RoleEnum.ADMIN])
   @UseInterceptors(FileInterceptor('file', createCsvUploadOptions()))
@@ -55,12 +61,6 @@ export class UsersController {
   @Roles([RoleEnum.ADMIN])
   async exportCSV(@Query() query: IFilterUsers, @Res() res: Response): Promise<void> {
     await this.queryBus.execute(new ExportUsersCsvQuery(query, res));
-  }
-
-  @Get()
-  @Roles([RoleEnum.ADMIN])
-  findAll(@Query() query: IFilterUsers): Promise<[IUserResponse[], number]> {
-    return this.queryBus.execute(new FindUsersQuery(query));
   }
 
   @Get('by-email/:email')
