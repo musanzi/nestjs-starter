@@ -1,4 +1,4 @@
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,20 +19,16 @@ export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, Use
 
   async execute(query: FindUserByIdQuery): Promise<UserResponse> {
     try {
-      const user = await this.repository.findOne({
+      const user = await this.repository.findOneOrFail({
         where: { id: query.id },
         relations: ['roles']
       });
-      if (!user) {
-        throw new NotFoundException('Utilisateur introuvable');
-      }
-
       return mapUserRoles(user);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
       logHandlerError(this.logger, 'Find user by id', error, `id="${query.id}"`);
-      throw new BadRequestException("Recherche de l'utilisateur impossible");
+      throw new NotFoundException('Utilisateur introuvable');
     }
   }
 }
