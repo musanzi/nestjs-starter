@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { MailerService } from '@nestjs-modules/mailer';
-import { buildStarterEmail } from '@/shared/helpers';
+import { buildEmailBody } from '@/shared/helpers';
 import { ResetPasswordRequestedEvent } from '../impl';
 
 @EventsHandler(ResetPasswordRequestedEvent)
@@ -10,7 +10,7 @@ export class SendResetPasswordEmailHandler implements IEventHandler<ResetPasswor
 
   async handle(event: ResetPasswordRequestedEvent): Promise<void> {
     try {
-      const content = buildStarterEmail({
+      const content = buildEmailBody({
         title: 'Réinitialisation du mot de passe',
         greetingName: event.user.name,
         intro: 'Nous avons reçu une demande de réinitialisation de votre mot de passe.',

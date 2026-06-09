@@ -34,7 +34,7 @@ const escapeHtml = (value: string): string =>
 const paragraph = (value: string): string =>
   `<p style="margin:0 0 16px;color:#334155;font-size:16px;line-height:1.6;">${escapeHtml(value)}</p>`;
 
-export const buildStarterEmail = (options: EmailTemplateOptions): EmailContent => {
+export const buildEmailBody = (options: EmailTemplateOptions): EmailContent => {
   const action = options.action
     ? `<p style="margin:24px 0;">
         <a href="${escapeHtml(options.action.url)}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;padding:12px 18px;border-radius:6px;">${escapeHtml(options.action.label)}</a>

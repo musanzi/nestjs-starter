@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { MailerService } from '@nestjs-modules/mailer';
-import { buildStarterEmail } from '@/shared/helpers';
+import { buildEmailBody } from '@/shared/helpers';
 import { WelcomeUserEvent } from '../impl';
 
 @EventsHandler(WelcomeUserEvent)
@@ -10,7 +10,7 @@ export class SendWelcomeEmailHandler implements IEventHandler<WelcomeUserEvent> 
 
   async handle(event: WelcomeUserEvent): Promise<void> {
     try {
-      const content = buildStarterEmail({
+      const content = buildEmailBody({
         title: 'Bienvenue sur Starter',
         greetingName: event.user.name,
         intro: 'Votre compte a bien été créé. Vous pouvez maintenant vous connecter et commencer à utiliser Starter.',
