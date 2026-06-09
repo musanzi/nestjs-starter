@@ -9,13 +9,12 @@ import { User } from '../users/entities/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { SessionSerializer } from './serializers/session.serializer';
-import { CqrsModule } from '@nestjs/cqrs';
 import { CommandHandlers } from './commands/handlers';
 import { QueryHandlers } from './queries/handlers';
 import { EventHandlers } from './events/handlers';
 
 @Module({
-  imports: [CqrsModule, UsersModule, TypeOrmModule.forFeature([User, Role]), PassportModule, JwtModule],
+  imports: [UsersModule, TypeOrmModule.forFeature([User, Role]), PassportModule, JwtModule],
   controllers: [AuthController],
   providers: [LocalStrategy, GoogleStrategy, SessionSerializer, ...CommandHandlers, ...QueryHandlers, ...EventHandlers]
 })
