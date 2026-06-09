@@ -20,14 +20,18 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
   ) {}
 
   async execute(command: ForgotPasswordCommand): Promise<void> {
+    const { dto } = command;
+
     try {
-      const user = await this.queryBus.execute(new FindUserByEmailQuery(command.dto.email));
+      const user = await this.queryBus.execute(new FindUserByEmailQuery(dto.email));
+
       const token = await createAuthToken(this.jwtService, this.configService, user, '15m');
+
       const frontendUri = this.configService.get<string>('FRONTEND_URI');
       const link = `${frontendUri}/reset-password?token=${token}`;
       this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
     } catch (error) {
-      logHandlerError(this.logger, 'Forgot password', error, `email="${command.dto.email}"`);
+      logHandlerError(this.logger, 'Forgot password', error, `email="${dto.email}"`);
       throw new BadRequestException('Demande invalide');
     }
   }
