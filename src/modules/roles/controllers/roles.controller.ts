@@ -17,37 +17,37 @@ export class RolesController {
   ) {}
 
   @Post()
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   create(@Body() dto: CreateRoleDto): Promise<Role> {
     return this.commandBus.execute(new CreateRoleCommand(dto));
   }
 
   @Get('paginated')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   findPaginated(@Query() query: IFilterRoles): Promise<[Role[], number]> {
     return this.queryBus.execute(new FindPaginatedRolesQuery(query));
   }
 
   @Get()
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   findAll(): Promise<Role[]> {
     return this.queryBus.execute(new FindAllRolesQuery());
   }
 
   @Get('id/:id')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
     return this.queryBus.execute(new FindRoleByIdQuery(id));
   }
 
   @Patch('id/:id')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
     return this.commandBus.execute(new UpdateRoleCommand(id, updateRoleDto));
   }
 
   @Delete('id/:id')
-  @Roles([RoleEnum.ADMIN, RoleEnum.STAFF])
+  @Roles([RoleEnum.ADMIN])
   remove(@Param('id') id: string): Promise<void> {
     return this.commandBus.execute(new DeleteRoleCommand(id));
   }
