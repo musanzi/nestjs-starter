@@ -1,4 +1,4 @@
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,18 +20,36 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
   ) {}
 
   async execute(command: UpdateUserCommand): Promise<UserResponse> {
-    try {
-      await this.queryBus.execute(new FindUserByIdQuery(command.id));
+    const { roles, ...dto } = command.dto;
 
-      const { roles, ...dto } = command.dto;
-      await this.repository.save({
-        id: command.id,
-        ...dto,
-        roles: roles ? mapRoleIds(roles) : undefined
+    try {
+      const user = await this.repository.findOne({
+        where: { id: command.id }
       });
-      return await this.queryBus.execute(new FindUserByIdQuery(command.id));
+
+      if (!user) {
+        throw new NotFoundException('Aucun utilisateur trouvé');
+      }
+
+      if (dto.email && dto.email !== user.email) {
+        const existingUser = await this.repository.findOne({
+          where: { email: dto.email }
+        });
+
+        if (existingUser) {
+          throw new ConflictException('Un utilisateur avec cette adresse email existe déjà');
+        }
+      }
+
+      const updatedUser = await this.repository.save(
+        this.repository.merge(user, {
+          ...dto,
+          roles: roles ? mapRoleIds(roles) : undefined
+        })
+      );
+      return this.queryBus.execute(new FindUserByIdQuery(updatedUser.id));
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
 
       logHandlerError(this.logger, 'Update user', error, `id="${command.id}"`);
       throw new BadRequestException('Mise à jour impossible');
