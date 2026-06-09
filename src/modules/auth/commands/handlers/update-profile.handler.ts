@@ -12,10 +12,12 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfileComman
   constructor(private readonly commandBus: CommandBus) {}
 
   async execute(command: UpdateProfileCommand): Promise<UserResponse> {
+    const { dto, currentUser } = command;
+
     try {
-      return await this.commandBus.execute(new UpdateUserCommand(command.currentUser.id, command.dto));
+      return await this.commandBus.execute(new UpdateUserCommand(currentUser.id, dto));
     } catch (error) {
-      logHandlerError(this.logger, 'Update profile', error, `id="${command.currentUser?.id ?? ''}"`);
+      logHandlerError(this.logger, 'Update profile', error, `id="${currentUser?.id ?? ''}"`);
       throw new BadRequestException('Requête invalide');
     }
   }
