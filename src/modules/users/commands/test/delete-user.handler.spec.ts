@@ -26,7 +26,7 @@ describe('DeleteUserHandler', () => {
 
   it('checks that the user exists before soft deleting it', async () => {
     queryBus.execute.mockResolvedValueOnce({ id: 'user-id' } as User);
-    repository.softDelete.mockResolvedValueOnce({ affected: 1, raw: [] });
+    repository.softDelete.mockResolvedValueOnce({ affected: 1, raw: [], generatedMaps: [] });
 
     await handler.execute(new DeleteUserCommand('user-id'));
 
