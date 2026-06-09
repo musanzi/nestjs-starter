@@ -2,8 +2,6 @@
 
 A NestJS starter API for building session-based backend services with authentication, roles, users, database persistence, email workflows, file uploads, CQRS handlers, and a consistent response shape.
 
-The README is intended to get a new developer from clone to a running local API, then give enough structure to add the next module without reverse-engineering the project.
-
 ## Features
 
 - **Authentication:** email/password signup and signin using Passport local strategy and server-side sessions.
