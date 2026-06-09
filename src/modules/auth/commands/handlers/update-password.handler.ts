@@ -2,9 +2,9 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { UserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
-import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
+import { FindUserQuery } from '@/modules/users/queries';
 
 @CommandHandler(UpdatePasswordCommand)
 export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordCommand, UserResponse> {
@@ -21,7 +21,11 @@ export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordComm
     try {
       await this.commandBus.execute(new UpdateUserCommand(currentUser.id, { password: dto.password }));
 
-      return await this.queryBus.execute(new FindUserByEmailQuery(currentUser.email));
+      return await this.queryBus.execute(
+        new FindUserQuery({
+          where: { email: currentUser.email }
+        })
+      );
     } catch (error) {
       logHandlerError(this.logger, 'Update password', error, `id="${currentUser?.id ?? ''}"`);
       throw new BadRequestException('Mise à jour impossible');

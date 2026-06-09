@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
-import { FindUserByEmailQuery } from '@/modules/users/queries';
+import { FindUserQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { createAuthToken } from '../../common/create-auth-token';
 import { ResetPasswordRequestedEvent } from '../../events';
@@ -49,7 +49,7 @@ describe('ForgotPasswordHandler', () => {
 
     await handler.execute(new ForgotPasswordCommand({ email: 'ada@example.com' }));
 
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { email: 'ada@example.com' } }));
     expect(createAuthTokenMock).toHaveBeenCalledWith(jwtService, configService, user, '15m');
     expect(configService.get).toHaveBeenCalledWith('FRONTEND_URI');
     expect(eventBus.publish).toHaveBeenCalledWith(

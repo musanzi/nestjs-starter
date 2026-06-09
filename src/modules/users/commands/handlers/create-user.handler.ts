@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
-import { FindUserByIdQuery } from '../../queries';
+import { FindUserQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';
@@ -49,7 +49,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
 
       this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
 
-      return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));
+      return await this.queryBus.execute(
+        new FindUserQuery({
+          where: { id: createdUser.id }
+        })
+      );
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

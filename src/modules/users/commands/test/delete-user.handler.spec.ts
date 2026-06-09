@@ -3,7 +3,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { FindUserByIdQuery } from '../../queries';
+import { FindUserQuery } from '../../queries';
 import { DeleteUserCommand } from '../impl/delete-user.command';
 import { DeleteUserHandler } from '../handlers/delete-user.handler';
 
@@ -30,7 +30,7 @@ describe('DeleteUserHandler', () => {
 
     await handler.execute(new DeleteUserCommand('user-id'));
 
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('user-id'));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
     expect(repository.softDelete).toHaveBeenCalledWith('user-id');
   });
 

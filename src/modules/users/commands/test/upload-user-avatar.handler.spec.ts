@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
-import { FindUserByIdQuery } from '../../queries';
+import { FindUserQuery } from '../../queries';
 import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
 import { UploadUserAvatarHandler } from '../handlers/upload-user-avatar.handler';
 
@@ -46,7 +46,7 @@ describe('UploadUserAvatarHandler', () => {
     expect(result).toBe(userResponse);
     expect(unlinkSpy).toHaveBeenCalledWith('./uploads/profiles/old-avatar.png');
     expect(repository.update).toHaveBeenCalledWith('user-id', { avatar: 'new-avatar.png' });
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('user-id'));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
   });
 
   it('updates the avatar without removing a file when the user has no current avatar', async () => {

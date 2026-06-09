@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
-import { FindUserByIdQuery } from '../../queries';
+import { FindUserQuery } from '../../queries';
 import { UpdateUserCommand } from '../impl/update-user.command';
 import { UpdateUserHandler } from '../handlers/update-user.handler';
 
@@ -46,7 +46,7 @@ describe('UpdateUserHandler', () => {
     expect(repository.findOne).toHaveBeenCalledTimes(1);
     expect(repository.merge).toHaveBeenCalledWith(user, { name: 'Ada Byron', roles: [{ id: 'role-id' }] });
     expect(repository.save).toHaveBeenCalledWith(updatedUser);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('user-id'));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
   });
 
   it('checks email uniqueness when the email changes', async () => {

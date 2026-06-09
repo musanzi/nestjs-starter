@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
-import { FindUserByIdQuery } from '../../queries';
+import { FindUserQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdateUserCommand } from '../impl/update-user.command';
 
@@ -47,7 +47,11 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
           roles: roles ? mapRoleIds(roles) : undefined
         })
       );
-      return this.queryBus.execute(new FindUserByIdQuery(updatedUser.id));
+      return this.queryBus.execute(
+        new FindUserQuery({
+          where: { id: updatedUser.id }
+        })
+      );
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
 

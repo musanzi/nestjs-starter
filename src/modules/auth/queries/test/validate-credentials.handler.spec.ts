@@ -3,7 +3,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { compare } from 'bcryptjs';
 import { User } from '@/modules/users/entities/user.entity';
 import { UserResponse } from '@/modules/users/interfaces';
-import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery } from '@/modules/users/queries';
+import { FindUserQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { ValidateCredentialsQuery } from '../impl/validate-credentials.query';
 import { ValidateCredentialsHandler } from '../handlers/validate-credentials.handler';
@@ -38,9 +38,15 @@ describe('ValidateCredentialsHandler', () => {
     const result = await handler.execute(new ValidateCredentialsQuery('ada@example.com', 'password'));
 
     expect(result).toBe(publicUser);
-    expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindUserByEmailWithPasswordQuery('ada@example.com'));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(
+      1,
+      new FindUserQuery({
+        where: { email: 'ada@example.com' },
+        select: ['id', 'email', 'password']
+      })
+    );
     expect(compareMock).toHaveBeenCalledWith('password', 'hashed-password');
-    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByEmailQuery('ada@example.com'));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ where: { email: 'ada@example.com' } }));
   });
 
   it('throws UnauthorizedException when the user is missing', async () => {

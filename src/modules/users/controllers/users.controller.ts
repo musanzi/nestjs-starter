@@ -29,7 +29,7 @@ import {
   UpdateUserCommand,
   UploadUserAvatarCommand
 } from '../commands';
-import { ExportUsersCsvQuery, FindUserByEmailQuery, FindUsersQuery } from '../queries';
+import { ExportUsersCsvQuery, FindUserQuery, FindUsersQuery } from '../queries';
 
 @Controller('users')
 export class UsersController {
@@ -66,7 +66,7 @@ export class UsersController {
   @Get('by-email/:email')
   @Public()
   findOneByEmail(@Param('email') email: string): Promise<UserResponse> {
-    return this.queryBus.execute(new FindUserByEmailQuery(email));
+    return this.queryBus.execute(new FindUserQuery({ where: { email } }));
   }
 
   @Patch('id/:userId')
