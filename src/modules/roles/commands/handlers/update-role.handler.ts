@@ -21,7 +21,11 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
     const { dto, id } = command;
 
     try {
-      const role = await this.queryBus.execute(new FindRoleQuery({ id }));
+      const role = await this.queryBus.execute(
+        new FindRoleQuery({
+          where: { id }
+        })
+      );
 
       if (dto.name && dto.name !== role.name) {
         const existingRole = await this.repository.findOne({

@@ -9,8 +9,8 @@ import { UserResponse } from '../../interfaces';
 import { FindUserQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
-import { FindRoleByNameQuery } from '@/modules/roles/queries';
 import { WelcomeUserEvent } from '../../events';
+import { FindRoleQuery } from '@/modules/roles/queries';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand, UserResponse> {
@@ -38,7 +38,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
         throw new ConflictException('Cet utilisateur existe déjà');
       }
 
-      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByNameQuery('user'))];
+      const userRoles = roles
+        ? mapRoleIds(roles)
+        : [await this.queryBus.execute(new FindRoleQuery({ where: { name: 'user' } }))];
       const user = this.repository.create({
         ...dto,
         password,

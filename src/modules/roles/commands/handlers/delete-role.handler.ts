@@ -19,7 +19,11 @@ export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand, voi
 
   async execute(command: DeleteRoleCommand): Promise<void> {
     try {
-      await this.queryBus.execute(new FindRoleQuery({ id: command.id }));
+      await this.queryBus.execute(
+        new FindRoleQuery({
+          where: { id: command.id }
+        })
+      );
 
       await this.repository.delete(command.id);
     } catch (error) {
