@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { IGoogleProfile } from '../interfaces/google-profile.interface';
@@ -24,7 +23,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   async validate(_accessToken: string, _refreshToken: string, profile: IGoogleProfile): Promise<UserResponse> {
     const { emails, name, photos } = profile;
-    const userDto: CreateUserDto = {
+    const userDto = {
       email: emails[0]['value'],
       name: `${name['givenName']} ${name['familyName']}`,
       avatar: photos[0]['value']
