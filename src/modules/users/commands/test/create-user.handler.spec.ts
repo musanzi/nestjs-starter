@@ -69,7 +69,7 @@ describe('CreateUserHandler', () => {
       1,
       new FindRoleQuery({ name: 'user' })
     );
-    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ where: { id: 'user-id' } }));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ id: 'user-id' }));
   });
 
   it('generates a six digit password and publishes a welcome event when password is missing', async () => {
@@ -115,7 +115,7 @@ describe('CreateUserHandler', () => {
       roles: [{ id: 'admin-role-id' }]
     });
     expect(queryBus.execute).toHaveBeenCalledTimes(1);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
   });
 
   it('throws ConflictException when the email already exists', async () => {

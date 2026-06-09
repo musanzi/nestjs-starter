@@ -46,7 +46,7 @@ describe('UploadUserAvatarHandler', () => {
     expect(result).toBe(userResponse);
     expect(unlinkSpy).toHaveBeenCalledWith('./uploads/profiles/old-avatar.png');
     expect(repository.update).toHaveBeenCalledWith('user-id', { avatar: 'new-avatar.png' });
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
   });
 
   it('updates the avatar without removing a file when the user has no current avatar', async () => {

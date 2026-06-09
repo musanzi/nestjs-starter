@@ -21,13 +21,14 @@ export class FindUserHandler implements IQueryHandler<FindUserQuery, UserRespons
     try {
       const user = await this.repository.findOneOrFail({
         ...query.options,
+        where: query.where,
         relations: ['roles']
       });
       return mapUserRoles(user);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logHandlerError(this.logger, 'Find user by id', error, `options="${query.options}"`);
+      logHandlerError(this.logger, 'Find user by id', error, `where="${JSON.stringify(query.where)}"`);
       throw new NotFoundException('Utilisateur introuvable');
     }
   }

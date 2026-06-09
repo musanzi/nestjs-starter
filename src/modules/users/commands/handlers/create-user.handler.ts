@@ -50,9 +50,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
       this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
 
       return await this.queryBus.execute(
-        new FindUserQuery({
-          where: { id: createdUser.id }
-        })
+        new FindUserQuery({ id: createdUser.id })
       );
     } catch (error) {
       if (error instanceof ConflictException) throw error;

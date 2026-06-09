@@ -29,10 +29,10 @@ describe('FindUserHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
-  it('finds one user with the provided options and maps roles', async () => {
+  it('finds one user with the provided conditions and maps roles', async () => {
     repository.findOneOrFail.mockResolvedValueOnce(user);
 
-    const result = await handler.execute(new FindUserQuery({ where: { email: 'ada@example.com' } }));
+    const result = await handler.execute(new FindUserQuery({ email: 'ada@example.com' }));
 
     expect(result).toEqual({ ...user, roles: ['admin'] });
     expect(repository.findOneOrFail).toHaveBeenCalledWith({
@@ -45,10 +45,7 @@ describe('FindUserHandler', () => {
     repository.findOneOrFail.mockResolvedValueOnce({ ...user, password: 'hashed-password' } as User);
 
     await handler.execute(
-      new FindUserQuery({
-        where: { email: 'ada@example.com' },
-        select: ['id', 'email', 'password']
-      })
+      new FindUserQuery({ email: 'ada@example.com' }, { select: ['id', 'email', 'password'] })
     );
 
     expect(repository.findOneOrFail).toHaveBeenCalledWith({
@@ -61,7 +58,7 @@ describe('FindUserHandler', () => {
   it('throws NotFoundException when no user is found', async () => {
     repository.findOneOrFail.mockRejectedValueOnce(new Error('not found'));
 
-    const promise = handler.execute(new FindUserQuery({ where: { id: 'missing-user-id' } }));
+    const promise = handler.execute(new FindUserQuery({ id: 'missing-user-id' }));
 
     await expect(promise).rejects.toThrow(NotFoundException);
     await expect(promise).rejects.toThrow('Utilisateur introuvable');

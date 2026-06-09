@@ -22,9 +22,7 @@ export class SignUpHandler implements ICommandHandler<SignUpCommand, UserRespons
       const user = await this.commandBus.execute(new CreateUserCommand(dto));
 
       return await this.queryBus.execute(
-        new FindUserQuery({
-          where: { id: user.id }
-        })
+        new FindUserQuery({ id: user.id })
       );
     } catch (error) {
       if (error instanceof ConflictException) throw error;

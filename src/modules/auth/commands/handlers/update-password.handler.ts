@@ -22,9 +22,7 @@ export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordComm
       await this.commandBus.execute(new UpdateUserCommand(currentUser.id, { password: dto.password }));
 
       return await this.queryBus.execute(
-        new FindUserQuery({
-          where: { email: currentUser.email }
-        })
+        new FindUserQuery({ email: currentUser.email })
       );
     } catch (error) {
       logHandlerError(this.logger, 'Update password', error, `id="${currentUser?.id ?? ''}"`);

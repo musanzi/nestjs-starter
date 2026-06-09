@@ -32,9 +32,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
       });
 
       return await this.queryBus.execute(
-        new FindUserQuery({
-          where: { id: currentUser.id }
-        })
+        new FindUserQuery({ id: currentUser.id })
       );
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

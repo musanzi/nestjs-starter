@@ -36,7 +36,7 @@ describe('UpdatePasswordHandler', () => {
 
     expect(result).toBe(updatedUser);
     expect(commandBus.execute).toHaveBeenCalledWith(new UpdateUserCommand('user-id', { password: 'new-password' }));
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { email: 'ada@example.com' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ email: 'ada@example.com' }));
   });
 
   it('throws BadRequestException when update password handling fails', async () => {

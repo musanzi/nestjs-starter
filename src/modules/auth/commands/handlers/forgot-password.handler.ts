@@ -24,9 +24,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
 
     try {
       const user = await this.queryBus.execute(
-        new FindUserQuery({
-          where: { email: dto.email }
-        })
+        new FindUserQuery({ email: dto.email })
       );
 
       const token = await createAuthToken(this.jwtService, this.configService, user, '15m');

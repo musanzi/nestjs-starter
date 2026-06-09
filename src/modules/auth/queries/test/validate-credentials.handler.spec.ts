@@ -40,13 +40,10 @@ describe('ValidateCredentialsHandler', () => {
     expect(result).toBe(publicUser);
     expect(queryBus.execute).toHaveBeenNthCalledWith(
       1,
-      new FindUserQuery({
-        where: { email: 'ada@example.com' },
-        select: ['id', 'email', 'password']
-      })
+      new FindUserQuery({ email: 'ada@example.com' }, { select: ['id', 'email', 'password'] })
     );
     expect(compareMock).toHaveBeenCalledWith('password', 'hashed-password');
-    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ where: { email: 'ada@example.com' } }));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ email: 'ada@example.com' }));
   });
 
   it('throws UnauthorizedException when the user is missing', async () => {

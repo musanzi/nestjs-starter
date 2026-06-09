@@ -14,10 +14,12 @@ export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredent
 
     try {
       const user = await this.queryBus.execute(
-        new FindUserQuery({
-          where: { email: query.email },
-          select: ['id', 'email', 'password']
-        })
+        new FindUserQuery(
+          { email: query.email },
+          {
+            select: ['id', 'email', 'password']
+          }
+        )
       );
 
       if (!user?.password) throw unauthorized;
@@ -25,11 +27,7 @@ export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredent
       const isPasswordValid = await compare(query.password, user.password);
       if (!isPasswordValid) throw unauthorized;
 
-      return await this.queryBus.execute(
-        new FindUserQuery({
-          where: { email: query.email }
-        })
-      );
+      return await this.queryBus.execute(new FindUserQuery({ email: query.email }));
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw unauthorized;

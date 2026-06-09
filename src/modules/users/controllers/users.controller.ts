@@ -66,7 +66,7 @@ export class UsersController {
   @Get('by-email/:email')
   @Public()
   findOneByEmail(@Param('email') email: string): Promise<UserResponse> {
-    return this.queryBus.execute(new FindUserQuery({ where: { email } }));
+    return this.queryBus.execute(new FindUserQuery({ email }));
   }
 
   @Patch('id/:userId')

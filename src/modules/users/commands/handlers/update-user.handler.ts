@@ -48,9 +48,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
         })
       );
       return this.queryBus.execute(
-        new FindUserQuery({
-          where: { id: updatedUser.id }
-        })
+        new FindUserQuery({ id: updatedUser.id })
       );
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof ConflictException) throw error;

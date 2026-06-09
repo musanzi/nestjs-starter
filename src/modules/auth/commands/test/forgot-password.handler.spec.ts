@@ -49,7 +49,7 @@ describe('ForgotPasswordHandler', () => {
 
     await handler.execute(new ForgotPasswordCommand({ email: 'ada@example.com' }));
 
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { email: 'ada@example.com' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ email: 'ada@example.com' }));
     expect(createAuthTokenMock).toHaveBeenCalledWith(jwtService, configService, user, '15m');
     expect(configService.get).toHaveBeenCalledWith('FRONTEND_URI');
     expect(eventBus.publish).toHaveBeenCalledWith(

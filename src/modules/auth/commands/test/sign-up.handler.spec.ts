@@ -36,7 +36,7 @@ describe('SignUpHandler', () => {
 
     expect(result).toBe(freshUser);
     expect(commandBus.execute).toHaveBeenCalledWith(new CreateUserCommand(dto));
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
   });
 
   it('throws ConflictException unchanged when the email already exists', async () => {

@@ -9,9 +9,7 @@ export class ProfileHandler implements IQueryHandler<ProfileQuery, UserResponse>
 
   execute(query: ProfileQuery): Promise<UserResponse> {
     return this.queryBus.execute(
-      new FindUserQuery({
-        where: { email: query.currentUser.email }
-      })
+      new FindUserQuery({ email: query.currentUser.email })
     );
   }
 }

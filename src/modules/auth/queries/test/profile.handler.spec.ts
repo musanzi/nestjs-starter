@@ -17,6 +17,6 @@ describe('ProfileHandler', () => {
     const result = await handler.execute(new ProfileQuery(currentUser));
 
     expect(result).toBe(profile);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { email: 'ada@example.com' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ email: 'ada@example.com' }));
   });
 });

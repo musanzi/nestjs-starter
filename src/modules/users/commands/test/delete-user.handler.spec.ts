@@ -30,7 +30,7 @@ describe('DeleteUserHandler', () => {
 
     await handler.execute(new DeleteUserCommand('user-id'));
 
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
     expect(repository.softDelete).toHaveBeenCalledWith('user-id');
   });
 

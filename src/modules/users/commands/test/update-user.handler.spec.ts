@@ -46,7 +46,7 @@ describe('UpdateUserHandler', () => {
     expect(repository.findOne).toHaveBeenCalledTimes(1);
     expect(repository.merge).toHaveBeenCalledWith(user, { name: 'Ada Byron', roles: [{ id: 'role-id' }] });
     expect(repository.save).toHaveBeenCalledWith(updatedUser);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ where: { id: 'user-id' } }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
   });
 
   it('checks email uniqueness when the email changes', async () => {
