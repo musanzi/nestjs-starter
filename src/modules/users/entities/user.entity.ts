@@ -1,8 +1,8 @@
-import { Column, Entity, ManyToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { AbstractEntity } from '@/modules/database/abstract.entity';
 
-@Entity()
+@Entity('users')
 export class User extends AbstractEntity {
   @Column({ unique: true })
   email: string;
@@ -17,5 +17,6 @@ export class User extends AbstractEntity {
   avatar: string;
 
   @ManyToMany(() => Role)
+  @JoinTable({ name: 'user_roles' })
   roles: Role[];
 }

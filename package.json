@@ -21,6 +21,7 @@
     "db:migrate": "pnpm build && pnpm typeorm migration:generate ./src/modules/database/migrations/$name -d ./src/modules/database/orm.config.ts",
     "db:up": "pnpm build && pnpm typeorm migration:run -d ./src/modules/database/orm.config.ts",
     "db:down": "pnpm build && pnpm typeorm migration:revert -d ./src/modules/database/orm.config.ts",
+    "db:seed": "pnpm build && node dist/src/modules/database/seeds/index.js",
     "prepare": "husky"
   },
   "dependencies": {
