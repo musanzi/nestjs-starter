@@ -3,7 +3,6 @@ import { randomInt } from 'crypto';
 import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { WelcomeUserEvent } from '@/modules/auth/events';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
@@ -11,6 +10,7 @@ import { FindUserByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';
+import { WelcomeUserEvent } from '../../events';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand, UserResponse> {

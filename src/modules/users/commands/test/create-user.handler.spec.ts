@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { WelcomeUserEvent } from '@/modules/auth/events';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';
 import { mockDependency } from '@/shared/helpers';
@@ -10,6 +9,7 @@ import { UserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { CreateUserHandler } from '../handlers/create-user.handler';
+import { WelcomeUserEvent } from '../../events';
 
 describe('CreateUserHandler', () => {
   let repository: jest.Mocked<Pick<Repository<User>, 'findOne' | 'create' | 'save'>>;

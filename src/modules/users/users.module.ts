@@ -7,10 +7,11 @@ import { UserSubscriber } from './subscribers/user.subscriber';
 import { Role } from '../roles/entities/role.entity';
 import { CommandHandlers } from './commands/handlers';
 import { QueryHandlers } from './queries/handlers';
+import { EventHandlers } from './events/handlers';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Role]), RolesModule],
   controllers: [UsersController],
-  providers: [UserSubscriber, ...CommandHandlers, ...QueryHandlers]
+  providers: [UserSubscriber, ...CommandHandlers, ...QueryHandlers, ...EventHandlers]
 })
 export class UsersModule {}
