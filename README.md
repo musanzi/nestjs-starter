@@ -211,7 +211,7 @@ Base path: `/users`
 
 - `POST /users`
 - `POST /users/import-csv`
-- `GET /users`
+- `GET /users?page=1&limit=20`
 - `GET /users/by-email/:email`
 - `PATCH /users/id/:userId`
 - `DELETE /users/id/:userId`
@@ -223,11 +223,13 @@ Base path: `/users`
 Base path: `/roles`
 
 - `POST /roles`
-- `GET /roles/paginated`
+- `GET /roles/paginated?page=1&limit=20`
 - `GET /roles`
 - `GET /roles/id/:id`
 - `PATCH /roles/id/:id`
 - `DELETE /roles/id/:id`
+
+Paginated endpoints default to `limit=20` and accept `limit` values from `1` to `100`.
 
 ## Project Structure
 
