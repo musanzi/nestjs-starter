@@ -24,10 +24,12 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
 
     try {
       const existingUser = await this.repository.findOne({
-        where: { email: dto.email }
+        where: { email: dto.email },
+        relations: ['roles']
       });
 
       if (existingUser) {
+        if (existingUser.avatar) delete dto.avatar;
         return this.commandBus.execute(new UpdateUserCommand(existingUser.id, dto));
       }
 

@@ -15,9 +15,9 @@ describe('FindOrCreateUserHandler', () => {
   let handler: FindOrCreateUserHandler;
   let loggerErrorSpy: jest.SpyInstance;
 
-  const dto = { name: 'Ada Lovelace', email: 'ada@example.com' };
-  const existingUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com' } as User;
+  const existingUser = { id: 'user-id', name: 'Ada Lovelace', email: 'ada@example.com', roles: [] } as User;
   const userResponse = { ...existingUser, roles: [] } as UserResponse;
+  const createDto = () => ({ name: 'Ada Lovelace', email: 'ada@example.com', avatar: 'google-avatar.png' });
 
   beforeEach(() => {
     repository = { findOne: jest.fn() };
@@ -33,18 +33,35 @@ describe('FindOrCreateUserHandler', () => {
     loggerErrorSpy.mockRestore();
   });
 
-  it('updates an existing user found by email', async () => {
-    repository.findOne.mockResolvedValueOnce(existingUser);
+  it('sets the Google avatar when an existing user has no avatar', async () => {
+    const dto = createDto();
+    repository.findOne.mockResolvedValueOnce({ ...existingUser, avatar: null } as User);
     commandBus.execute.mockResolvedValueOnce(userResponse);
 
     const result = await handler.execute(new FindOrCreateUserCommand(dto));
 
     expect(result).toBe(userResponse);
-    expect(repository.findOne).toHaveBeenCalledWith({ where: { email: 'ada@example.com' } });
+    expect(repository.findOne).toHaveBeenCalledWith({ where: { email: 'ada@example.com' }, relations: ['roles'] });
     expect(commandBus.execute).toHaveBeenCalledWith(new UpdateUserCommand('user-id', dto));
   });
 
+  it('updates an existing user without replacing an avatar that already exists', async () => {
+    const dto = createDto();
+    const userWithAvatar = { ...existingUser, avatar: 'existing-avatar.png' } as User;
+    repository.findOne.mockResolvedValueOnce(userWithAvatar);
+    commandBus.execute.mockResolvedValueOnce(userResponse);
+
+    const result = await handler.execute(new FindOrCreateUserCommand(dto));
+
+    expect(result).toBe(userResponse);
+    expect(dto).toEqual({ name: 'Ada Lovelace', email: 'ada@example.com' });
+    expect(commandBus.execute).toHaveBeenCalledWith(
+      new UpdateUserCommand('user-id', { name: 'Ada Lovelace', email: 'ada@example.com' })
+    );
+  });
+
   it('creates a new user when no existing user matches the email', async () => {
+    const dto = createDto();
     repository.findOne.mockResolvedValueOnce(null);
     commandBus.execute.mockResolvedValueOnce(userResponse);
 
@@ -56,7 +73,7 @@ describe('FindOrCreateUserHandler', () => {
 
   it('throws BadRequestException when find or create fails unexpectedly', async () => {
     repository.findOne.mockRejectedValueOnce(new Error('database unavailable'));
-    const promise = handler.execute(new FindOrCreateUserCommand(dto));
+    const promise = handler.execute(new FindOrCreateUserCommand(createDto()));
 
     await expect(promise).rejects.toThrow(BadRequestException);
     await expect(promise).rejects.toThrow('Requête invalide');
