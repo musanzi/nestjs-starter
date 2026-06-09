@@ -5,7 +5,7 @@ import { mockDependency } from '../../../../../test/mock-dependency';
 import { FindRoleByIdQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
 import { UpdateRoleCommand } from '../impl/update-role.command';
-import { UpdateRoleHandler } from './update-role.handler';
+import { UpdateRoleHandler } from '../handlers/update-role.handler';
 
 describe('UpdateRoleHandler', () => {
   let repository: jest.Mocked<Pick<Repository<Role>, 'findOne' | 'merge' | 'save'>>;

@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { Role } from '../../entities/role.entity';
-import { FindAllRolesHandler } from './find-all-roles.handler';
+import { FindAllRolesHandler } from '../handlers/find-all-roles.handler';
 
 describe('FindAllRolesHandler', () => {
   let repository: jest.Mocked<Pick<Repository<Role>, 'find'>>;

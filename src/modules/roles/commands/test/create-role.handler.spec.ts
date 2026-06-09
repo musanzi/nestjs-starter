@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { Role } from '../../entities/role.entity';
 import { CreateRoleCommand } from '../impl/create-role.command';
-import { CreateRoleHandler } from './create-role.handler';
+import { CreateRoleHandler } from '../handlers/create-role.handler';
 
 describe('CreateRoleHandler', () => {
   let repository: jest.Mocked<Pick<Repository<Role>, 'findOne' | 'create' | 'save'>>;

@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { ResetPasswordRequestedEvent } from '../impl';
-import { SendResetPasswordEmailHandler } from './send-reset-password-email.handler';
+import { SendResetPasswordEmailHandler } from '../handlers/send-reset-password-email.handler';
 
 describe('SendResetPasswordEmailHandler', () => {
   let mailerService: jest.Mocked<Pick<MailerService, 'sendMail'>>;
@@ -26,16 +26,8 @@ describe('SendResetPasswordEmailHandler', () => {
     expect(mailerService.sendMail).toHaveBeenCalledWith({
       to: 'ada@example.com',
       subject: 'Réinitialisation du mot de passe',
-      text: [
-        'Bonjour Ada Lovelace,',
-        '',
-        'Vous avez demande la reinitialisation de votre mot de passe.',
-        'Lien: https://example.com/reset',
-        '',
-        "Si vous n'etes pas a l'origine de cette demande, ignorez cet email.",
-        '',
-        "L'equipe Starter"
-      ].join('\n')
+      html: expect.stringContaining('Réinitialiser mon mot de passe'),
+      text: expect.stringContaining("Si vous n'êtes pas à l'origine de cette demande")
     });
   });
 

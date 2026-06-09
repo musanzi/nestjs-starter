@@ -1,9 +1,9 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { randomInt } from 'crypto';
-import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SendGeneratedPasswordEmailCommand } from '@/modules/auth/commands/impl/send-generated-password-email.command';
+import { WelcomeUserEvent } from '@/modules/auth/events';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { UserResponse } from '../../interfaces';
@@ -19,7 +19,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>,
-    private readonly commandBus: CommandBus,
+    private readonly eventBus: EventBus,
     private readonly queryBus: QueryBus
   ) {}
 
@@ -30,16 +30,16 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, Use
     const password = hasPassword ? dto.password : generatedPassword;
 
     try {
-      const defaultRole = await this.queryBus.execute(new FindRoleByNameQuery('user'));
+      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByNameQuery('user'))];
       const user = this.repository.create({
         ...dto,
         password,
-        roles: roles ? mapRoleIds(roles) : [defaultRole]
+        roles: userRoles
       });
       const createdUser = await this.repository.save(user);
 
       if (generatedPassword) {
-        await this.commandBus.execute(new SendGeneratedPasswordEmailCommand(createdUser, generatedPassword));
+        this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
       }
 
       return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));

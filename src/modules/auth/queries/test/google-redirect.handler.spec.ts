@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { GoogleRedirectQuery } from '../impl/google-redirect.query';
-import { GoogleRedirectHandler } from './google-redirect.handler';
+import { GoogleRedirectHandler } from '../handlers/google-redirect.handler';
 
 describe('GoogleRedirectHandler', () => {
   it('redirects to the configured frontend URI', async () => {

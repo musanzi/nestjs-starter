@@ -6,7 +6,7 @@ import { UpdateUserCommand } from '@/modules/users/commands';
 import { UserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
-import { ResetPasswordHandler } from './reset-password.handler';
+import { ResetPasswordHandler } from '../handlers/reset-password.handler';
 
 describe('ResetPasswordHandler', () => {
   let commandBus: jest.Mocked<Pick<CommandBus, 'execute'>>;

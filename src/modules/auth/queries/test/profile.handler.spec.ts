@@ -4,7 +4,7 @@ import { UserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { ProfileQuery } from '../impl/profile.query';
-import { ProfileHandler } from './profile.handler';
+import { ProfileHandler } from '../handlers/profile.handler';
 
 describe('ProfileHandler', () => {
   it('returns the current user profile by email', async () => {

@@ -5,7 +5,7 @@ import { mockDependency } from '../../../../../test/mock-dependency';
 import { FindRoleByIdQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
 import { DeleteRoleCommand } from '../impl/delete-role.command';
-import { DeleteRoleHandler } from './delete-role.handler';
+import { DeleteRoleHandler } from '../handlers/delete-role.handler';
 
 describe('DeleteRoleHandler', () => {
   let repository: jest.Mocked<Pick<Repository<Role>, 'delete'>>;

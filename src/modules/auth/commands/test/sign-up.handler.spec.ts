@@ -6,7 +6,7 @@ import { FindUserByEmailQuery, FindUserByIdQuery } from '@/modules/users/queries
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { WelcomeUserEvent } from '../../events';
 import { SignUpCommand } from '../impl/sign-up.command';
-import { SignUpHandler } from './sign-up.handler';
+import { SignUpHandler } from '../handlers/sign-up.handler';
 
 describe('SignUpHandler', () => {
   let commandBus: jest.Mocked<Pick<CommandBus, 'execute'>>;

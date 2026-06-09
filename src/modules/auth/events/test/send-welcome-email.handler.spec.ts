@@ -2,7 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { WelcomeUserEvent } from '../impl';
-import { SendWelcomeEmailHandler } from './send-welcome-email.handler';
+import { SendWelcomeEmailHandler } from '../handlers/send-welcome-email.handler';
 
 describe('SendWelcomeEmailHandler', () => {
   let mailerService: jest.Mocked<Pick<MailerService, 'sendMail'>>;
@@ -24,7 +24,21 @@ describe('SendWelcomeEmailHandler', () => {
     expect(mailerService.sendMail).toHaveBeenCalledWith({
       to: 'ada@example.com',
       subject: 'Bienvenue sur Starter',
-      text: ['Bonjour Ada Lovelace,', '', 'Bienvenue sur Starter.', '', "L'equipe Starter"].join('\n')
+      html: expect.stringContaining('Votre compte a bien été créé'),
+      text: expect.stringContaining('Votre compte a bien été créé')
+    });
+  });
+
+  it('includes the default password when provided', async () => {
+    mailerService.sendMail.mockResolvedValueOnce(undefined);
+
+    await handler.handle(new WelcomeUserEvent({ name: 'Ada Lovelace', email: 'ada@example.com' }, '123456'));
+
+    expect(mailerService.sendMail).toHaveBeenCalledWith({
+      to: 'ada@example.com',
+      subject: 'Bienvenue sur Starter',
+      html: expect.stringContaining('123456'),
+      text: expect.stringContaining('123456')
     });
   });
 

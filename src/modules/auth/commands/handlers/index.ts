@@ -1,7 +1,6 @@
 import { Provider } from '@nestjs/common';
 import { ForgotPasswordHandler } from './forgot-password.handler';
 import { ResetPasswordHandler } from './reset-password.handler';
-import { SendGeneratedPasswordEmailHandler } from './send-generated-password-email.handler';
 import { SignOutHandler } from './sign-out.handler';
 import { SignUpHandler } from './sign-up.handler';
 import { UpdatePasswordHandler } from './update-password.handler';
@@ -13,6 +12,5 @@ export const CommandHandlers: Provider[] = [
   UpdateProfileHandler,
   UpdatePasswordHandler,
   ForgotPasswordHandler,
-  ResetPasswordHandler,
-  SendGeneratedPasswordEmailHandler
+  ResetPasswordHandler
 ];

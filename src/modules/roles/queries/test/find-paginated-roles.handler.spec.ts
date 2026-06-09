@@ -3,7 +3,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { Role } from '../../entities/role.entity';
 import { FindPaginatedRolesQuery } from '../impl/find-paginated-roles.query';
-import { FindPaginatedRolesHandler } from './find-paginated-roles.handler';
+import { FindPaginatedRolesHandler } from '../handlers/find-paginated-roles.handler';
 
 describe('FindPaginatedRolesHandler', () => {
   let repository: jest.Mocked<Pick<Repository<Role>, 'createQueryBuilder'>>;

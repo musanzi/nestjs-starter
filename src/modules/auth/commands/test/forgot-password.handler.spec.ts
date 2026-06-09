@@ -7,7 +7,7 @@ import { mockDependency } from '../../../../../test/mock-dependency';
 import { createAuthToken } from '../../common/create-auth-token';
 import { ResetPasswordRequestedEvent } from '../../events';
 import { ForgotPasswordCommand } from '../impl/forgot-password.command';
-import { ForgotPasswordHandler } from './forgot-password.handler';
+import { ForgotPasswordHandler } from '../handlers/forgot-password.handler';
 
 jest.mock('../../common/create-auth-token', () => ({
   createAuthToken: jest.fn()

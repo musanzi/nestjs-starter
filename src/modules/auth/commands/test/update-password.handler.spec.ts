@@ -6,7 +6,7 @@ import { UserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
-import { UpdatePasswordHandler } from './update-password.handler';
+import { UpdatePasswordHandler } from '../handlers/update-password.handler';
 
 describe('UpdatePasswordHandler', () => {
   let commandBus: jest.Mocked<Pick<CommandBus, 'execute'>>;

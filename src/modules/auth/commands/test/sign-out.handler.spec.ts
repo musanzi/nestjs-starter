@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { SignOutCommand } from '../impl/sign-out.command';
-import { SignOutHandler } from './sign-out.handler';
+import { SignOutHandler } from '../handlers/sign-out.handler';
 
 describe('SignOutHandler', () => {
   it('destroys the request session', async () => {

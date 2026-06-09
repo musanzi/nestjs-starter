@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { UserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { SignInQuery } from '../impl/sign-in.query';
-import { SignInHandler } from './sign-in.handler';
+import { SignInHandler } from '../handlers/sign-in.handler';
 
 describe('SignInHandler', () => {
   it('returns the authenticated request user', async () => {

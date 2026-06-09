@@ -5,7 +5,7 @@ import { User } from '@/modules/users/entities/user.entity';
 import { UserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '../../../../../test/mock-dependency';
 import { UpdateProfileCommand } from '../impl/update-profile.command';
-import { UpdateProfileHandler } from './update-profile.handler';
+import { UpdateProfileHandler } from '../handlers/update-profile.handler';
 
 describe('UpdateProfileHandler', () => {
   let commandBus: jest.Mocked<Pick<CommandBus, 'execute'>>;
