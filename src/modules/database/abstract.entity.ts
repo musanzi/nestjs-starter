@@ -1,7 +1,7 @@
 import { CreateDateColumn, UpdateDateColumn, DeleteDateColumn, PrimaryColumn } from 'typeorm';
 
 export abstract class AbstractEntity {
-  @PrimaryColumn({ type: 'uuid', generated: 'uuid' })
+  @PrimaryColumn({ generated: 'uuid' })
   id: string;
 
   @CreateDateColumn()
@@ -10,6 +10,6 @@ export abstract class AbstractEntity {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ default: null })
   deleted_at: Date;
 }
