@@ -71,10 +71,10 @@ import { UsersModule } from './modules/users/users.module';
     RolesModule
   ],
   providers: [
-    { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor }
+    { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
+    { provide: APP_GUARD, useClass: ThrottlerGuard }
   ]
 })
 export class AppModule {}

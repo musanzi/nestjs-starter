@@ -1,14 +1,25 @@
-import { PassportSerializer } from '@nestjs/passport';
+import { IUserResponse } from '@/modules/users/interfaces';
+import { FindUserQuery } from '@/modules/users/queries';
 import { Injectable } from '@nestjs/common';
-import { User } from '../../users/entities/user.entity';
+import { QueryBus } from '@nestjs/cqrs';
+import { PassportSerializer } from '@nestjs/passport';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  serializeUser(user: User, done: (_: null, user: User) => void): void {
-    done(null, user);
+  constructor(private readonly queryBus: QueryBus) {
+    super();
   }
 
-  deserializeUser(payload: string, done: (_: null, payload: string) => void) {
-    done(null, payload);
+  serializeUser(user: IUserResponse, done: (err: Error | null, id?: string) => void) {
+    done(null, user.id);
+  }
+
+  async deserializeUser(id: string, done: (err: Error | null, user?: IUserResponse) => void) {
+    try {
+      const user = await this.queryBus.execute(new FindUserQuery({ id }));
+      done(null, user);
+    } catch (error) {
+      done(error as Error);
+    }
   }
 }
