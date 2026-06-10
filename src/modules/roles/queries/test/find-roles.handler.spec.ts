@@ -45,7 +45,7 @@ describe('FindRolesHandler', () => {
     const result = await handler.execute(new FindRolesQuery({}));
 
     expect(result).toEqual([roles, 1]);
-    expect(repository.findAndCount).toHaveBeenCalledWith({ order: { updated_at: 'DESC' } });
+    expect(repository.findAndCount).toHaveBeenCalledWith({ order: { updatedAt: 'DESC' } });
     expect(repository.createQueryBuilder).not.toHaveBeenCalled();
   });
 
@@ -56,7 +56,7 @@ describe('FindRolesHandler', () => {
 
     expect(result).toEqual([roles, 1]);
     expect(repository.createQueryBuilder).toHaveBeenCalledWith('role');
-    expect(queryBuilder.orderBy).toHaveBeenCalledWith('role.updated_at', 'DESC');
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('role.updatedAt', 'DESC');
     expect(queryBuilder.where).toHaveBeenCalledWith('role.name LIKE :name', { name: '%adm%' });
     expect(queryBuilder.skip).toHaveBeenCalledWith(25);
     expect(queryBuilder.take).toHaveBeenCalledWith(25);

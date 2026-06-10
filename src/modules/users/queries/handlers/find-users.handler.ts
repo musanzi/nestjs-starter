@@ -24,7 +24,7 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserRes
 
       if (Object.keys(query.params).length === 0) {
         const users = await this.repository.findAndCount({
-          order: { updated_at: 'DESC' }
+          order: { updatedAt: 'DESC' }
         });
         return [mapUsersRoles(users[0]), users[1]];
       }
@@ -32,7 +32,7 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserRes
       const queryBuilder = this.repository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.roles', 'roles')
-        .orderBy('user.updated_at', 'DESC');
+        .orderBy('user.updatedAt', 'DESC');
       if (q) queryBuilder.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
 
       const [users, total] = await queryBuilder

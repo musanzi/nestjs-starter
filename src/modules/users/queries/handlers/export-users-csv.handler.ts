@@ -23,7 +23,7 @@ export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsvQuery,
       const queryBuilder = this.repository
         .createQueryBuilder('user')
         .select(['user.name', 'user.email'])
-        .orderBy('user.updated_at', 'DESC');
+        .orderBy('user.updatedAt', 'DESC');
       if (q) {
         queryBuilder.where('user.name LIKE :q OR user.email LIKE :q', { q: `%${q}%` });
       }

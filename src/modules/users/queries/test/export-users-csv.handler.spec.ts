@@ -63,7 +63,7 @@ describe('ExportUsersCsvHandler', () => {
 
     expect(repository.createQueryBuilder).toHaveBeenCalledWith('user');
     expect(queryBuilder.select).toHaveBeenCalledWith(['user.name', 'user.email']);
-    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.updated_at', 'DESC');
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.updatedAt', 'DESC');
     expect(queryBuilder.where).toHaveBeenCalledWith('user.name LIKE :q OR user.email LIKE :q', { q: '%ada%' });
     expect(formatMock).toHaveBeenCalledWith({ headers: ['Name', 'Email'] });
     expect(csvStream.pipe).toHaveBeenCalledWith(response);

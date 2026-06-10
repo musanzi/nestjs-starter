@@ -56,7 +56,7 @@ describe('FindUsersHandler', () => {
     expect(result).toEqual([[{ ...users[0], roles: ['admin'] }], 1]);
     expect(repository.createQueryBuilder).toHaveBeenCalledWith('user');
     expect(queryBuilder.leftJoinAndSelect).toHaveBeenCalledWith('user.roles', 'roles');
-    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.updated_at', 'DESC');
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.updatedAt', 'DESC');
     expect(queryBuilder.where).toHaveBeenCalledWith('user.name LIKE :q OR user.email LIKE :q', { q: '%ada%' });
     expect(queryBuilder.skip).toHaveBeenCalledWith(25);
     expect(queryBuilder.take).toHaveBeenCalledWith(25);
@@ -69,7 +69,7 @@ describe('FindUsersHandler', () => {
     const result = await handler.execute(new FindUsersQuery({}));
 
     expect(result).toEqual([[{ ...users[0], roles: ['admin'] }], 1]);
-    expect(repository.findAndCount).toHaveBeenCalledWith({ order: { updated_at: 'DESC' } });
+    expect(repository.findAndCount).toHaveBeenCalledWith({ order: { updatedAt: 'DESC' } });
     expect(repository.createQueryBuilder).not.toHaveBeenCalled();
   });
 

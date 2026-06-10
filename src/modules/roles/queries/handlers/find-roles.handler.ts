@@ -21,12 +21,12 @@ export class FindRolesHandler implements IQueryHandler<FindRolesQuery, [Role[], 
     try {
       if (Object.keys(query.params).length === 0) {
         return await this.repository.findAndCount({
-          order: { updated_at: 'DESC' }
+          order: { updatedAt: 'DESC' }
         });
       }
 
       const { pageNumber, limitNumber } = parsePaginationParams(query.params);
-      const queryBuilder = this.repository.createQueryBuilder('role').orderBy('role.updated_at', 'DESC');
+      const queryBuilder = this.repository.createQueryBuilder('role').orderBy('role.updatedAt', 'DESC');
       if (q) queryBuilder.where('role.name LIKE :name', { name: `%${q}%` });
 
       return await queryBuilder

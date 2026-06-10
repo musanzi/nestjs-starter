@@ -5,11 +5,11 @@ export abstract class AbstractEntity {
   id: string;
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({ default: null })
-  deleted_at: Date;
+  deletedAt: Date;
 }
