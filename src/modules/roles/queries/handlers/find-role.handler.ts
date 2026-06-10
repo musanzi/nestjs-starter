@@ -17,7 +17,10 @@ export class FindRoleHandler implements IQueryHandler<FindRoleQuery, Role> {
 
   async execute(query: FindRoleQuery): Promise<Role> {
     try {
-      return await this.repository.findOneByOrFail(query.where);
+      return await this.repository.findOneOrFail({
+        ...query.options,
+        where: query.where
+      });
     } catch (error) {
       logHandlerError(this.logger, 'Find role', error, `where="${JSON.stringify(query.where)}"`);
       throw new NotFoundException('Rôle introuvable');
