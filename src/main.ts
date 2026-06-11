@@ -39,8 +39,8 @@ async function bootstrap(): Promise<void> {
     session({
       store: sessionStore,
       name: 'sid',
-      secret: process.env.SESSION_SECRET,
       saveUninitialized: false,
+      secret: process.env.SESSION_SECRET,
       resave: false,
       rolling: true,
       cookie: {

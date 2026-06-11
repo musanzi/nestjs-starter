@@ -22,7 +22,6 @@ FROM dependencies AS build
 
 COPY . .
 RUN pnpm build
-RUN pnpm prune --prod
 
 FROM node:24-alpine AS production
 

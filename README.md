@@ -27,7 +27,7 @@ NestJS API starter for session-based authentication, Google OAuth, role-based ac
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 24+
 - pnpm
 - PostgreSQL for local development, or Docker for the containerized stack
 
@@ -66,7 +66,7 @@ GOOGLE_REDIRECT_URI=
 FRONTEND_URI=
 ```
 
-`DB_HOST=localhost` is for running the API directly on your machine. Docker Compose overrides the API container database host to `starter-db`.
+`DB_HOST=localhost` is for running the API directly on your machine. Docker Compose overrides the API container database host to `db`.
 
 Generate the initial migration after entity changes:
 
@@ -105,21 +105,21 @@ DB_NAME=
 Start PostgreSQL first:
 
 ```bash
-docker compose up -d starter-db
+docker compose up -d db
 ```
 
 Generate migrations after entity changes. Migrations and seeds are intentionally manual commands:
 
 ```bash
-docker compose run --rm starter-api pnpm db:migrate
-docker compose run --rm starter-api pnpm db:up
-docker compose run --rm starter-api pnpm db:seed
+docker compose run --rm api pnpm db:migrate
+docker compose run --rm api pnpm db:up
+docker compose run --rm api pnpm db:seed
 ```
 
 Start the API:
 
 ```bash
-docker compose up starter-api
+docker compose up api
 ```
 
 Build the development image directly:
@@ -139,8 +139,8 @@ Do not use starter credentials in production.
 ### Docker Notes
 
 - `docker-compose.yml` requires `.env` to exist and fails fast when required database variables are empty.
-- The database service uses `postgres:17-alpine`.
-- The API service uses `DB_HOST=starter-db` inside Compose, regardless of the local `.env` value.
+- The database service uses `postgres:18-alpine`.
+- The API service uses `DB_HOST=db` inside Compose, regardless of the local `.env` value.
 - The Dockerfile copies `pnpm-workspace.yaml` before `pnpm install` so pnpm build-script approvals are available during image builds.
 - The production image runs `pnpm start:prod`, which starts the compiled app from `dist/src/main`.
 
