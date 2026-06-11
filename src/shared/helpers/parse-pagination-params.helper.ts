@@ -3,7 +3,6 @@ import { IPagination, IParsedPaginationParams } from '../interfaces';
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
-const PAGINATION_ERROR_MESSAGE = 'Les paramètres de pagination sont invalides';
 
 export function parsePaginationParams(params: IPagination): IParsedPaginationParams {
   const { page = 1, limit, take } = params;
@@ -17,7 +16,7 @@ export function parsePaginationParams(params: IPagination): IParsedPaginationPar
     limitNumber < 1 ||
     limitNumber > MAX_LIMIT
   ) {
-    throw new BadRequestException(PAGINATION_ERROR_MESSAGE);
+    throw new BadRequestException('Les paramètres de pagination sont invalides');
   }
 
   return { pageNumber, limitNumber };
