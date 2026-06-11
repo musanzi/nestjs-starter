@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/c
 import { IUserResponse } from '@/modules/users/interfaces';
 import { logHandlerError } from '@/shared/helpers';
 import { SignUpCommand } from '../impl/sign-up.command';
-import { FindUserQuery } from '@/modules/users/queries';
+import { FindUserByIdQuery } from '@/modules/users/queries';
 import { CreateUserCommand } from '@/modules/users/commands';
 
 @CommandHandler(SignUpCommand)
@@ -21,7 +21,7 @@ export class SignUpHandler implements ICommandHandler<SignUpCommand, IUserRespon
     try {
       const user = await this.commandBus.execute(new CreateUserCommand(dto));
 
-      return await this.queryBus.execute(new FindUserQuery({ id: user.id }));
+      return await this.queryBus.execute(new FindUserByIdQuery(user.id));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

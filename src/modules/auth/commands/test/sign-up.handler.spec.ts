@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '@/modules/users/commands';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { FindUserQuery } from '@/modules/users/queries';
+import { FindUserByIdQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { SignUpCommand } from '../impl/sign-up.command';
 import { SignUpHandler } from '../handlers/sign-up.handler';
@@ -36,7 +36,7 @@ describe('SignUpHandler', () => {
 
     expect(result).toBe(freshUser);
     expect(commandBus.execute).toHaveBeenCalledWith(new CreateUserCommand(dto));
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('user-id'));
   });
 
   it('throws ConflictException unchanged when the email already exists', async () => {

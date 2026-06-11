@@ -4,25 +4,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { logHandlerError } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRoleQuery } from '../impl/find-role.query';
+import { FindRoleByIdQuery } from '../impl/find-role-by-id.query';
 
-@QueryHandler(FindRoleQuery)
-export class FindRoleHandler implements IQueryHandler<FindRoleQuery, Role> {
-  private readonly logger = new Logger(FindRoleHandler.name);
+@QueryHandler(FindRoleByIdQuery)
+export class FindRoleByIdHandler implements IQueryHandler<FindRoleByIdQuery, Role> {
+  private readonly logger = new Logger(FindRoleByIdHandler.name);
 
   constructor(
     @InjectRepository(Role)
     private readonly repository: Repository<Role>
   ) {}
 
-  async execute(query: FindRoleQuery): Promise<Role> {
+  async execute(query: FindRoleByIdQuery): Promise<Role> {
     try {
       return await this.repository.findOneOrFail({
-        ...query.options,
-        where: query.where
+        where: { id: query.id }
       });
     } catch (error) {
-      logHandlerError(this.logger, 'Find role', error, `where="${JSON.stringify(query.where)}"`);
+      logHandlerError(this.logger, 'Find role by id', error, `id="${query.id}"`);
       throw new NotFoundException('Rôle introuvable');
     }
   }

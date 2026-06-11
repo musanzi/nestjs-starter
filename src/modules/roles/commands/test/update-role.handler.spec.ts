@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Logger, NotFoundException } fro
 import { QueryBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
-import { FindRoleQuery } from '../../queries';
+import { FindRoleByIdQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
 import { UpdateRoleCommand } from '../impl/update-role.command';
 import { UpdateRoleHandler } from '../handlers/update-role.handler';
@@ -40,7 +40,7 @@ describe('UpdateRoleHandler', () => {
     const result = await handler.execute(new UpdateRoleCommand('role-id', { name: 'manager' }));
 
     expect(result).toBe(updatedRole);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleQuery({ id: 'role-id' }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindRoleByIdQuery('role-id'));
     expect(repository.findOne).toHaveBeenCalledWith({ where: { name: 'manager' } });
     expect(repository.merge).toHaveBeenCalledWith(role, { name: 'manager' });
     expect(repository.save).toHaveBeenCalledWith(updatedRole);

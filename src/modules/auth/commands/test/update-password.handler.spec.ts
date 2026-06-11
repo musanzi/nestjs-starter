@@ -3,7 +3,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { User } from '@/modules/users/entities/user.entity';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { FindUserQuery } from '@/modules/users/queries';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
 import { UpdatePasswordHandler } from '../handlers/update-password.handler';
@@ -36,7 +36,7 @@ describe('UpdatePasswordHandler', () => {
 
     expect(result).toBe(updatedUser);
     expect(commandBus.execute).toHaveBeenCalledWith(new UpdateUserCommand('user-id', { password: 'new-password' }));
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ email: 'ada@example.com' }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
   });
 
   it('throws BadRequestException when update password handling fails', async () => {

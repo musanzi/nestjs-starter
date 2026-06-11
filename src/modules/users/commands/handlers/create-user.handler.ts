@@ -6,11 +6,11 @@ import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { FindUserQuery } from '../../queries';
+import { FindUserByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { WelcomeUserEvent } from '../../events';
-import { FindRoleQuery } from '@/modules/roles/queries';
+import { FindRoleByNameQuery } from '@/modules/roles/queries';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUserResponse> {
@@ -38,7 +38,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUs
         throw new ConflictException('Cet utilisateur existe déjà');
       }
 
-      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleQuery({ name: 'user' }))];
+      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByNameQuery('user'))];
       const user = this.repository.create({
         ...dto,
         password,
@@ -49,7 +49,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUs
 
       this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
 
-      return await this.queryBus.execute(new FindUserQuery({ id: createdUser.id }));
+      return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

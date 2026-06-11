@@ -4,7 +4,7 @@ import { IUserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { logHandlerError } from '@/shared/helpers';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
-import { FindUserQuery } from '@/modules/users/queries';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 
 @CommandHandler(UpdatePasswordCommand)
 export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordCommand, IUserResponse> {
@@ -21,7 +21,7 @@ export class UpdatePasswordHandler implements ICommandHandler<UpdatePasswordComm
     try {
       await this.commandBus.execute(new UpdateUserCommand(currentUser.id, { password: dto.password }));
 
-      return await this.queryBus.execute(new FindUserQuery({ email: currentUser.email }));
+      return await this.queryBus.execute(new FindUserByEmailQuery(currentUser.email));
     } catch (error) {
       logHandlerError(this.logger, 'Update password', error, `id="${currentUser?.id ?? ''}"`);
       throw new BadRequestException('Mise à jour impossible');

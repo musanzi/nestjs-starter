@@ -6,29 +6,26 @@ import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
-import { FindUserQuery } from '../impl/find-user.query';
+import { FindUserByIdQuery } from '../impl/find-user-by-id.query';
 
-@QueryHandler(FindUserQuery)
-export class FindUserHandler implements IQueryHandler<FindUserQuery, IUserResponse> {
-  private readonly logger = new Logger(FindUserHandler.name);
+@QueryHandler(FindUserByIdQuery)
+export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, IUserResponse> {
+  private readonly logger = new Logger(FindUserByIdHandler.name);
 
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUserQuery): Promise<IUserResponse> {
+  async execute(query: FindUserByIdQuery): Promise<IUserResponse> {
     try {
       const user = await this.repository.findOneOrFail({
-        ...query.options,
-        where: query.where,
+        where: { id: query.id },
         relations: ['roles']
       });
       return mapUserRoles(user);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-
-      logHandlerError(this.logger, 'Find user by id', error, `where="${JSON.stringify(query.where)}"`);
+      logHandlerError(this.logger, 'Find user by id', error, `id="${query.id}"`);
       throw new NotFoundException('Utilisateur introuvable');
     }
   }

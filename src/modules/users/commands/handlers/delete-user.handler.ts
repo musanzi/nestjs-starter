@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { logHandlerError } from '@/shared/helpers';
 import { DeleteUserCommand } from '../impl/delete-user.command';
-import { FindUserQuery } from '../../queries';
+import { FindUserByIdQuery } from '../../queries';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, void> {
@@ -19,7 +19,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
 
   async execute(command: DeleteUserCommand): Promise<void> {
     try {
-      await this.queryBus.execute(new FindUserQuery({ id: command.id }));
+      await this.queryBus.execute(new FindUserByIdQuery(command.id));
 
       await this.repository.softDelete(command.id);
     } catch (error) {

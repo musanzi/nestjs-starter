@@ -5,11 +5,11 @@ import { Role } from '@/modules/roles/entities/role.entity';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { FindUserQuery } from '../../queries';
+import { FindUserByIdQuery } from '../../queries';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { CreateUserHandler } from '../handlers/create-user.handler';
 import { WelcomeUserEvent } from '../../events';
-import { FindRoleQuery } from '@/modules/roles/queries';
+import { FindRoleByNameQuery } from '@/modules/roles/queries';
 
 describe('CreateUserHandler', () => {
   let repository: jest.Mocked<Pick<Repository<User>, 'findOne' | 'create' | 'save'>>;
@@ -65,8 +65,8 @@ describe('CreateUserHandler', () => {
       roles: [defaultRole]
     });
     expect(eventBus.publish).toHaveBeenCalledWith(new WelcomeUserEvent(createdUser));
-    expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindRoleQuery({ name: 'user' }));
-    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserQuery({ id: 'user-id' }));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(1, new FindRoleByNameQuery('user'));
+    expect(queryBus.execute).toHaveBeenNthCalledWith(2, new FindUserByIdQuery('user-id'));
   });
 
   it('generates a six digit password and publishes a welcome event when password is missing', async () => {
@@ -112,7 +112,7 @@ describe('CreateUserHandler', () => {
       roles: [{ id: 'admin-role-id' }]
     });
     expect(queryBus.execute).toHaveBeenCalledTimes(1);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ id: 'user-id' }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByIdQuery('user-id'));
   });
 
   it('throws ConflictException when the email already exists', async () => {

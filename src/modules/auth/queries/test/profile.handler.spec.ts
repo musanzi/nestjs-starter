@@ -1,7 +1,7 @@
 import { QueryBus } from '@nestjs/cqrs';
 import { User } from '@/modules/users/entities/user.entity';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { FindUserQuery } from '@/modules/users/queries';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { ProfileQuery } from '../impl/profile.query';
 import { ProfileHandler } from '../handlers/profile.handler';
@@ -17,6 +17,6 @@ describe('ProfileHandler', () => {
     const result = await handler.execute(new ProfileQuery(currentUser));
 
     expect(result).toBe(profile);
-    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserQuery({ email: 'ada@example.com' }));
+    expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
   });
 });

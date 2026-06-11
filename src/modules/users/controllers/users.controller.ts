@@ -18,7 +18,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { IFilterUsers, IUserResponse } from '../interfaces';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entities/user.entity';
-import { CurrentUser, Public, Roles } from '@/modules/auth/decorators';
+import { CurrentUser, Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
 import { createDiskUploadOptions } from '@/shared/helpers';
 import { Response } from 'express';
@@ -29,7 +29,7 @@ import {
   UpdateUserCommand,
   UploadUserAvatarCommand
 } from '../commands';
-import { ExportUsersCsvQuery, FindUserQuery, FindUsersQuery } from '../queries';
+import { ExportUsersCsvQuery, FindUserByEmailQuery, FindUsersQuery } from '../queries';
 
 @Controller('users')
 export class UsersController {
@@ -57,16 +57,16 @@ export class UsersController {
     return this.commandBus.execute(new ImportUsersCsvCommand(file));
   }
 
-  @Get('export/users.csv')
+  @Get('export-csv')
   @Roles([RoleEnum.ADMIN])
   async exportCSV(@Query() query: IFilterUsers, @Res() res: Response): Promise<void> {
     await this.queryBus.execute(new ExportUsersCsvQuery(query, res));
   }
 
-  @Get('by-email/:email')
-  @Public()
+  @Get(':email')
+  @Roles([RoleEnum.ADMIN])
   findOneByEmail(@Param('email') email: string): Promise<IUserResponse> {
-    return this.queryBus.execute(new FindUserQuery({ email }));
+    return this.queryBus.execute(new FindUserByEmailQuery(email));
   }
 
   @Patch('id/:userId')

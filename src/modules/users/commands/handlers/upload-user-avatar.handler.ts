@@ -7,7 +7,7 @@ import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindUserQuery } from '../../queries';
+import { FindUserByIdQuery } from '../../queries';
 
 @CommandHandler(UploadUserAvatarCommand)
 export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatarCommand, IUserResponse> {
@@ -31,7 +31,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
         avatar: file.filename
       });
 
-      return await this.queryBus.execute(new FindUserQuery({ id: currentUser.id }));
+      return await this.queryBus.execute(new FindUserByIdQuery(currentUser.id));
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 

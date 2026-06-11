@@ -6,7 +6,7 @@ import { createAuthToken } from '../../common/create-auth-token';
 import { logHandlerError } from '@/shared/helpers';
 import { ForgotPasswordCommand } from '../impl/forgot-password.command';
 import { ResetPasswordRequestedEvent } from '../../events';
-import { FindUserQuery } from '@/modules/users/queries';
+import { FindUserByEmailQuery } from '@/modules/users/queries';
 
 @CommandHandler(ForgotPasswordCommand)
 export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordCommand, void> {
@@ -23,9 +23,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
     const { dto } = command;
 
     try {
-      const user = await this.queryBus.execute(
-        new FindUserQuery({ email: dto.email })
-      );
+      const user = await this.queryBus.execute(new FindUserByEmailQuery(dto.email));
 
       const token = await createAuthToken(this.jwtService, this.configService, user, '15m');
 

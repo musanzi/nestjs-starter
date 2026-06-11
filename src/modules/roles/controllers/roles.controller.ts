@@ -7,7 +7,7 @@ import { Role } from '../entities/role.entity';
 import { Roles } from '@/modules/auth/decorators';
 import { RoleEnum } from '@/modules/auth/enums';
 import { CreateRoleCommand, DeleteRoleCommand, UpdateRoleCommand } from '../commands';
-import { FindRoleQuery, FindRolesQuery } from '../queries';
+import { FindRoleByIdQuery, FindRolesQuery } from '../queries';
 
 @Controller('roles')
 export class RolesController {
@@ -31,7 +31,7 @@ export class RolesController {
   @Get('id/:id')
   @Roles([RoleEnum.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
-    return this.queryBus.execute(new FindRoleQuery({ id }));
+    return this.queryBus.execute(new FindRoleByIdQuery(id));
   }
 
   @Patch('id/:id')
