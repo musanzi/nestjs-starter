@@ -63,14 +63,20 @@ describe('FindUsersHandler', () => {
     expect(queryBuilder.getManyAndCount).toHaveBeenCalledTimes(1);
   });
 
-  it('returns all mapped users without pagination when no query params are provided', async () => {
-    repository.findAndCount.mockResolvedValueOnce([users, 1]);
+  it('returns the first page of mapped users when no query params are provided', async () => {
+    queryBuilder.getManyAndCount.mockResolvedValueOnce([users, 1]);
 
     const result = await handler.execute(new FindUsersQuery({}));
 
     expect(result).toEqual([[{ ...users[0], roles: ['admin'] }], 1]);
-    expect(repository.findAndCount).toHaveBeenCalledWith({ order: { updatedAt: 'DESC' } });
-    expect(repository.createQueryBuilder).not.toHaveBeenCalled();
+    expect(repository.createQueryBuilder).toHaveBeenCalledWith('user');
+    expect(queryBuilder.leftJoinAndSelect).toHaveBeenCalledWith('user.roles', 'roles');
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.updatedAt', 'DESC');
+    expect(queryBuilder.where).not.toHaveBeenCalled();
+    expect(queryBuilder.skip).toHaveBeenCalledWith(0);
+    expect(queryBuilder.take).toHaveBeenCalledWith(20);
+    expect(queryBuilder.getManyAndCount).toHaveBeenCalledTimes(1);
+    expect(repository.findAndCount).not.toHaveBeenCalled();
   });
 
   it('defaults to the first page when query params are provided without pagination params', async () => {
@@ -117,7 +123,7 @@ describe('FindUsersHandler', () => {
   });
 
   it('throws BadRequestException when users cannot be found without query params', async () => {
-    repository.findAndCount.mockRejectedValueOnce(new Error('database unavailable'));
+    queryBuilder.getManyAndCount.mockRejectedValueOnce(new Error('database unavailable'));
     const promise = handler.execute(new FindUsersQuery({}));
 
     await expect(promise).rejects.toThrow(BadRequestException);

@@ -74,6 +74,18 @@ describe('FindRolesHandler', () => {
     expect(queryBuilder.take).toHaveBeenCalledWith(20);
   });
 
+  it('paginates when an empty search query param is provided', async () => {
+    queryBuilder.getManyAndCount.mockResolvedValueOnce([roles, 1]);
+
+    const result = await handler.execute(new FindRolesQuery({ q: '' }));
+
+    expect(result).toEqual([roles, 1]);
+    expect(queryBuilder.where).not.toHaveBeenCalled();
+    expect(queryBuilder.skip).toHaveBeenCalledWith(0);
+    expect(queryBuilder.take).toHaveBeenCalledWith(20);
+    expect(repository.findAndCount).not.toHaveBeenCalled();
+  });
+
   it('accepts take as a legacy alias for limit', async () => {
     queryBuilder.getManyAndCount.mockResolvedValueOnce([roles, 1]);
 

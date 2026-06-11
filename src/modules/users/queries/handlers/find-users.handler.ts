@@ -22,13 +22,6 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserRes
       const { q } = query.params;
       const { pageNumber, limitNumber } = parsePaginationParams(query.params);
 
-      if (Object.keys(query.params).length === 0) {
-        const users = await this.repository.findAndCount({
-          order: { updatedAt: 'DESC' }
-        });
-        return [mapUsersRoles(users[0]), users[1]];
-      }
-
       const queryBuilder = this.repository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.roles', 'roles')
