@@ -5,7 +5,7 @@ import { format } from 'fast-csv';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { logHandlerError } from '@/shared/helpers';
-import { ExportUsersCsvQuery } from '../impl/export-users-csv.query';
+import { ExportUsersCsvQuery } from '../impl';
 
 @QueryHandler(ExportUsersCsvQuery)
 export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsvQuery, void> {

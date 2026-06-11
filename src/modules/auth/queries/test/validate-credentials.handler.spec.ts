@@ -5,7 +5,7 @@ import { User } from '@/modules/users/entities/user.entity';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
-import { ValidateCredentialsQuery } from '../impl/validate-credentials.query';
+import { ValidateCredentialsQuery } from '../impl';
 import { ValidateCredentialsHandler } from '../handlers/validate-credentials.handler';
 
 jest.mock('bcryptjs', () => ({

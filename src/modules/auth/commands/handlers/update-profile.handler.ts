@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { logHandlerError } from '@/shared/helpers';
-import { UpdateProfileCommand } from '../impl/update-profile.command';
+import { UpdateProfileCommand } from '../impl';
 
 @CommandHandler(UpdateProfileCommand)
 export class UpdateProfileHandler implements ICommandHandler<UpdateProfileCommand, IUserResponse> {

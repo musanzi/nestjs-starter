@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 import { FindRoleByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
-import { UpdateRoleCommand } from '../impl/update-role.command';
+import { UpdateRoleCommand } from '../impl';
 
 @CommandHandler(UpdateRoleCommand)
 export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Role> {

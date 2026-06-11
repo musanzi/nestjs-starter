@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { logHandlerError } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByIdQuery } from '../impl/find-role-by-id.query';
+import { FindRoleByIdQuery } from '../impl';
 
 @QueryHandler(FindRoleByIdQuery)
 export class FindRoleByIdHandler implements IQueryHandler<FindRoleByIdQuery, Role> {

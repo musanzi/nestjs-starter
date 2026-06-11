@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { FindRoleByIdQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
-import { DeleteRoleCommand } from '../impl/delete-role.command';
+import { DeleteRoleCommand } from '../impl';
 import { DeleteRoleHandler } from '../handlers/delete-role.handler';
 
 describe('DeleteRoleHandler', () => {

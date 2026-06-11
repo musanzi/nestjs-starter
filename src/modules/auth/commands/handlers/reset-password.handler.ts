@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { logHandlerError } from '@/shared/helpers';
-import { ResetPasswordCommand } from '../impl/reset-password.command';
+import { ResetPasswordCommand } from '../impl';
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand, IUserResponse> {

@@ -6,7 +6,7 @@ import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
 import { createAuthToken } from '../../common/create-auth-token';
 import { ResetPasswordRequestedEvent } from '../../events';
-import { ForgotPasswordCommand } from '../impl/forgot-password.command';
+import { ForgotPasswordCommand } from '../impl';
 import { ForgotPasswordHandler } from '../handlers/forgot-password.handler';
 
 jest.mock('../../common/create-auth-token', () => ({

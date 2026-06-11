@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '@/shared/helpers';
-import { ResetPasswordCommand } from '../impl/reset-password.command';
+import { ResetPasswordCommand } from '../impl';
 import { ResetPasswordHandler } from '../handlers/reset-password.handler';
 
 describe('ResetPasswordHandler', () => {

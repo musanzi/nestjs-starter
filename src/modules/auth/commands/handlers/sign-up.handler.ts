@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { logHandlerError } from '@/shared/helpers';
-import { SignUpCommand } from '../impl/sign-up.command';
+import { SignUpCommand } from '../impl';
 import { FindUserByIdQuery } from '@/modules/users/queries';
 import { CreateUserCommand } from '@/modules/users/commands';
 

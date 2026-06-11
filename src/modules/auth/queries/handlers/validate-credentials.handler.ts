@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { compare } from 'bcryptjs';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { ValidateCredentialsQuery } from '../impl/validate-credentials.query';
+import { ValidateCredentialsQuery } from '../impl';
 import { FindUserByEmailQuery, FindUserByEmailWithPasswordQuery } from '@/modules/users/queries';
 
 @QueryHandler(ValidateCredentialsQuery)

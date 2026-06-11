@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/c
 import { IUserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
 import { logHandlerError } from '@/shared/helpers';
-import { UpdatePasswordCommand } from '../impl/update-password.command';
+import { UpdatePasswordCommand } from '../impl';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 
 @CommandHandler(UpdatePasswordCommand)

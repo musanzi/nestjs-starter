@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { SignInQuery } from '../impl/sign-in.query';
+import { SignInQuery } from '../impl';
 
 @QueryHandler(SignInQuery)
 export class SignInHandler implements IQueryHandler<SignInQuery, IUserResponse> {

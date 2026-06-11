@@ -5,7 +5,7 @@ import { User } from '@/modules/users/entities/user.entity';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
-import { UpdatePasswordCommand } from '../impl/update-password.command';
+import { UpdatePasswordCommand } from '../impl';
 import { UpdatePasswordHandler } from '../handlers/update-password.handler';
 
 describe('UpdatePasswordHandler', () => {

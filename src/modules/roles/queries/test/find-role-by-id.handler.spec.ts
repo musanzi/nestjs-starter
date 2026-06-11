@@ -2,7 +2,7 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByIdQuery } from '../impl/find-role-by-id.query';
+import { FindRoleByIdQuery } from '../impl';
 import { FindRoleByIdHandler } from '../handlers/find-role-by-id.handler';
 
 describe('FindRoleByIdHandler', () => {

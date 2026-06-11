@@ -6,7 +6,7 @@ import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
-import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
+import { UploadUserAvatarCommand } from '../impl';
 import { UploadUserAvatarHandler } from '../handlers/upload-user-avatar.handler';
 
 describe('UploadUserAvatarHandler', () => {

@@ -4,7 +4,7 @@ import { format } from 'fast-csv';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { ExportUsersCsvQuery } from '../impl/export-users-csv.query';
+import { ExportUsersCsvQuery } from '../impl';
 import { ExportUsersCsvHandler } from '../handlers/export-users-csv.handler';
 
 jest.mock('fast-csv', () => ({

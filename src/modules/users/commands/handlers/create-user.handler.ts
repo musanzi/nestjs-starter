@@ -8,7 +8,7 @@ import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
-import { CreateUserCommand } from '../impl/create-user.command';
+import { CreateUserCommand } from '../impl';
 import { WelcomeUserEvent } from '../../events';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';
 

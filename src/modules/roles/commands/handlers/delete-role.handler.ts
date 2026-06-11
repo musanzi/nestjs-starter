@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 import { FindRoleByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
-import { DeleteRoleCommand } from '../impl/delete-role.command';
+import { DeleteRoleCommand } from '../impl';
 
 @CommandHandler(DeleteRoleCommand)
 export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand, void> {

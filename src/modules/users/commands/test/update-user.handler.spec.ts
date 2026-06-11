@@ -5,7 +5,7 @@ import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
-import { UpdateUserCommand } from '../impl/update-user.command';
+import { UpdateUserCommand } from '../impl';
 import { UpdateUserHandler } from '../handlers/update-user.handler';
 
 describe('UpdateUserHandler', () => {

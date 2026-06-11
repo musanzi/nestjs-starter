@@ -4,9 +4,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { CreateUserCommand } from '../impl/create-user.command';
-import { FindOrCreateUserCommand } from '../impl/find-or-create-user.command';
-import { UpdateUserCommand } from '../impl/update-user.command';
+import { CreateUserCommand, FindOrCreateUserCommand, UpdateUserCommand } from '../impl';
 import { FindOrCreateUserHandler } from '../handlers/find-or-create-user.handler';
 
 describe('FindOrCreateUserHandler', () => {

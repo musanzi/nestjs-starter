@@ -6,7 +6,7 @@ import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
-import { FindUserByEmailQuery } from '../impl/find-user-by-email.query';
+import { FindUserByEmailQuery } from '../impl';
 
 @QueryHandler(FindUserByEmailQuery)
 export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuery, IUserResponse> {

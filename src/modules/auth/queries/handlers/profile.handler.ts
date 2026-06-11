@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { ProfileQuery } from '../impl/profile.query';
+import { ProfileQuery } from '../impl';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 
 @QueryHandler(ProfileQuery)

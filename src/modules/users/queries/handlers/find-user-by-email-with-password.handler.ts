@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { logHandlerError } from '@/shared/helpers';
-import { FindUserByEmailWithPasswordQuery } from '../impl/find-user-by-email-with-password.query';
+import { FindUserByEmailWithPasswordQuery } from '../impl';
 
 @QueryHandler(FindUserByEmailWithPasswordQuery)
 export class FindUserByEmailWithPasswordHandler implements IQueryHandler<FindUserByEmailWithPasswordQuery, User> {

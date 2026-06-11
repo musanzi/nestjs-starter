@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { CreateRoleCommand } from '../impl/create-role.command';
+import { CreateRoleCommand } from '../impl';
 import { logHandlerError } from '@/shared/helpers';
 
 @CommandHandler(CreateRoleCommand)

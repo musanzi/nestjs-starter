@@ -7,7 +7,7 @@ import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
 import { logHandlerError } from '@/shared/helpers';
-import { UpdateUserCommand } from '../impl/update-user.command';
+import { UpdateUserCommand } from '../impl';
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, IUserResponse> {

@@ -2,8 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { mockDependency } from '@/shared/helpers';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
-import { FindOrCreateUserCommand } from '../impl/find-or-create-user.command';
-import { ImportUsersCsvCommand } from '../impl/import-users-csv.command';
+import { FindOrCreateUserCommand, ImportUsersCsvCommand } from '../impl';
 import { ImportUsersCsvHandler } from '../handlers/import-users-csv.handler';
 
 jest.mock('../../helpers/user-csv.helper', () => ({

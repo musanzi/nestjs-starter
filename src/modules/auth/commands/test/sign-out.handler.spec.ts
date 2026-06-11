@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { mockDependency } from '@/shared/helpers';
-import { SignOutCommand } from '../impl/sign-out.command';
+import { SignOutCommand } from '../impl';
 import { SignOutHandler } from '../handlers/sign-out.handler';
 
 describe('SignOutHandler', () => {

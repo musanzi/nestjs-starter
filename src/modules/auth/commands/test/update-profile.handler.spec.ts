@@ -4,7 +4,7 @@ import { UpdateUserCommand } from '@/modules/users/commands';
 import { User } from '@/modules/users/entities/user.entity';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '@/shared/helpers';
-import { UpdateProfileCommand } from '../impl/update-profile.command';
+import { UpdateProfileCommand } from '../impl';
 import { UpdateProfileHandler } from '../handlers/update-profile.handler';
 
 describe('UpdateProfileHandler', () => {

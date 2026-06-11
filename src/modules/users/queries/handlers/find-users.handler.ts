@@ -6,7 +6,7 @@ import { mapUsersRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { logHandlerError, parsePaginationParams } from '@/shared/helpers';
-import { FindUsersQuery } from '../impl/find-users.query';
+import { FindUsersQuery } from '../impl';
 
 @QueryHandler(FindUsersQuery)
 export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserResponse[], number]> {

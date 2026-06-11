@@ -4,7 +4,7 @@ import { CreateUserCommand } from '@/modules/users/commands';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserByIdQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
-import { SignUpCommand } from '../impl/sign-up.command';
+import { SignUpCommand } from '../impl';
 import { SignUpHandler } from '../handlers/sign-up.handler';
 
 describe('SignUpHandler', () => {

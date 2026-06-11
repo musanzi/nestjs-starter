@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
-import { GoogleRedirectQuery } from '../impl/google-redirect.query';
+import { GoogleRedirectQuery } from '../impl';
 
 @QueryHandler(GoogleRedirectQuery)
 export class GoogleRedirectHandler implements IQueryHandler<GoogleRedirectQuery, void> {

@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { promises } from 'fs';
 import { IUserResponse } from '../../interfaces';
 import { logHandlerError } from '@/shared/helpers';
-import { UploadUserAvatarCommand } from '../impl/upload-user-avatar.command';
+import { UploadUserAvatarCommand } from '../impl';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';

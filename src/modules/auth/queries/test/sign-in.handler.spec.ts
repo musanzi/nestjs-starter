@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { mockDependency } from '@/shared/helpers';
-import { SignInQuery } from '../impl/sign-in.query';
+import { SignInQuery } from '../impl';
 import { SignInHandler } from '../handlers/sign-in.handler';
 
 describe('SignInHandler', () => {

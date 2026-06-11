@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { FindUserByIdHandler } from '../handlers/find-user-by-id.handler';
-import { FindUserByIdQuery } from '../impl/find-user-by-id.query';
+import { FindUserByIdQuery } from '../impl';
 
 describe('FindUserByIdHandler', () => {
   let repository: jest.Mocked<Pick<Repository<User>, 'findOneOrFail'>>;

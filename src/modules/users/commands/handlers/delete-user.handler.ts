@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { logHandlerError } from '@/shared/helpers';
-import { DeleteUserCommand } from '../impl/delete-user.command';
+import { DeleteUserCommand } from '../impl';
 import { FindUserByIdQuery } from '../../queries';
 
 @CommandHandler(DeleteUserCommand)

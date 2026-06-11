@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { mockDependency } from '@/shared/helpers';
-import { GoogleRedirectQuery } from '../impl/google-redirect.query';
+import { GoogleRedirectQuery } from '../impl';
 import { GoogleRedirectHandler } from '../handlers/google-redirect.handler';
 
 describe('GoogleRedirectHandler', () => {

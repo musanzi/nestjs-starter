@@ -3,7 +3,7 @@ import { User } from '@/modules/users/entities/user.entity';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 import { mockDependency } from '@/shared/helpers';
-import { ProfileQuery } from '../impl/profile.query';
+import { ProfileQuery } from '../impl';
 import { ProfileHandler } from '../handlers/profile.handler';
 
 describe('ProfileHandler', () => {

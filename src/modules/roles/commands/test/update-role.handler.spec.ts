@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { FindRoleByIdQuery } from '../../queries';
 import { Role } from '../../entities/role.entity';
-import { UpdateRoleCommand } from '../impl/update-role.command';
+import { UpdateRoleCommand } from '../impl';
 import { UpdateRoleHandler } from '../handlers/update-role.handler';
 
 describe('UpdateRoleHandler', () => {

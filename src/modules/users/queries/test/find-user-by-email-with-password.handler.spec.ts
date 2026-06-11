@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { FindUserByEmailWithPasswordHandler } from '../handlers/find-user-by-email-with-password.handler';
-import { FindUserByEmailWithPasswordQuery } from '../impl/find-user-by-email-with-password.query';
+import { FindUserByEmailWithPasswordQuery } from '../impl';
 
 describe('FindUserByEmailWithPasswordHandler', () => {
   let repository: jest.Mocked<Pick<Repository<User>, 'findOneOrFail'>>;

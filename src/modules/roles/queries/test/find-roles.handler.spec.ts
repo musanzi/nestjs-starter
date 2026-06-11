@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRolesQuery } from '../impl/find-roles.query';
+import { FindRolesQuery } from '../impl';
 import { FindRolesHandler } from '../handlers/find-roles.handler';
 
 describe('FindRolesHandler', () => {

@@ -6,7 +6,7 @@ import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
-import { CreateUserCommand } from '../impl/create-user.command';
+import { CreateUserCommand } from '../impl';
 import { CreateUserHandler } from '../handlers/create-user.handler';
 import { WelcomeUserEvent } from '../../events';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';

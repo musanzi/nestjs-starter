@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { mockDependency } from '@/shared/helpers';
 import { User } from '../../entities/user.entity';
-import { FindUsersQuery } from '../impl/find-users.query';
+import { FindUsersQuery } from '../impl';
 import { FindUsersHandler } from '../handlers/find-users.handler';
 
 describe('FindUsersHandler', () => {

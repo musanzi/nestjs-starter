@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createAuthToken } from '../../common/create-auth-token';
 import { logHandlerError } from '@/shared/helpers';
-import { ForgotPasswordCommand } from '../impl/forgot-password.command';
+import { ForgotPasswordCommand } from '../impl';
 import { ResetPasswordRequestedEvent } from '../../events';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
 
