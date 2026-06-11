@@ -15,5 +15,6 @@ minimumReleaseAgeExclude:
   - better-auth@1.6.13
 
 onlyBuiltDependencies:
+  - '@scarf/scarf'
   - '@nestjs/core'
   - unrs-resolver

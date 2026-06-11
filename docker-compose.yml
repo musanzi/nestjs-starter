@@ -1,0 +1,46 @@
+services:
+  starter-db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
+    ports:
+      - '${DB_PORT:?DB_PORT is required}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  starter-api:
+    build:
+      context: .
+      target: development
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: starter-db
+      DB_PORT: 5432
+    ports:
+      - '${PORT:?PORT is required}:${PORT:?PORT is required}'
+    volumes:
+      - .:/app
+      - starter-api_node_modules:/app/node_modules
+      - ./uploads:/app/uploads
+    depends_on:
+      starter-db:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    command: pnpm start:dev
+
+volumes:
+  postgres_data:
+  starter-api_node_modules:
