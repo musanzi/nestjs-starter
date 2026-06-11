@@ -10,6 +10,6 @@ export abstract class AbstractEntity {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date;
 }
