@@ -3,7 +3,6 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { logHandlerError } from '@/shared/helpers';
 import { FindUserByEmailWithPasswordQuery } from '../impl';
 
 @QueryHandler(FindUserByEmailWithPasswordQuery)
@@ -22,7 +21,9 @@ export class FindUserByEmailWithPasswordHandler implements IQueryHandler<FindUse
         select: ['id', 'email', 'password']
       });
     } catch (error) {
-      logHandlerError(this.logger, 'Find user by email with password', error, `email="${query.email}"`);
+      this.logger.error(
+        `Find user by email with password failed email="${query.email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new NotFoundException('Utilisateur introuvable');
     }
   }

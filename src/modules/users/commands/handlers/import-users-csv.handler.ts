@@ -1,7 +1,6 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
-import { logHandlerError } from '@/shared/helpers';
 import { FindOrCreateUserCommand, ImportUsersCsvCommand } from '../impl';
 
 @CommandHandler(ImportUsersCsvCommand)
@@ -20,7 +19,7 @@ export class ImportUsersCsvHandler implements ICommandHandler<ImportUsersCsvComm
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logHandlerError(this.logger, 'Import users csv', error);
+      this.logger.error(`Import users csv failed: ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Import des utilisateurs impossible');
     }
   }

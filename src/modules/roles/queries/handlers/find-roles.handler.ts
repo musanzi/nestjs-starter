@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { logHandlerError, parsePaginationParams } from '@/shared/helpers';
+import { parsePaginationParams } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { FindRolesQuery } from '../impl/find-roles.query';
 
@@ -36,7 +36,9 @@ export class FindRolesHandler implements IQueryHandler<FindRolesQuery, [Role[], 
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logHandlerError(this.logger, 'Find roles', error, `params="${JSON.stringify(query.params)}"`);
+      this.logger.error(
+        `Find roles failed params="${JSON.stringify(query.params)}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Rôles introuvables');
     }
   }

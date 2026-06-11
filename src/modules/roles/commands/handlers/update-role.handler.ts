@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 import { FindRoleByIdQuery } from '../../queries';
-import { logHandlerError } from '@/shared/helpers';
 import { UpdateRoleCommand } from '../impl';
 
 @CommandHandler(UpdateRoleCommand)
@@ -37,7 +36,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
     } catch (error) {
       if (error instanceof ConflictException || error instanceof NotFoundException) throw error;
 
-      logHandlerError(this.logger, 'Update role', error, `id="${id}"`);
+      this.logger.error(`Update role failed id="${id}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Mise à jour du rôle impossible');
     }
   }

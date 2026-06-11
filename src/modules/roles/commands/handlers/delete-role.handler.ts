@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
 import { FindRoleByIdQuery } from '../../queries';
-import { logHandlerError } from '@/shared/helpers';
 import { DeleteRoleCommand } from '../impl';
 
 @CommandHandler(DeleteRoleCommand)
@@ -25,7 +24,9 @@ export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand, voi
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logHandlerError(this.logger, 'Delete role', error, `id="${command.id}"`);
+      this.logger.error(
+        `Delete role failed id="${command.id}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Suppression du rôle impossible');
     }
   }

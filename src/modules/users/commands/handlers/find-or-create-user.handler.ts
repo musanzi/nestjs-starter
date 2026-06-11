@@ -1,6 +1,5 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { logHandlerError } from '@/shared/helpers';
 import { IUserResponse } from '../../interfaces';
 import { CreateUserCommand, FindOrCreateUserCommand, UpdateUserCommand } from '../impl';
 import { Repository } from 'typeorm';
@@ -33,7 +32,9 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
 
       return await this.commandBus.execute(new CreateUserCommand(dto));
     } catch (error) {
-      logHandlerError(this.logger, 'Find or create user', error, `email="${dto.email}"`);
+      this.logger.error(
+        `Find or create user failed email="${dto.email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Requête invalide');
     }
   }

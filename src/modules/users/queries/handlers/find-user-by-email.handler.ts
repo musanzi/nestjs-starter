@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { logHandlerError } from '@/shared/helpers';
 import { FindUserByEmailQuery } from '../impl';
 
 @QueryHandler(FindUserByEmailQuery)
@@ -25,7 +24,9 @@ export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuer
       });
       return mapUserRoles(user);
     } catch (error) {
-      logHandlerError(this.logger, 'Find user by email', error, `email="${query.email}"`);
+      this.logger.error(
+        `Find user by email failed email="${query.email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new NotFoundException('Utilisateur introuvable');
     }
   }

@@ -2,7 +2,6 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { logHandlerError } from '@/shared/helpers';
 import { ForgotPasswordCommand } from '../impl';
 import { ResetPasswordRequestedEvent } from '../../events';
 import { FindUserByEmailQuery } from '@/modules/users/queries';
@@ -33,7 +32,9 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
 
       this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
     } catch (error) {
-      logHandlerError(this.logger, 'Forgot password', error, `email="${dto.email}"`);
+      this.logger.error(
+        `Forgot password failed email="${dto.email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Demande invalide');
     }
   }

@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { logHandlerError } from '@/shared/helpers';
 import { FindUserByIdQuery } from '../impl';
 
 @QueryHandler(FindUserByIdQuery)
@@ -25,7 +24,9 @@ export class FindUserByIdHandler implements IQueryHandler<FindUserByIdQuery, IUs
       });
       return mapUserRoles(user);
     } catch (error) {
-      logHandlerError(this.logger, 'Find user by id', error, `id="${query.id}"`);
+      this.logger.error(
+        `Find user by id failed id="${query.id}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new NotFoundException('Utilisateur introuvable');
     }
   }

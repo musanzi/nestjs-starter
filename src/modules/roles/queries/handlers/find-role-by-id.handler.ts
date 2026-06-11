@@ -2,7 +2,6 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { logHandlerError } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
 import { FindRoleByIdQuery } from '../impl';
 
@@ -21,7 +20,9 @@ export class FindRoleByIdHandler implements IQueryHandler<FindRoleByIdQuery, Rol
         where: { id: query.id }
       });
     } catch (error) {
-      logHandlerError(this.logger, 'Find role by id', error, `id="${query.id}"`);
+      this.logger.error(
+        `Find role by id failed id="${query.id}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new NotFoundException('Rôle introuvable');
     }
   }

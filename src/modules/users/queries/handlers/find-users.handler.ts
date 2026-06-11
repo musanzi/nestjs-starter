@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { mapUsersRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { logHandlerError, parsePaginationParams } from '@/shared/helpers';
+import { parsePaginationParams } from '@/shared/helpers';
 import { FindUsersQuery } from '../impl';
 
 @QueryHandler(FindUsersQuery)
@@ -36,7 +36,9 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserRes
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
 
-      logHandlerError(this.logger, 'Find users', error, `options="${JSON.stringify(query.params)}"`);
+      this.logger.error(
+        `Find users failed options="${JSON.stringify(query.params)}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Utilisateurs introuvables');
     }
   }

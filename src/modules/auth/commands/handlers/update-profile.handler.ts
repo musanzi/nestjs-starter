@@ -2,7 +2,6 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
-import { logHandlerError } from '@/shared/helpers';
 import { UpdateProfileCommand } from '../impl';
 
 @CommandHandler(UpdateProfileCommand)
@@ -17,7 +16,9 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfileComman
     try {
       return await this.commandBus.execute(new UpdateUserCommand(currentUser.id, dto));
     } catch (error) {
-      logHandlerError(this.logger, 'Update profile', error, `id="${currentUser?.id ?? ''}"`);
+      this.logger.error(
+        `Update profile failed id="${currentUser?.id ?? ''}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Requête invalide');
     }
   }

@@ -2,7 +2,6 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { promises } from 'fs';
 import { IUserResponse } from '../../interfaces';
-import { logHandlerError } from '@/shared/helpers';
 import { UploadUserAvatarCommand } from '../impl';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
@@ -35,7 +34,9 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
-      logHandlerError(this.logger, 'Upload user avatar', error, `id="${currentUser.id}"`);
+      this.logger.error(
+        `Upload user avatar failed id="${currentUser.id}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException("Ajout d'image impossible");
     }
   }

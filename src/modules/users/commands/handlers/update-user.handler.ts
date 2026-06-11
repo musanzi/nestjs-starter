@@ -6,7 +6,6 @@ import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
-import { logHandlerError } from '@/shared/helpers';
 import { UpdateUserCommand } from '../impl';
 
 @CommandHandler(UpdateUserCommand)
@@ -51,7 +50,9 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, IUs
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
 
-      logHandlerError(this.logger, 'Update user', error, `id="${command.id}"`);
+      this.logger.error(
+        `Update user failed id="${command.id}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Mise à jour impossible');
     }
   }

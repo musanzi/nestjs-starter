@@ -4,16 +4,16 @@ import { AbstractEntity } from '@/modules/database/abstract.entity';
 
 @Entity('users')
 export class User extends AbstractEntity {
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 320, unique: true })
   email: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 150 })
   name: string;
 
-  @Column({ nullable: true, select: false })
+  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   avatar: string;
 
   @ManyToMany(() => Role)

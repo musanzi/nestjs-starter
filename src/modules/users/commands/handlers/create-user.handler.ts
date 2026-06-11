@@ -7,7 +7,6 @@ import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByIdQuery } from '../../queries';
-import { logHandlerError } from '@/shared/helpers';
 import { CreateUserCommand } from '../impl';
 import { WelcomeUserEvent } from '../../events';
 import { FindRoleByNameQuery } from '@/modules/roles/queries';
@@ -53,7 +52,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUs
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 
-      logHandlerError(this.logger, 'Create user', error, `email="${dto.email}"`);
+      this.logger.error(
+        `Create user failed email="${dto.email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
   }

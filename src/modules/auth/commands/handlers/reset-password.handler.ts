@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { UpdateUserCommand } from '@/modules/users/commands';
-import { logHandlerError } from '@/shared/helpers';
 import { ResetPasswordCommand } from '../impl';
 
 @CommandHandler(ResetPasswordCommand)
@@ -25,7 +24,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
       const payload = await this.jwtService.verifyAsync(token, { secret });
       return await this.commandBus.execute(new UpdateUserCommand(payload.sub, { password }));
     } catch (error) {
-      logHandlerError(this.logger, 'Reset password', error);
+      this.logger.error(`Reset password failed: ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Mot de passe invalide');
     }
   }
