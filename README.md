@@ -185,7 +185,6 @@ pnpm db:seed          # seed local roles and users
 - `@Public()` marks unauthenticated routes.
 - `@Roles([RoleEnum.ADMIN])` restricts routes to admin users.
 - Uploaded files are served from `/uploads`.
-- User avatars are stored under `uploads/profiles`.
 
 ## API
 
@@ -277,7 +276,3 @@ Protected routes require an authenticated session. Admin routes require the `adm
       interfaces/               # shared pagination contracts
   uploads/                      # runtime upload target, gitignored
 ```
-
-## License
-
-MIT
