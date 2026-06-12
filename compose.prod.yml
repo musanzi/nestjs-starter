@@ -21,20 +21,18 @@ services:
   api:
     build:
       context: .
-      target: development
+      target: production
     restart: unless-stopped
     env_file:
       - .env
     ports:
       - '${PORT:?PORT is required}:${PORT:?PORT is required}'
     volumes:
-      - .:/app
-      - /app/uploads
-      - /app/node_modules
+      - uploads_data:/app/uploads
     depends_on:
       db:
         condition: service_healthy
-    command: pnpm start:dev
 
 volumes:
   postgres_data:
+  uploads_data:
