@@ -63,25 +63,25 @@ export class UsersController {
     await this.queryBus.execute(new ExportUsersCsvQuery(query, res));
   }
 
+  @Post('profile/avatar')
+  @UseInterceptors(FileInterceptor('avatar', createDiskUploadOptions('./uploads/profiles')))
+  uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<IUserResponse> {
+    return this.commandBus.execute(new UploadUserAvatarCommand(user, file));
+  }
+
   @Get(':email')
   @Roles([RoleEnum.ADMIN])
   findOneByEmail(@Param('email') email: string): Promise<IUserResponse> {
     return this.queryBus.execute(new FindUserByEmailQuery(email));
   }
 
-  @Patch('id/:userId')
+  @Patch(':userId')
   @Roles([RoleEnum.ADMIN])
   update(@Param('userId') userId: string, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
     return this.commandBus.execute(new UpdateUserCommand(userId, dto));
   }
 
-  @Post('me/profile-image')
-  @UseInterceptors(FileInterceptor('profile', createDiskUploadOptions('./uploads/profiles')))
-  uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<IUserResponse> {
-    return this.commandBus.execute(new UploadUserAvatarCommand(user, file));
-  }
-
-  @Delete('id/:userId')
+  @Delete(':userId')
   @Roles([RoleEnum.ADMIN])
   remove(@Param('userId') userId: string): Promise<void> {
     return this.commandBus.execute(new DeleteUserCommand(userId));

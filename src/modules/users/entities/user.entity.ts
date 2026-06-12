@@ -2,7 +2,7 @@ import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { AbstractEntity } from '@/modules/database/abstract.entity';
 
-@Entity('users')
+@Entity()
 export class User extends AbstractEntity {
   @Column({ type: 'varchar', length: 320, unique: true })
   email: string;
