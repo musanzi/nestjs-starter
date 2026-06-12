@@ -28,19 +28,19 @@ export class RolesController {
     return this.queryBus.execute(new FindRolesQuery(query));
   }
 
-  @Get('id/:id')
+  @Get(':id')
   @Roles([RoleEnum.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
     return this.queryBus.execute(new FindRoleByIdQuery(id));
   }
 
-  @Patch('id/:id')
+  @Patch(':id')
   @Roles([RoleEnum.ADMIN])
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
     return this.commandBus.execute(new UpdateRoleCommand(id, updateRoleDto));
   }
 
-  @Delete('id/:id')
+  @Delete(':id')
   @Roles([RoleEnum.ADMIN])
   remove(@Param('id') id: string): Promise<void> {
     return this.commandBus.execute(new DeleteRoleCommand(id));
