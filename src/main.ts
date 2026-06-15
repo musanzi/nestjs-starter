@@ -27,7 +27,7 @@ async function bootstrap(): Promise<void> {
   app.useLogger(app.get(Logger));
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:4200', 'http://localhost:4000'],
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
   });
   app.useGlobalPipes(
