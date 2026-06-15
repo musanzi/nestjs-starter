@@ -27,12 +27,9 @@ services:
       - .env
     ports:
       - '${PORT:?PORT is required}:${PORT:?PORT is required}'
-    volumes:
-      - uploads_data:/app/uploads
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   postgres_data:
-  uploads_data:
