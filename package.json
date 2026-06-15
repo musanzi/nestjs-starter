@@ -17,12 +17,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "typeorm": "ts-node ./node_modules/typeorm/cli",
+    "typeorm": "node ./node_modules/typeorm/cli",
     "db:migrate": "pnpm typeorm migration:generate ./src/modules/database/migrations/$name -d ./src/modules/database/orm.config.ts",
     "db:up": "pnpm typeorm migration:run -d ./src/modules/database/orm.config.ts",
     "db:down": "pnpm typeorm migration:revert -d ./src/modules/database/orm.config.ts",
-    "db:seed": "node dist/src/modules/database/seeds/index.js",
-    "prepare": "husky"
+    "db:seed": "node dist/src/modules/database/seeds/index.js"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -65,8 +64,6 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.2",
-    "@commitlint/config-conventional": "^21.0.2",
     "@eslint/js": "^9.38.0",
     "@faker-js/faker": "^10.1.0",
     "@nestjs/cli": "^11.0.10",
