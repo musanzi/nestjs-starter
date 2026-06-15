@@ -20,10 +20,6 @@ const seedUsers = [
 ];
 
 async function seed(): Promise<void> {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('Refusing to run starter seed credentials in production.');
-  }
-
   await dataSource.initialize();
 
   try {
