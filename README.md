@@ -12,7 +12,7 @@ NestJS API starter for session-based authentication, Google OAuth, role-based ac
 - Nodemailer via `@nestjs-modules/mailer`
 - Pino request logging
 - Jest, ESLint, Prettier, Husky, pnpm
-- Docker and Docker Compose
+- Docker and Docker Compose, including an Adminer service for local database access
 
 ## Features
 
@@ -27,6 +27,7 @@ NestJS API starter for session-based authentication, Google OAuth, role-based ac
 - PostgreSQL persistence with TypeORM migrations
 - Local seed script for starter admin and user credentials
 - Development and production Docker Compose files
+- Adminer in the development Compose stack
 
 ## Requirements
 
@@ -71,7 +72,7 @@ GOOGLE_REDIRECT_URI=
 FRONTEND_URI=
 ```
 
-Run the API locally:
+Run the API locally against a PostgreSQL instance on your machine:
 
 ```bash
 pnpm build
@@ -80,7 +81,7 @@ pnpm db:seed
 pnpm start:dev
 ```
 
-The API listens on `PORT`, or `3000` when `PORT` is not set. `DB_HOST=localhost` is for running the API directly on your machine.
+The API listens on `PORT`, or `3000` when `PORT` is not set. Use `DB_HOST=localhost` when running the API directly on your machine.
 
 Seed credentials for local development:
 
@@ -119,16 +120,18 @@ Database synchronization is disabled.
 
 This repo has separate Compose files for development and production:
 
-- `compose.dev.yml` builds the `development` Docker target and runs `pnpm start:dev` with the project bind-mounted into `/app`.
+- `compose.dev.yml` builds the `development` Docker target, runs `pnpm start:dev` with the project bind-mounted into `/app`, and starts Adminer on port `8080`.
 - `compose.prod.yml` builds the `production` Docker target and runs the compiled app with `pnpm start:prod`.
 
-Both Compose files run PostgreSQL with `postgres:18-alpine`, read `.env`, require database variables to be set, and wait for the database health check before starting the API.
+Both Compose files run PostgreSQL with `postgres:18-alpine`, read `.env`, require database variables to be set, and wait for the database health check before starting the API. Inside Compose, set `DB_HOST=db` in `.env` so the API connects to the database service.
 
 Start the development stack:
 
 ```bash
 docker compose -f compose.dev.yml up --build
 ```
+
+The API is available on `http://localhost:$PORT`. Adminer is available on `http://localhost:8080`.
 
 Run migrations and seeds in the development API container:
 
@@ -150,8 +153,6 @@ Build Docker targets directly:
 docker build --target development .
 docker build --target production .
 ```
-
-Inside Compose, set `DB_HOST=db` in `.env` so the API connects to the database service.
 
 ## Scripts
 
@@ -177,9 +178,10 @@ pnpm db:seed          # seed local roles and users
 
 - Requests are validated with a global `ValidationPipe` using `transform: true`.
 - Responses are wrapped by `TransformInterceptor`.
-- CORS allows credentialed requests from `http://localhost:4200` and `http://localhost:4000`.
+- CORS is credentialed and reflects the request origin (`origin: true`).
 - Sessions use `express-session`, Passport, and a PostgreSQL session store.
 - The session cookie is named `sid`; `secure` is enabled when `NODE_ENV=production`.
+- The session table is created automatically by `connect-pg-simple` when it is missing.
 - Global guards are registered for authentication, roles, and throttling.
 - Throttling is configured at 50 requests per 60 seconds.
 - `@Public()` marks unauthenticated routes.
@@ -229,6 +231,7 @@ Protected routes require an authenticated session. Admin routes require the `adm
   Dockerfile                    # multi-stage development and production image
   compose.dev.yml               # development API + PostgreSQL stack
   compose.prod.yml              # production-style API + PostgreSQL stack
+  .env.example                  # required runtime configuration keys
   pnpm-workspace.yaml           # pnpm workspace and build-script approvals
   src/
     main.ts                     # app bootstrap, CORS, sessions, validation
