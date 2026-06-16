@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
     ports:
-      - '${DB_PORT:?DB_PORT is required}:5432'
+      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
@@ -26,7 +26,7 @@ services:
     env_file:
       - .env
     ports:
-      - '${PORT:?PORT is required}:${PORT:?PORT is required}'
+      - ${PORT}:${PORT}
     volumes:
       - .:/app
       - /app/node_modules
@@ -38,7 +38,7 @@ services:
     image: adminer:latest
     restart: unless-stopped
     ports:
-      - '8080:8080'
+      - 8080:8080
     depends_on:
       db:
         condition: service_healthy
