@@ -5,11 +5,11 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME is required}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-      POSTGRES_DB: ${DB_NAME:?DB_NAME is required}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - '${DB_PORT:?DB_PORT is required}:5432'
+      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
@@ -25,11 +25,14 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    volumes:
+      - uploads_data:/app/uploads
     ports:
-      - '${PORT:?PORT is required}:${PORT:?PORT is required}'
+      - ${PORT}:${PORT}
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   postgres_data:
+  uploads_data:
