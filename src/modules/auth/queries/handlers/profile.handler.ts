@@ -7,7 +7,9 @@ import { FindUserByEmailQuery } from '@/modules/users/queries';
 export class ProfileHandler implements IQueryHandler<ProfileQuery, IUserResponse> {
   constructor(private readonly queryBus: QueryBus) {}
 
-  execute(query: ProfileQuery): Promise<IUserResponse> {
-    return this.queryBus.execute(new FindUserByEmailQuery(query.currentUser.email));
+  execute(query: ProfileQuery): Promise<IUserResponse | null> {
+    const { currentUser } = query;
+    if (!currentUser?.email) return null;
+    return this.queryBus.execute(new FindUserByEmailQuery(currentUser.email));
   }
 }

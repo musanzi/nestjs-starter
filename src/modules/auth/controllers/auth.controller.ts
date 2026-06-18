@@ -60,7 +60,8 @@ export class AuthController {
   }
 
   @Get('me')
-  profile(@CurrentUser() user: User): Promise<IUserResponse> {
+  @Public()
+  profile(@CurrentUser() user: User): Promise<IUserResponse | null> {
     return this.queryBus.execute(new ProfileQuery(user));
   }
 
