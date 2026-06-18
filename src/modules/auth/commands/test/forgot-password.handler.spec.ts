@@ -52,7 +52,7 @@ describe('ForgotPasswordHandler', () => {
     );
     expect(configService.get).toHaveBeenCalledWith('FRONTEND_URI');
     expect(eventBus.publish).toHaveBeenCalledWith(
-      new ResetPasswordRequestedEvent(user, 'https://app.example.com/reset-password?token=reset-token')
+      new ResetPasswordRequestedEvent(user, 'https://app.example.com/auth/reset-password?token=reset-token')
     );
   });
 
