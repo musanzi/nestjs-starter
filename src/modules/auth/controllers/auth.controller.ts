@@ -69,7 +69,7 @@ export class AuthController {
     return this.commandBus.execute(new UpdateProfileCommand(user, dto));
   }
 
-  @Patch('me/password')
+  @Patch('password')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<IUserResponse> {
     return this.commandBus.execute(new UpdatePasswordCommand(user, dto));
   }
