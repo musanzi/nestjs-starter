@@ -17,7 +17,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
   api:
     build:
       context: .
@@ -32,7 +31,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
 volumes:
   postgres_data:
   uploads_data:
