@@ -42,7 +42,7 @@ export class AuthController {
     return this.queryBus.execute(new SignInQuery(req));
   }
 
-  @Get('google')
+  @Get('signin/google')
   @Public()
   @UseGuards(GoogleAuthGuard)
   googleAuth(): void {}
