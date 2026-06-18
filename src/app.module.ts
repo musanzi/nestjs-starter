@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
-import { TransformInterceptor } from '@/shared/interceptors/transform.interceptor';
 import { DatabaseModule } from './modules/database/database.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -73,7 +72,6 @@ import { UsersModule } from './modules/users/users.module';
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
-    { provide: APP_INTERCEPTOR, useClass: TransformInterceptor },
     { provide: APP_GUARD, useClass: ThrottlerGuard }
   ]
 })
