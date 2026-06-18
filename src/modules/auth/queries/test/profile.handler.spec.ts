@@ -25,13 +25,4 @@ describe('ProfileHandler', () => {
     expect(result).toBe(profile);
     expect(queryBus.execute).toHaveBeenCalledWith(new FindUserByEmailQuery('ada@example.com'));
   });
-
-  it('returns null when current user has no email', async () => {
-    const currentUser = { id: 'user-id' } as User;
-
-    const result = await handler.execute(new ProfileQuery(currentUser));
-
-    expect(result).toBeNull();
-    expect(queryBus.execute).not.toHaveBeenCalled();
-  });
 });

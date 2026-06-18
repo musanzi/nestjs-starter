@@ -60,8 +60,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @Public()
-  profile(@CurrentUser() user: User): Promise<IUserResponse | null> {
+  profile(@CurrentUser() user: User): Promise<IUserResponse> {
     return this.queryBus.execute(new ProfileQuery(user));
   }
 
@@ -82,6 +81,7 @@ export class AuthController {
   }
 
   @Post('password/reset')
+  @Public()
   resetPassword(@Body() dto: ResetPasswordDto): Promise<IUserResponse> {
     return this.commandBus.execute(new ResetPasswordCommand(dto));
   }
