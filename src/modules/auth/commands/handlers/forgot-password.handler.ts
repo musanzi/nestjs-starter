@@ -28,7 +28,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
       const token = await this.jwtService.signAsync(payload, { secret, expiresIn: '15m' });
 
       const frontendUri = this.configService.get<string>('FRONTEND_URI');
-      const link = `${frontendUri}/reset-password?token=${token}`;
+      const link = `${frontendUri}/auth/reset-password?token=${token}`;
 
       this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
     } catch (error) {
