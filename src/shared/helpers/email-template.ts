@@ -59,8 +59,6 @@ export const buildEmailBody = (options: EmailTemplateOptions): EmailContent => {
     <title>${escapeHtml(options.title)}</title>
   </head>
   <body>
-    <p><strong>Starter</strong></p>
-
     <h1><u>${escapeHtml(options.title)}</u></h1>
 
     ${paragraph(`Bonjour ${options.greetingName},`)}
