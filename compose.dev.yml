@@ -1,4 +1,20 @@
 services:
+  api:
+    build:
+      context: .
+      target: development
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:18-alpine
     restart: unless-stopped
@@ -17,22 +33,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  api:
-    build:
-      context: .
-      target: development
-    restart: unless-stopped
-    env_file:
-      - .env
-    ports:
-      - ${PORT}:${PORT}
-    volumes:
-      - .:/app
-      - /app/node_modules
-    depends_on:
-      db:
-        condition: service_healthy
 
   adminer:
     image: adminer:latest

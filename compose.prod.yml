@@ -1,4 +1,19 @@
 services:
+  api:
+    build:
+      context: .
+      target: production
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - uploads_data:/app/uploads
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:18-alpine
     restart: unless-stopped
@@ -17,21 +32,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  api:
-    build:
-      context: .
-      target: production
-    restart: unless-stopped
-    env_file:
-      - .env
-    volumes:
-      - uploads_data:/app/uploads
-    ports:
-      - ${PORT}:${PORT}
-    depends_on:
-      db:
-        condition: service_healthy
 
 volumes:
   postgres_data:
