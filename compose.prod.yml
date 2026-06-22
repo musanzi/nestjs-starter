@@ -1,5 +1,6 @@
 services:
   api:
+    image: starter-api
     build:
       context: .
       target: production
