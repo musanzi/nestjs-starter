@@ -209,12 +209,12 @@ Protected routes require an authenticated session. Admin routes require the `adm
 
 - `POST /users` admin
 - `GET /users` admin, supports `q`, `page`, and `limit` query params
-- `POST /users/import-csv` admin, multipart field `file`
-- `GET /users/export-csv` admin, supports `q`, `page`, and `limit` query params
+- `POST /users/import/csv` admin, multipart field `file`
+- `GET /users/export/csv` admin, supports `q`, `page`, and `limit` query params
 - `POST /users/profile/avatar` authenticated, multipart field `avatar`
 - `GET /users/:email` admin
-- `PATCH /users/:userId` admin
-- `DELETE /users/:userId` admin
+- `PATCH /users/:id` admin
+- `DELETE /users/:id` admin
 
 ### Roles
 
