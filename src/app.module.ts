@@ -14,6 +14,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RolesModule } from './modules/roles/roles.module';
 import { UsersModule } from './modules/users/users.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -67,7 +68,8 @@ import { UsersModule } from './modules/users/users.module';
     DatabaseModule,
     AuthModule,
     UsersModule,
-    RolesModule
+    RolesModule,
+    StatsModule
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },

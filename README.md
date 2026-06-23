@@ -1,6 +1,6 @@
 # Starter API
 
-NestJS API starter for session-based authentication, Google OAuth, role-based access control, user and role management, CSV user import/export, local avatar uploads, password reset emails, and PostgreSQL persistence with TypeORM.
+NestJS API starter for session-based authentication, Google OAuth, role-based access control, user and role management, aggregate stats, CSV user import/export, local avatar uploads, password reset emails, and PostgreSQL persistence with TypeORM.
 
 ## Stack
 
@@ -22,6 +22,7 @@ NestJS API starter for session-based authentication, Google OAuth, role-based ac
 - Global authentication, role, throttling, validation, and response transform layers
 - Auth flows for signup, signin, signout, profile updates, password updates, forgot password, and reset password
 - User and role CRUD implemented through CQRS command and query handlers
+- Admin stats endpoint for user and role totals
 - User CSV import and export
 - Local avatar uploads served from `/uploads`
 - PostgreSQL persistence with TypeORM migrations
@@ -224,6 +225,10 @@ Protected routes require an authenticated session. Admin routes require the `adm
 - `PATCH /roles/:id` admin
 - `DELETE /roles/:id` admin
 
+### Stats
+
+- `GET /stats` admin, returns user and role totals as `{ label, total }` items
+
 ## Project Layout
 
 ```text
@@ -262,6 +267,10 @@ Protected routes require an authenticated session. Admin routes require the `adm
         entities/               # Role entity
         interfaces/             # role filters
         queries/                # role lookup/list handlers
+      stats/
+        controllers/            # /stats routes
+        interfaces/             # stats response contracts
+        queries/                # stats query handlers
       users/
         commands/               # user create/update/delete/import/avatar handlers
         common/                 # user mapping helpers
