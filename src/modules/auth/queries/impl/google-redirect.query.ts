@@ -2,7 +2,10 @@ import { Query } from '@nestjs/cqrs';
 import { Response } from 'express';
 
 export class GoogleRedirectQuery extends Query<void> {
-  constructor(public readonly response: Response) {
+  constructor(
+    public readonly response: Response,
+    public readonly state?: unknown
+  ) {
     super();
   }
 }

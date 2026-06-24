@@ -50,8 +50,8 @@ export class AuthController {
   @Get('google/redirect')
   @Public()
   @UseGuards(GoogleAuthGuard)
-  googleCallback(@Res() res: Response): Promise<void> {
-    return this.queryBus.execute(new GoogleRedirectQuery(res));
+  googleCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
+    return this.queryBus.execute(new GoogleRedirectQuery(res, req.query.state));
   }
 
   @Post('signout')
