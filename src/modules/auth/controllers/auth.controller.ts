@@ -64,12 +64,12 @@ export class AuthController {
     return this.queryBus.execute(new ProfileQuery(user));
   }
 
-  @Patch('me')
+  @Patch('me/update')
   updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
     return this.commandBus.execute(new UpdateProfileCommand(user, dto));
   }
 
-  @Patch('password')
+  @Patch('password/update')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<IUserResponse> {
     return this.commandBus.execute(new UpdatePasswordCommand(user, dto));
   }

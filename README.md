@@ -202,8 +202,8 @@ Protected routes require an authenticated session. Admin routes require the `adm
 - `GET /auth/google/redirect` public
 - `POST /auth/signout`
 - `GET /auth/me`
-- `PATCH /auth/me`
-- `PATCH /auth/me/password`
+- `PATCH /auth/me/update`
+- `PATCH /auth/password/update`
 - `POST /auth/password/forgot` public
 - `POST /auth/password/reset`
 
