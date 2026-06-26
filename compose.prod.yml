@@ -1,6 +1,6 @@
 services:
   api:
-    image: starter-api
+    container_name: starter-api
     build:
       context: .
       target: production
