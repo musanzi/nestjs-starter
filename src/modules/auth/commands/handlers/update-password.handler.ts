@@ -16,7 +16,7 @@ export class UpdatePasswordHandler implements ICommandHandler<UpdatePassword, IU
 
   async execute(command: UpdatePassword): Promise<IUserResponse> {
     const { currentUser } = command;
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       await this.commandBus.execute(new UpdateUser(currentUser.id, data));

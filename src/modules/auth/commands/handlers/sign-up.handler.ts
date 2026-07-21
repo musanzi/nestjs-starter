@@ -15,7 +15,7 @@ export class SignUpHandler implements ICommandHandler<SignUp, IUserResponse> {
   ) {}
 
   async execute(command: SignUp): Promise<IUserResponse> {
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       const user = await this.commandBus.execute(new CreateUser(data));

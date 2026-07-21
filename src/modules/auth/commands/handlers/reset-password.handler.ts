@@ -17,7 +17,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPassword, IUse
   ) {}
 
   async execute(command: ResetPassword): Promise<IUserResponse> {
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       const secret = this.configService.get<string>('JWT_SECRET');

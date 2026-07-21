@@ -17,7 +17,7 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
   ) {}
 
   async execute(command: FindOrCreateUser): Promise<IUserResponse> {
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       const existingUser = await this.repository.findOne({

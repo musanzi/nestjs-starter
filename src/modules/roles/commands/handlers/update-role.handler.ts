@@ -18,7 +18,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRole, Role> {
 
   async execute(command: UpdateRole): Promise<Role> {
     const { id } = command;
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       const role = await this.queryBus.execute(new FindRoleById(id));

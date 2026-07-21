@@ -12,7 +12,7 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfile, IUse
 
   async execute(command: UpdateProfile): Promise<IUserResponse> {
     const { currentUser } = command;
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       return await this.commandBus.execute(new UpdateUser(currentUser.id, data));

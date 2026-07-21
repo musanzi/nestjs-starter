@@ -14,30 +14,30 @@ export class RolesController extends AbstractController {
   @Post()
   @HasRoles([Roles.ADMIN])
   create(@Body() dto: CreateRoleDto): Promise<Role> {
-    return this.commandBus.execute(new CreateRole(dto));
+    return this.commandHandler.execute(new CreateRole({ ...dto }));
   }
 
   @Get()
   @HasRoles([Roles.ADMIN])
   findAll(@Query() query: IFilterRoles): Promise<[Role[], number]> {
-    return this.queryBus.execute(new FindRoles(query));
+    return this.queryHandler.execute(new FindRoles(query));
   }
 
   @Get(':id')
   @HasRoles([Roles.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
-    return this.queryBus.execute(new FindRoleById(id));
+    return this.queryHandler.execute(new FindRoleById(id));
   }
 
   @Patch(':id')
   @HasRoles([Roles.ADMIN])
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
-    return this.commandBus.execute(new UpdateRole(id, updateRoleDto));
+    return this.commandHandler.execute(new UpdateRole(id, { ...updateRoleDto }));
   }
 
   @Delete(':id')
   @HasRoles([Roles.ADMIN])
   remove(@Param('id') id: string): Promise<void> {
-    return this.commandBus.execute(new DeleteRole(id));
+    return this.commandHandler.execute(new DeleteRole(id));
   }
 }

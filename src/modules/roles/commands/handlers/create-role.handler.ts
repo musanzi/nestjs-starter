@@ -15,7 +15,7 @@ export class CreateRoleHandler implements ICommandHandler<CreateRole, Role> {
   ) {}
 
   async execute(command: CreateRole): Promise<Role> {
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       const role = this.repository.create(data);

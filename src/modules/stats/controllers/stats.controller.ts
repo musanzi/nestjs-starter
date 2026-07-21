@@ -10,6 +10,6 @@ export class StatsController extends AbstractController {
   @Get()
   @HasRoles([Roles.ADMIN])
   findAll(): Promise<IStatItem[]> {
-    return this.queryBus.execute(new FindStats());
+    return this.queryHandler.execute(new FindStats());
   }
 }

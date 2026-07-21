@@ -22,13 +22,7 @@ import { CurrentUser, HasRoles } from '@/modules/auth/decorators';
 import { Roles } from '@/modules/auth/enums';
 import { createDiskUploadOptions } from '@/shared/helpers';
 import { Response } from 'express';
-import {
-  CreateUser,
-  DeleteUser,
-  ImportUsersCsv,
-  UpdateUser,
-  UploadUserAvatar
-} from '../commands';
+import { CreateUser, DeleteUser, ImportUsersCsv, UpdateUser, UploadUserAvatar } from '../commands';
 import { ExportUsersCsv, FindUserByEmail, FindUsers } from '../queries';
 
 @Controller('users')
@@ -36,49 +30,49 @@ export class UsersController extends AbstractController {
   @Post()
   @HasRoles([Roles.ADMIN])
   create(@Body() dto: CreateUserDto): Promise<IUserResponse> {
-    return this.commandBus.execute(new CreateUser(dto));
+    return this.commandHandler.execute(new CreateUser({ ...dto }));
   }
 
   @Get()
   @HasRoles([Roles.ADMIN])
   findAll(@Query() query: IFilterUsers): Promise<[IUserResponse[], number]> {
-    return this.queryBus.execute(new FindUsers(query));
+    return this.queryHandler.execute(new FindUsers(query));
   }
 
   @Post('import/csv')
   @HasRoles([Roles.ADMIN])
   @UseInterceptors(FileInterceptor('file', createCsvUploadOptions()))
   importCsv(@UploadedFile() file: Express.Multer.File): Promise<void> {
-    return this.commandBus.execute(new ImportUsersCsv(file));
+    return this.commandHandler.execute(new ImportUsersCsv(file));
   }
 
   @Get('export/csv')
   @HasRoles([Roles.ADMIN])
   async exportCSV(@Query() query: IFilterUsers, @Res() res: Response): Promise<void> {
-    await this.queryBus.execute(new ExportUsersCsv(query, res));
+    await this.queryHandler.execute(new ExportUsersCsv(query, res));
   }
 
   @Post('profile/avatar')
   @UseInterceptors(FileInterceptor('avatar', createDiskUploadOptions('./uploads/profiles')))
   uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<IUserResponse> {
-    return this.commandBus.execute(new UploadUserAvatar(user, file));
+    return this.commandHandler.execute(new UploadUserAvatar(user, file));
   }
 
   @Get(':email')
   @HasRoles([Roles.ADMIN])
   findOneByEmail(@Param('email') email: string): Promise<IUserResponse> {
-    return this.queryBus.execute(new FindUserByEmail(email));
+    return this.queryHandler.execute(new FindUserByEmail(email));
   }
 
   @Patch(':id')
   @HasRoles([Roles.ADMIN])
   update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
-    return this.commandBus.execute(new UpdateUser(id, dto));
+    return this.commandHandler.execute(new UpdateUser(id, { ...dto }));
   }
 
   @Delete(':id')
   @HasRoles([Roles.ADMIN])
   remove(@Param('id') id: string): Promise<void> {
-    return this.commandBus.execute(new DeleteUser(id));
+    return this.commandHandler.execute(new DeleteUser(id));
   }
 }

@@ -18,7 +18,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPassword, vo
   ) {}
 
   async execute(command: ForgotPassword): Promise<void> {
-    const data = { ...command.dto };
+    const data = { ...command.data };
 
     try {
       const user = await this.queryBus.execute(new FindUserByEmail(data.email));
