@@ -15,11 +15,10 @@ export class UpdatePasswordHandler implements ICommandHandler<UpdatePassword, IU
   ) {}
 
   async execute(command: UpdatePassword): Promise<IUserResponse> {
-    const { currentUser } = command;
-    const data = { ...command.data };
+    const { currentUser, password } = command;
 
     try {
-      await this.commandBus.execute(new UpdateUser(currentUser.id, data));
+      await this.commandBus.execute(new UpdateUser(currentUser.id, undefined, undefined, password));
 
       return await this.queryBus.execute(new FindUserByEmail(currentUser.email));
     } catch (error) {

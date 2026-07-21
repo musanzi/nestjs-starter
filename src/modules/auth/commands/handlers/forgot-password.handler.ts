@@ -18,10 +18,10 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPassword, vo
   ) {}
 
   async execute(command: ForgotPassword): Promise<void> {
-    const data = { ...command.data };
+    const { email } = command;
 
     try {
-      const user = await this.queryBus.execute(new FindUserByEmail(data.email));
+      const user = await this.queryBus.execute(new FindUserByEmail(email));
 
       const secret = this.configService.get<string>('JWT_SECRET');
       const payload = { sub: user.id, name: user.name, email: user.email };
@@ -32,9 +32,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPassword, vo
 
       this.eventBus.publish(new ResetPasswordRequestedEvent(user, link));
     } catch (error) {
-      this.logger.error(
-        `Forgot password failed email="${data.email}": ${error instanceof Error ? error.message : String(error)}`
-      );
+      this.logger.error(`Forgot password failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Demande invalide');
     }
   }

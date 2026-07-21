@@ -23,14 +23,14 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, IUserRespo
   ) {}
 
   async execute(command: CreateUser): Promise<IUserResponse> {
-    const { roles, ...data } = { ...command.data };
-    const hasPassword = Boolean(data.password);
+    const { email, name, password: suppliedPassword, avatar, roles } = command;
+    const hasPassword = Boolean(suppliedPassword);
     const generatedPassword = hasPassword ? undefined : this.generatePassword();
-    const password = data.password ?? generatedPassword;
+    const password = suppliedPassword ?? generatedPassword;
 
     try {
       const existingUser = await this.repository.findOne({
-        where: { email: data.email }
+        where: { email }
       });
 
       if (existingUser) {
@@ -39,8 +39,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, IUserRespo
 
       const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByName('user'))];
       const user = this.repository.create({
-        ...data,
+        email,
+        name,
         password,
+        avatar,
         roles: userRoles
       });
 
@@ -52,9 +54,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, IUserRespo
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 
-      this.logger.error(
-        `Create user failed email="${data.email}": ${error instanceof Error ? error.message : String(error)}`
-      );
+      this.logger.error(`Create user failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
   }

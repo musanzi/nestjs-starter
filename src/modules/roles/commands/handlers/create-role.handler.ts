@@ -15,16 +15,14 @@ export class CreateRoleHandler implements ICommandHandler<CreateRole, Role> {
   ) {}
 
   async execute(command: CreateRole): Promise<Role> {
-    const data = { ...command.data };
+    const { name } = command;
 
     try {
-      const role = this.repository.create(data);
+      const role = this.repository.create({ name });
 
       return await this.repository.save(role);
     } catch (error) {
-      this.logger.error(
-        `Create role failed name="${data.name}": ${error instanceof Error ? error.message : String(error)}`
-      );
+      this.logger.error(`Create role failed name="${name}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Création du rôle impossible');
     }
   }

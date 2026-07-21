@@ -15,18 +15,16 @@ export class SignUpHandler implements ICommandHandler<SignUp, IUserResponse> {
   ) {}
 
   async execute(command: SignUp): Promise<IUserResponse> {
-    const data = { ...command.data };
+    const { name, email, password } = command;
 
     try {
-      const user = await this.commandBus.execute(new CreateUser(data));
+      const user = await this.commandBus.execute(new CreateUser(email, name, password));
 
       return await this.queryBus.execute(new FindUserById(user.id));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 
-      this.logger.error(
-        `Sign up failed email="${data.email}": ${error instanceof Error ? error.message : String(error)}`
-      );
+      this.logger.error(`Sign up failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException(error['message'] ?? 'Inscription impossible');
     }
   }

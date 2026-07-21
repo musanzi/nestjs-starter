@@ -23,11 +23,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
   async validate(_accessToken: string, _refreshToken: string, profile: IGoogleProfile): Promise<IUserResponse> {
     const { emails, name, photos } = profile;
-    const userData = {
-      email: emails[0]['value'],
-      name: `${name['givenName']} ${name['familyName']}`,
-      avatar: photos[0]['value']
-    };
-    return await this.commandBus.execute(new FindOrCreateUser(userData));
+    return await this.commandBus.execute(
+      new FindOrCreateUser(
+        emails[0]['value'],
+        `${name['givenName']} ${name['familyName']}`,
+        undefined,
+        photos[0]['value']
+      )
+    );
   }
 }

@@ -17,12 +17,12 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPassword, IUse
   ) {}
 
   async execute(command: ResetPassword): Promise<IUserResponse> {
-    const data = { ...command.data };
+    const { token, password } = command;
 
     try {
       const secret = this.configService.get<string>('JWT_SECRET');
-      const payload = await this.jwtService.verifyAsync(data.token, { secret });
-      return await this.commandBus.execute(new UpdateUser(payload.sub, { password: data.password }));
+      const payload = await this.jwtService.verifyAsync(token, { secret });
+      return await this.commandBus.execute(new UpdateUser(payload.sub, undefined, undefined, password));
     } catch (error) {
       this.logger.error(`Reset password failed: ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Mot de passe invalide');

@@ -20,7 +20,7 @@ export class AuthController extends AbstractController {
   @Post('signup')
   @Public()
   signUp(@Body() dto: SignUpDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new SignUp({ ...dto }));
+    return this.commandHandler.execute(new SignUp(dto.name, dto.email, dto.password));
   }
 
   @Post('signin')
@@ -54,23 +54,25 @@ export class AuthController extends AbstractController {
 
   @Patch('me/update')
   updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new UpdateProfile(user, { ...dto }));
+    return this.commandHandler.execute(
+      new UpdateProfile(user, dto.email, dto.name, dto.password, dto.avatar, dto.roles)
+    );
   }
 
   @Patch('password/update')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new UpdatePassword(user, { ...dto }));
+    return this.commandHandler.execute(new UpdatePassword(user, dto.password));
   }
 
   @Post('password/forgot')
   @Public()
   forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
-    return this.commandHandler.execute(new ForgotPassword({ ...dto }));
+    return this.commandHandler.execute(new ForgotPassword(dto.email));
   }
 
   @Post('password/reset')
   @Public()
   resetPassword(@Body() dto: ResetPasswordDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(new ResetPassword({ ...dto }));
+    return this.commandHandler.execute(new ResetPassword(dto.token, dto.password));
   }
 }

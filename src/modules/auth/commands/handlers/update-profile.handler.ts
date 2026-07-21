@@ -11,11 +11,10 @@ export class UpdateProfileHandler implements ICommandHandler<UpdateProfile, IUse
   constructor(private readonly commandBus: CommandBus) {}
 
   async execute(command: UpdateProfile): Promise<IUserResponse> {
-    const { currentUser } = command;
-    const data = { ...command.data };
+    const { currentUser, email, name, password, avatar, roles } = command;
 
     try {
-      return await this.commandBus.execute(new UpdateUser(currentUser.id, data));
+      return await this.commandBus.execute(new UpdateUser(currentUser.id, email, name, password, avatar, roles));
     } catch (error) {
       this.logger.error(
         `Update profile failed id="${currentUser?.id ?? ''}": ${error instanceof Error ? error.message : String(error)}`

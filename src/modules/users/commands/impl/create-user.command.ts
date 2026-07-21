@@ -3,13 +3,11 @@ import { IUserResponse } from '../../interfaces';
 
 export class CreateUser extends Command<IUserResponse> {
   constructor(
-    public readonly data: {
-      email: string;
-      name: string;
-      password?: string;
-      avatar?: string;
-      roles?: string[];
-    }
+    public readonly email: string,
+    public readonly name: string,
+    public readonly password?: string,
+    public readonly avatar?: string,
+    public readonly roles?: string[]
   ) {
     super();
   }

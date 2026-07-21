@@ -5,7 +5,7 @@ import { IUserResponse } from '@/modules/users/interfaces';
 export class UpdatePassword extends Command<IUserResponse> {
   constructor(
     public readonly currentUser: User,
-    public readonly data: { password: string }
+    public readonly password: string
   ) {
     super();
   }
