@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SignOutCommand } from '../impl';
+import { SignOut } from '../impl';
 
-@CommandHandler(SignOutCommand)
-export class SignOutHandler implements ICommandHandler<SignOutCommand, void> {
-  async execute(command: SignOutCommand): Promise<void> {
+@CommandHandler(SignOut)
+export class SignOutHandler implements ICommandHandler<SignOut, void> {
+  async execute(command: SignOut): Promise<void> {
     command.request.session.destroy(() => {});
   }
 }

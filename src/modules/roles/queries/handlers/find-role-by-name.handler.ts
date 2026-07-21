@@ -3,10 +3,10 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByNameQuery } from '../impl';
+import { FindRoleByName } from '../impl';
 
-@QueryHandler(FindRoleByNameQuery)
-export class FindRoleByNameHandler implements IQueryHandler<FindRoleByNameQuery, Role> {
+@QueryHandler(FindRoleByName)
+export class FindRoleByNameHandler implements IQueryHandler<FindRoleByName, Role> {
   private readonly logger = new Logger(FindRoleByNameHandler.name);
 
   constructor(
@@ -14,7 +14,7 @@ export class FindRoleByNameHandler implements IQueryHandler<FindRoleByNameQuery,
     private readonly repository: Repository<Role>
   ) {}
 
-  async execute(query: FindRoleByNameQuery): Promise<Role> {
+  async execute(query: FindRoleByName): Promise<Role> {
     try {
       return await this.repository.findOneOrFail({
         where: { name: query.name }

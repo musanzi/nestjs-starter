@@ -5,11 +5,11 @@ import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { FindUserByIdQuery } from '../../queries';
-import { UpdateUserCommand } from '../impl';
+import { FindUserById } from '../../queries';
+import { UpdateUser } from '../impl';
 
-@CommandHandler(UpdateUserCommand)
-export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, IUserResponse> {
+@CommandHandler(UpdateUser)
+export class UpdateUserHandler implements ICommandHandler<UpdateUser, IUserResponse> {
   private readonly logger = new Logger(UpdateUserHandler.name);
 
   constructor(
@@ -18,7 +18,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, IUs
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: UpdateUserCommand): Promise<IUserResponse> {
+  async execute(command: UpdateUser): Promise<IUserResponse> {
     const { roles, ...dto } = command.dto;
 
     try {
@@ -46,7 +46,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, IUs
           roles: roles ? mapRoleIds(roles) : undefined
         })
       );
-      return this.queryBus.execute(new FindUserByIdQuery(updatedUser.id));
+      return this.queryBus.execute(new FindUserById(updatedUser.id));
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
 

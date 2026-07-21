@@ -1,48 +1,43 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { AbstractController } from '@/shared/abstracts';
 import { CreateRoleDto } from '../dto/create-role.dto';
 import { UpdateRoleDto } from '../dto/update-role.dto';
 import { IFilterRoles } from '../interfaces';
 import { Role } from '../entities/role.entity';
-import { Roles } from '@/modules/auth/decorators';
-import { RoleEnum } from '@/modules/auth/enums';
-import { CreateRoleCommand, DeleteRoleCommand, UpdateRoleCommand } from '../commands';
-import { FindRoleByIdQuery, FindRolesQuery } from '../queries';
+import { HasRoles } from '@/modules/auth/decorators';
+import { Roles } from '@/modules/auth/enums';
+import { CreateRole, DeleteRole, UpdateRole } from '../commands';
+import { FindRoleById, FindRoles } from '../queries';
 
 @Controller('roles')
-export class RolesController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
-  ) {}
-
+export class RolesController extends AbstractController {
   @Post()
-  @Roles([RoleEnum.ADMIN])
+  @HasRoles([Roles.ADMIN])
   create(@Body() dto: CreateRoleDto): Promise<Role> {
-    return this.commandBus.execute(new CreateRoleCommand(dto));
+    return this.commandBus.execute(new CreateRole(dto));
   }
 
   @Get()
-  @Roles([RoleEnum.ADMIN])
+  @HasRoles([Roles.ADMIN])
   findAll(@Query() query: IFilterRoles): Promise<[Role[], number]> {
-    return this.queryBus.execute(new FindRolesQuery(query));
+    return this.queryBus.execute(new FindRoles(query));
   }
 
   @Get(':id')
-  @Roles([RoleEnum.ADMIN])
+  @HasRoles([Roles.ADMIN])
   findOne(@Param('id') id: string): Promise<Role> {
-    return this.queryBus.execute(new FindRoleByIdQuery(id));
+    return this.queryBus.execute(new FindRoleById(id));
   }
 
   @Patch(':id')
-  @Roles([RoleEnum.ADMIN])
+  @HasRoles([Roles.ADMIN])
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
-    return this.commandBus.execute(new UpdateRoleCommand(id, updateRoleDto));
+    return this.commandBus.execute(new UpdateRole(id, updateRoleDto));
   }
 
   @Delete(':id')
-  @Roles([RoleEnum.ADMIN])
+  @HasRoles([Roles.ADMIN])
   remove(@Param('id') id: string): Promise<void> {
-    return this.commandBus.execute(new DeleteRoleCommand(id));
+    return this.commandBus.execute(new DeleteRole(id));
   }
 }

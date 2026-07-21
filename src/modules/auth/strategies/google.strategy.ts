@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
 import { IGoogleProfile } from '../interfaces/google-profile.interface';
 import { CommandBus } from '@nestjs/cqrs';
-import { FindOrCreateUserCommand } from '@/modules/users/commands';
+import { FindOrCreateUser } from '@/modules/users/commands';
 import { IUserResponse } from '@/modules/users/interfaces';
 
 @Injectable()
@@ -28,6 +28,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       name: `${name['givenName']} ${name['familyName']}`,
       avatar: photos[0]['value']
     };
-    return await this.commandBus.execute(new FindOrCreateUserCommand(userDto));
+    return await this.commandBus.execute(new FindOrCreateUser(userDto));
   }
 }

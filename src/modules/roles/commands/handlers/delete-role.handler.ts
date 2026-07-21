@@ -3,11 +3,11 @@ import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByIdQuery } from '../../queries';
-import { DeleteRoleCommand } from '../impl';
+import { FindRoleById } from '../../queries';
+import { DeleteRole } from '../impl';
 
-@CommandHandler(DeleteRoleCommand)
-export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand, void> {
+@CommandHandler(DeleteRole)
+export class DeleteRoleHandler implements ICommandHandler<DeleteRole, void> {
   private readonly logger = new Logger(DeleteRoleHandler.name);
 
   constructor(
@@ -16,9 +16,9 @@ export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand, voi
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: DeleteRoleCommand): Promise<void> {
+  async execute(command: DeleteRole): Promise<void> {
     try {
-      await this.queryBus.execute(new FindRoleByIdQuery(command.id));
+      await this.queryBus.execute(new FindRoleById(command.id));
 
       await this.repository.delete(command.id);
     } catch (error) {

@@ -4,10 +4,10 @@ import { DataSource } from 'typeorm';
 import { Role } from '@/modules/roles/entities/role.entity';
 import { User } from '@/modules/users/entities/user.entity';
 import { IStatItem } from '../../interfaces';
-import { FindStatsQuery } from '../impl';
+import { FindStats } from '../impl';
 
-@QueryHandler(FindStatsQuery)
-export class FindStatsHandler implements IQueryHandler<FindStatsQuery, IStatItem[]> {
+@QueryHandler(FindStats)
+export class FindStatsHandler implements IQueryHandler<FindStats, IStatItem[]> {
   private readonly logger = new Logger(FindStatsHandler.name);
 
   constructor(private readonly dataSource: DataSource) {}

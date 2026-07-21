@@ -1,12 +1,12 @@
 import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { SignUpCommand } from '../impl';
-import { FindUserByIdQuery } from '@/modules/users/queries';
-import { CreateUserCommand } from '@/modules/users/commands';
+import { SignUp } from '../impl';
+import { FindUserById } from '@/modules/users/queries';
+import { CreateUser } from '@/modules/users/commands';
 
-@CommandHandler(SignUpCommand)
-export class SignUpHandler implements ICommandHandler<SignUpCommand, IUserResponse> {
+@CommandHandler(SignUp)
+export class SignUpHandler implements ICommandHandler<SignUp, IUserResponse> {
   private readonly logger = new Logger(SignUpHandler.name);
 
   constructor(
@@ -14,13 +14,13 @@ export class SignUpHandler implements ICommandHandler<SignUpCommand, IUserRespon
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: SignUpCommand): Promise<IUserResponse> {
+  async execute(command: SignUp): Promise<IUserResponse> {
     const { dto } = command;
 
     try {
-      const user = await this.commandBus.execute(new CreateUserCommand(dto));
+      const user = await this.commandBus.execute(new CreateUser(dto));
 
-      return await this.queryBus.execute(new FindUserByIdQuery(user.id));
+      return await this.queryBus.execute(new FindUserById(user.id));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

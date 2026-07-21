@@ -3,11 +3,11 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { UpdateUserCommand } from '@/modules/users/commands';
-import { ResetPasswordCommand } from '../impl';
+import { UpdateUser } from '@/modules/users/commands';
+import { ResetPassword } from '../impl';
 
-@CommandHandler(ResetPasswordCommand)
-export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand, IUserResponse> {
+@CommandHandler(ResetPassword)
+export class ResetPasswordHandler implements ICommandHandler<ResetPassword, IUserResponse> {
   private readonly logger = new Logger(ResetPasswordHandler.name);
 
   constructor(
@@ -16,13 +16,13 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
     private readonly configService: ConfigService
   ) {}
 
-  async execute(command: ResetPasswordCommand): Promise<IUserResponse> {
+  async execute(command: ResetPassword): Promise<IUserResponse> {
     const { token, password } = command.dto;
 
     try {
       const secret = this.configService.get<string>('JWT_SECRET');
       const payload = await this.jwtService.verifyAsync(token, { secret });
-      return await this.commandBus.execute(new UpdateUserCommand(payload.sub, { password }));
+      return await this.commandBus.execute(new UpdateUser(payload.sub, { password }));
     } catch (error) {
       this.logger.error(`Reset password failed: ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Mot de passe invalide');

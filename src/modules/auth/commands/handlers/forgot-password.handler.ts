@@ -2,12 +2,12 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ForgotPasswordCommand } from '../impl';
+import { ForgotPassword } from '../impl';
 import { ResetPasswordRequestedEvent } from '../../events';
-import { FindUserByEmailQuery } from '@/modules/users/queries';
+import { FindUserByEmail } from '@/modules/users/queries';
 
-@CommandHandler(ForgotPasswordCommand)
-export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordCommand, void> {
+@CommandHandler(ForgotPassword)
+export class ForgotPasswordHandler implements ICommandHandler<ForgotPassword, void> {
   private readonly logger = new Logger(ForgotPasswordHandler.name);
 
   constructor(
@@ -17,11 +17,11 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordComm
     private readonly configService: ConfigService
   ) {}
 
-  async execute(command: ForgotPasswordCommand): Promise<void> {
+  async execute(command: ForgotPassword): Promise<void> {
     const { dto } = command;
 
     try {
-      const user = await this.queryBus.execute(new FindUserByEmailQuery(dto.email));
+      const user = await this.queryBus.execute(new FindUserByEmail(dto.email));
 
       const secret = this.configService.get<string>('JWT_SECRET');
       const payload = { sub: user.id, name: user.name, email: user.email };

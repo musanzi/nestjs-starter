@@ -4,10 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'fast-csv';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { ExportUsersCsvQuery } from '../impl';
+import { ExportUsersCsv } from '../impl';
 
-@QueryHandler(ExportUsersCsvQuery)
-export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsvQuery, void> {
+@QueryHandler(ExportUsersCsv)
+export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsv, void> {
   private readonly logger = new Logger(ExportUsersCsvHandler.name);
 
   constructor(
@@ -15,7 +15,7 @@ export class ExportUsersCsvHandler implements IQueryHandler<ExportUsersCsvQuery,
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: ExportUsersCsvQuery): Promise<void> {
+  async execute(query: ExportUsersCsv): Promise<void> {
     const { q } = query.params;
 
     try {

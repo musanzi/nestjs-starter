@@ -5,10 +5,10 @@ import { Repository } from 'typeorm';
 import { mapUserRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { FindUserByEmailQuery } from '../impl';
+import { FindUserByEmail } from '../impl';
 
-@QueryHandler(FindUserByEmailQuery)
-export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuery, IUserResponse> {
+@QueryHandler(FindUserByEmail)
+export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmail, IUserResponse> {
   private readonly logger = new Logger(FindUserByEmailHandler.name);
 
   constructor(
@@ -16,7 +16,7 @@ export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmailQuer
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUserByEmailQuery): Promise<IUserResponse> {
+  async execute(query: FindUserByEmail): Promise<IUserResponse> {
     try {
       const user = await this.repository.findOneOrFail({
         where: { email: query.email },

@@ -6,10 +6,10 @@ import { mapUsersRoles } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { parsePaginationParams } from '@/shared/helpers';
-import { FindUsersQuery } from '../impl';
+import { FindUsers } from '../impl';
 
-@QueryHandler(FindUsersQuery)
-export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserResponse[], number]> {
+@QueryHandler(FindUsers)
+export class FindUsersHandler implements IQueryHandler<FindUsers, [IUserResponse[], number]> {
   private readonly logger = new Logger(FindUsersHandler.name);
 
   constructor(
@@ -17,7 +17,7 @@ export class FindUsersHandler implements IQueryHandler<FindUsersQuery, [IUserRes
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUsersQuery): Promise<[IUserResponse[], number]> {
+  async execute(query: FindUsers): Promise<[IUserResponse[], number]> {
     try {
       const { q } = query.params;
       const { pageNumber, limitNumber } = parsePaginationParams(query.params);

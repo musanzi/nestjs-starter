@@ -3,11 +3,11 @@ import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { FindRoleByIdQuery } from '../../queries';
-import { UpdateRoleCommand } from '../impl';
+import { FindRoleById } from '../../queries';
+import { UpdateRole } from '../impl';
 
-@CommandHandler(UpdateRoleCommand)
-export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Role> {
+@CommandHandler(UpdateRole)
+export class UpdateRoleHandler implements ICommandHandler<UpdateRole, Role> {
   private readonly logger = new Logger(UpdateRoleHandler.name);
 
   constructor(
@@ -16,11 +16,11 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand, Rol
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: UpdateRoleCommand): Promise<Role> {
+  async execute(command: UpdateRole): Promise<Role> {
     const { dto, id } = command;
 
     try {
-      const role = await this.queryBus.execute(new FindRoleByIdQuery(id));
+      const role = await this.queryBus.execute(new FindRoleById(id));
 
       if (dto.name && dto.name !== role.name) {
         const existingRole = await this.repository.findOne({

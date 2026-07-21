@@ -3,10 +3,10 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { FindUserByEmailWithPasswordQuery } from '../impl';
+import { FindUserByEmailWithPassword } from '../impl';
 
-@QueryHandler(FindUserByEmailWithPasswordQuery)
-export class FindUserByEmailWithPasswordHandler implements IQueryHandler<FindUserByEmailWithPasswordQuery, User> {
+@QueryHandler(FindUserByEmailWithPassword)
+export class FindUserByEmailWithPasswordHandler implements IQueryHandler<FindUserByEmailWithPassword, User> {
   private readonly logger = new Logger(FindUserByEmailWithPasswordHandler.name);
 
   constructor(
@@ -14,7 +14,7 @@ export class FindUserByEmailWithPasswordHandler implements IQueryHandler<FindUse
     private readonly repository: Repository<User>
   ) {}
 
-  async execute(query: FindUserByEmailWithPasswordQuery): Promise<User> {
+  async execute(query: FindUserByEmailWithPassword): Promise<User> {
     try {
       return await this.repository.findOneOrFail({
         where: { email: query.email },

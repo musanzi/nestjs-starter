@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
+import { AbstractController } from '@/shared/abstracts';
 import { User } from '../../users/entities/user.entity';
 import { IUserResponse } from '../../users/interfaces';
 import { UpdateUserDto } from '../../users/dto/update-user.dto';
@@ -13,33 +13,28 @@ import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { GoogleAuthGuard } from '../guards/google-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import {
-  ForgotPasswordCommand,
-  ResetPasswordCommand,
-  SignOutCommand,
-  SignUpCommand,
-  UpdatePasswordCommand,
-  UpdateProfileCommand
+  ForgotPassword,
+  ResetPassword,
+  SignOut,
+  SignUp,
+  UpdatePassword,
+  UpdateProfile
 } from '../commands';
-import { GoogleRedirectQuery, ProfileQuery, SignInQuery } from '../queries';
+import { GoogleRedirect, Profile, SignIn } from '../queries';
 
 @Controller('auth')
-export class AuthController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
-  ) {}
-
+export class AuthController extends AbstractController {
   @Post('signup')
   @Public()
   signUp(@Body() dto: SignUpDto): Promise<IUserResponse> {
-    return this.commandBus.execute(new SignUpCommand(dto));
+    return this.commandBus.execute(new SignUp(dto));
   }
 
   @Post('signin')
   @Public()
   @UseGuards(LocalAuthGuard)
   signIn(@Req() req: Request): Promise<IUserResponse> {
-    return this.queryBus.execute(new SignInQuery(req));
+    return this.queryBus.execute(new SignIn(req));
   }
 
   @Get('signin/google')
@@ -51,38 +46,38 @@ export class AuthController {
   @Public()
   @UseGuards(GoogleAuthGuard)
   googleCallback(@Req() req: Request, @Res() res: Response): Promise<void> {
-    return this.queryBus.execute(new GoogleRedirectQuery(res, req.query.state));
+    return this.queryBus.execute(new GoogleRedirect(res, req.query.state));
   }
 
   @Post('signout')
   signOut(@Req() req: Request): Promise<void> {
-    return this.commandBus.execute(new SignOutCommand(req));
+    return this.commandBus.execute(new SignOut(req));
   }
 
   @Get('me')
   profile(@CurrentUser() user: User): Promise<IUserResponse> {
-    return this.queryBus.execute(new ProfileQuery(user));
+    return this.queryBus.execute(new Profile(user));
   }
 
   @Patch('me/update')
   updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
-    return this.commandBus.execute(new UpdateProfileCommand(user, dto));
+    return this.commandBus.execute(new UpdateProfile(user, dto));
   }
 
   @Patch('password/update')
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<IUserResponse> {
-    return this.commandBus.execute(new UpdatePasswordCommand(user, dto));
+    return this.commandBus.execute(new UpdatePassword(user, dto));
   }
 
   @Post('password/forgot')
   @Public()
   forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
-    return this.commandBus.execute(new ForgotPasswordCommand(dto));
+    return this.commandBus.execute(new ForgotPassword(dto));
   }
 
   @Post('password/reset')
   @Public()
   resetPassword(@Body() dto: ResetPasswordDto): Promise<IUserResponse> {
-    return this.commandBus.execute(new ResetPasswordCommand(dto));
+    return this.commandBus.execute(new ResetPassword(dto));
   }
 }

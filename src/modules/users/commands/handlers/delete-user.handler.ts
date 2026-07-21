@@ -3,11 +3,11 @@ import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { DeleteUserCommand } from '../impl';
-import { FindUserByIdQuery } from '../../queries';
+import { DeleteUser } from '../impl';
+import { FindUserById } from '../../queries';
 
-@CommandHandler(DeleteUserCommand)
-export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, void> {
+@CommandHandler(DeleteUser)
+export class DeleteUserHandler implements ICommandHandler<DeleteUser, void> {
   private readonly logger = new Logger(DeleteUserHandler.name);
 
   constructor(
@@ -16,9 +16,9 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: DeleteUserCommand): Promise<void> {
+  async execute(command: DeleteUser): Promise<void> {
     try {
-      await this.queryBus.execute(new FindUserByIdQuery(command.id));
+      await this.queryBus.execute(new FindUserById(command.id));
 
       await this.repository.softDelete(command.id);
     } catch (error) {

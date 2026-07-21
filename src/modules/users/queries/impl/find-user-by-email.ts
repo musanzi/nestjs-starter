@@ -1,7 +1,7 @@
 import { Query } from '@nestjs/cqrs';
 import { IUserResponse } from '../../interfaces';
 
-export class FindUserByEmailQuery extends Query<IUserResponse> {
+export class FindUserByEmail extends Query<IUserResponse> {
   constructor(public readonly email: string) {
     super();
   }

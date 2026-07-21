@@ -4,10 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { parsePaginationParams } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRolesQuery } from '../impl/find-roles.query';
+import { FindRoles } from '../impl/find-roles';
 
-@QueryHandler(FindRolesQuery)
-export class FindRolesHandler implements IQueryHandler<FindRolesQuery, [Role[], number]> {
+@QueryHandler(FindRoles)
+export class FindRolesHandler implements IQueryHandler<FindRoles, [Role[], number]> {
   private readonly logger = new Logger(FindRolesHandler.name);
 
   constructor(
@@ -15,7 +15,7 @@ export class FindRolesHandler implements IQueryHandler<FindRolesQuery, [Role[], 
     private readonly repository: Repository<Role>
   ) {}
 
-  async execute(query: FindRolesQuery): Promise<[Role[], number]> {
+  async execute(query: FindRoles): Promise<[Role[], number]> {
     try {
       const { q } = query.params;
 

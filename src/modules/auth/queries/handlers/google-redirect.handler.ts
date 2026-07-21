@@ -1,13 +1,13 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { ConfigService } from '@nestjs/config';
 import { GOOGLE_REDIRECT_TARGET_ADMIN, parseGoogleRedirectTarget } from '../../helpers/google-redirect-target.helper';
-import { GoogleRedirectQuery } from '../impl';
+import { GoogleRedirect } from '../impl';
 
-@QueryHandler(GoogleRedirectQuery)
-export class GoogleRedirectHandler implements IQueryHandler<GoogleRedirectQuery, void> {
+@QueryHandler(GoogleRedirect)
+export class GoogleRedirectHandler implements IQueryHandler<GoogleRedirect, void> {
   constructor(private readonly configService: ConfigService) {}
 
-  async execute(query: GoogleRedirectQuery): Promise<void> {
+  async execute(query: GoogleRedirect): Promise<void> {
     const frontendUri = this.configService.get<string>('FRONTEND_URI');
     const target = parseGoogleRedirectTarget(query.state);
     const redirectUri =

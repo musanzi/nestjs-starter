@@ -1,1 +1,1 @@
-export * from './find-stats.query';
+export * from './find-stats';

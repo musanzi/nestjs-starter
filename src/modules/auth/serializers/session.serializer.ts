@@ -1,5 +1,5 @@
 import { IUserResponse } from '@/modules/users/interfaces';
-import { FindUserByIdQuery } from '@/modules/users/queries';
+import { FindUserById } from '@/modules/users/queries';
 import { Injectable } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { PassportSerializer } from '@nestjs/passport';
@@ -16,7 +16,7 @@ export class SessionSerializer extends PassportSerializer {
 
   async deserializeUser(id: string, done: (err: Error | null, user?: IUserResponse) => void) {
     try {
-      const user = await this.queryBus.execute(new FindUserByIdQuery(id));
+      const user = await this.queryBus.execute(new FindUserById(id));
       done(null, user);
     } catch (error) {
       done(error as Error);

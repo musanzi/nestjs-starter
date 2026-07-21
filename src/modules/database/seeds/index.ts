@@ -1,6 +1,6 @@
 import { hash } from 'bcryptjs';
 import dataSource from '../orm.config';
-import { RoleEnum } from '../../auth/enums';
+import { Roles } from '../../auth/enums';
 import { Role } from '../../roles/entities/role.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -9,13 +9,13 @@ const seedUsers = [
     email: 'admin@admin.com',
     name: 'Admin',
     password: 'admin1234',
-    role: RoleEnum.ADMIN
+    role: Roles.ADMIN
   },
   {
     email: 'user@user.com',
     name: 'User',
     password: 'user1234',
-    role: RoleEnum.USER
+    role: Roles.USER
   }
 ];
 
@@ -26,9 +26,9 @@ async function seed(): Promise<void> {
     const roleRepository = dataSource.getRepository(Role);
     const userRepository = dataSource.getRepository(User);
 
-    const roles = new Map<RoleEnum, Role>();
+    const roles = new Map<Roles, Role>();
 
-    for (const roleName of [RoleEnum.ADMIN, RoleEnum.USER]) {
+    for (const roleName of [Roles.ADMIN, Roles.USER]) {
       let role = await roleRepository.findOne({ where: { name: roleName } });
 
       if (!role) {

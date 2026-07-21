@@ -1,20 +1,20 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { parseUsersCsv } from '../../helpers/user-csv.helper';
-import { FindOrCreateUserCommand, ImportUsersCsvCommand } from '../impl';
+import { FindOrCreateUser, ImportUsersCsv } from '../impl';
 
-@CommandHandler(ImportUsersCsvCommand)
-export class ImportUsersCsvHandler implements ICommandHandler<ImportUsersCsvCommand, void> {
+@CommandHandler(ImportUsersCsv)
+export class ImportUsersCsvHandler implements ICommandHandler<ImportUsersCsv, void> {
   private readonly logger = new Logger(ImportUsersCsvHandler.name);
 
   constructor(private readonly commandBus: CommandBus) {}
 
-  async execute(command: ImportUsersCsvCommand): Promise<void> {
+  async execute(command: ImportUsersCsv): Promise<void> {
     try {
       const rows = await parseUsersCsv(command.file.buffer);
 
       for (const row of rows) {
-        await this.commandBus.execute(new FindOrCreateUserCommand(row));
+        await this.commandBus.execute(new FindOrCreateUser(row));
       }
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

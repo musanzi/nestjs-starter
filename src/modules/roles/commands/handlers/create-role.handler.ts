@@ -1,12 +1,12 @@
-import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from '../../entities/role.entity';
-import { CreateRoleCommand } from '../impl';
+import { CreateRole } from '../impl';
 
-@CommandHandler(CreateRoleCommand)
-export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand, Role> {
+@CommandHandler(CreateRole)
+export class CreateRoleHandler implements ICommandHandler<CreateRole, Role> {
   private readonly logger = new Logger(CreateRoleHandler.name);
 
   constructor(
@@ -14,22 +14,14 @@ export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand, Rol
     private readonly repository: Repository<Role>
   ) {}
 
-  async execute(command: CreateRoleCommand): Promise<Role> {
+  async execute(command: CreateRole): Promise<Role> {
     const { name } = command.dto;
 
     try {
-      const role = await this.repository.findOne({
-        where: { name }
-      });
+      const role = this.repository.create(command.dto);
 
-      if (role) {
-        throw new ConflictException('Ce rôle existe déjà');
-      }
-
-      return await this.repository.save(this.repository.create(command.dto));
+      return await this.repository.save(role);
     } catch (error) {
-      if (error instanceof ConflictException) throw error;
-
       this.logger.error(`Create role failed name="${name}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Création du rôle impossible');
     }

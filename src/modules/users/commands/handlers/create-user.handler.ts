@@ -6,13 +6,13 @@ import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../common/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
-import { FindUserByIdQuery } from '../../queries';
-import { CreateUserCommand } from '../impl';
+import { FindUserById } from '../../queries';
+import { CreateUser } from '../impl';
 import { WelcomeUserEvent } from '../../events';
-import { FindRoleByNameQuery } from '@/modules/roles/queries';
+import { FindRoleByName } from '@/modules/roles/queries';
 
-@CommandHandler(CreateUserCommand)
-export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUserResponse> {
+@CommandHandler(CreateUser)
+export class CreateUserHandler implements ICommandHandler<CreateUser, IUserResponse> {
   private readonly logger = new Logger(CreateUserHandler.name);
 
   constructor(
@@ -22,7 +22,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUs
     private readonly queryBus: QueryBus
   ) {}
 
-  async execute(command: CreateUserCommand): Promise<IUserResponse> {
+  async execute(command: CreateUser): Promise<IUserResponse> {
     const { roles, ...dto } = command.dto;
     const hasPassword = Boolean(dto.password);
     const generatedPassword = hasPassword ? undefined : this.generatePassword();
@@ -37,7 +37,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUs
         throw new ConflictException('Cet utilisateur existe déjà');
       }
 
-      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByNameQuery('user'))];
+      const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByName('user'))];
       const user = this.repository.create({
         ...dto,
         password,
@@ -48,7 +48,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand, IUs
 
       this.eventBus.publish(new WelcomeUserEvent(createdUser, generatedPassword));
 
-      return await this.queryBus.execute(new FindUserByIdQuery(createdUser.id));
+      return await this.queryBus.execute(new FindUserById(createdUser.id));
     } catch (error) {
       if (error instanceof ConflictException) throw error;
 

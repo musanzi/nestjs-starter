@@ -1,14 +1,14 @@
 import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
-import { ProfileQuery } from '../impl';
-import { FindUserByEmailQuery } from '@/modules/users/queries';
+import { Profile } from '../impl';
+import { FindUserByEmail } from '@/modules/users/queries';
 
-@QueryHandler(ProfileQuery)
-export class ProfileHandler implements IQueryHandler<ProfileQuery, IUserResponse> {
+@QueryHandler(Profile)
+export class ProfileHandler implements IQueryHandler<Profile, IUserResponse> {
   constructor(private readonly queryBus: QueryBus) {}
 
-  async execute(query: ProfileQuery): Promise<IUserResponse> {
+  async execute(query: Profile): Promise<IUserResponse> {
     const { currentUser } = query;
-    return await this.queryBus.execute(new FindUserByEmailQuery(currentUser.email));
+    return await this.queryBus.execute(new FindUserByEmail(currentUser.email));
   }
 }
