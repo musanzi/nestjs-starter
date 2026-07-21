@@ -17,23 +17,23 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
   ) {}
 
   async execute(command: FindOrCreateUser): Promise<IUserResponse> {
-    const { dto } = command;
+    const data = { ...command.dto };
 
     try {
       const existingUser = await this.repository.findOne({
-        where: { email: dto.email },
+        where: { email: data.email },
         relations: ['roles']
       });
 
       if (existingUser) {
-        if (existingUser.avatar) delete dto.avatar;
-        return this.commandBus.execute(new UpdateUser(existingUser.id, dto));
+        if (existingUser.avatar) delete data.avatar;
+        return this.commandBus.execute(new UpdateUser(existingUser.id, data));
       }
 
-      return await this.commandBus.execute(new CreateUser(dto));
+      return await this.commandBus.execute(new CreateUser(data));
     } catch (error) {
       this.logger.error(
-        `Find or create user failed email="${dto.email}": ${error instanceof Error ? error.message : String(error)}`
+        `Find or create user failed email="${data.email}": ${error instanceof Error ? error.message : String(error)}`
       );
       throw new BadRequestException('Requête invalide');
     }

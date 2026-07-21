@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { parsePaginationParams } from '@/shared/helpers';
 import { Role } from '../../entities/role.entity';
-import { FindRoles } from '../impl/find-roles';
+import { FindRoles } from '../impl/find-roles.query';
 
 @QueryHandler(FindRoles)
 export class FindRolesHandler implements IQueryHandler<FindRoles, [Role[], number]> {

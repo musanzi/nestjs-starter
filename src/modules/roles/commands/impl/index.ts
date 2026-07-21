@@ -1,3 +1,3 @@
-export * from './create-role';
-export * from './delete-role';
-export * from './update-role';
+export * from './create-role.command';
+export * from './delete-role.command';
+export * from './update-role.command';

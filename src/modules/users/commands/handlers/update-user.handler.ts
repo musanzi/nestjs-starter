@@ -19,7 +19,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, IUserRespo
   ) {}
 
   async execute(command: UpdateUser): Promise<IUserResponse> {
-    const { roles, ...dto } = command.dto;
+    const { roles, ...data } = { ...command.dto };
 
     try {
       const user = await this.repository.findOne({
@@ -30,9 +30,9 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, IUserRespo
         throw new NotFoundException('Aucun utilisateur trouvé');
       }
 
-      if (dto.email && dto.email !== user.email) {
+      if (data.email && data.email !== user.email) {
         const existingUser = await this.repository.findOne({
-          where: { email: dto.email }
+          where: { email: data.email }
         });
 
         if (existingUser) {
@@ -42,7 +42,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, IUserRespo
 
       const updatedUser = await this.repository.save(
         this.repository.merge(user, {
-          ...dto,
+          ...data,
           roles: roles ? mapRoleIds(roles) : undefined
         })
       );
