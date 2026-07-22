@@ -19,23 +19,25 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
   ) {}
 
   async execute(command: UploadUserAvatar): Promise<IUserResponse> {
-    const { currentUser, file } = command;
+    const { userId, file } = command;
 
     try {
-      if (currentUser.avatar) {
-        await promises.unlink(`./uploads/profiles/${currentUser.avatar}`);
+      const user = await this.queryBus.execute(new FindUserById(userId));
+
+      if (user.avatar) {
+        await promises.unlink(`./uploads/profiles/${user.avatar}`);
       }
 
-      await this.repository.update(currentUser.id, {
+      await this.repository.update(user.id, {
         avatar: file.filename
       });
 
-      return await this.queryBus.execute(new FindUserById(currentUser.id));
+      return await this.queryBus.execute(new FindUserById(user.id));
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
 
       this.logger.error(
-        `Upload user avatar failed id="${currentUser.id}": ${error instanceof Error ? error.message : String(error)}`
+        `Upload user avatar failed id="${userId}": ${error instanceof Error ? error.message : String(error)}`
       );
       throw new BadRequestException("Ajout d'image impossible");
     }

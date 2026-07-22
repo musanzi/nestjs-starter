@@ -55,7 +55,7 @@ export class UsersController extends AbstractController {
   @Post('profile/avatar')
   @UseInterceptors(FileInterceptor('avatar', createDiskUploadOptions('./uploads/profiles')))
   uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<IUserResponse> {
-    return this.commandHandler.execute(new UploadUserAvatar(user, file));
+    return this.commandHandler.execute(new UploadUserAvatar(user.id, file));
   }
 
   @Get(':email')
