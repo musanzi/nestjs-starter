@@ -4,16 +4,16 @@ import { AbstractEntity } from '@/shared/abstracts';
 
 @Entity()
 export class User extends AbstractEntity {
-  @Column({ type: 'varchar', length: 320, unique: true })
+  @Column({ unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 150 })
+  @Column()
   name: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
+  @Column({ nullable: true, select: false })
   password: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ nullable: true })
   avatar: string;
 
   @ManyToMany(() => Role)

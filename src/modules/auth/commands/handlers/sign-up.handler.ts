@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { SignUp } from '../impl';
@@ -22,8 +22,6 @@ export class SignUpHandler implements ICommandHandler<SignUp, IUserResponse> {
 
       return await this.queryBus.execute(new FindUserById(user.id));
     } catch (error) {
-      if (error instanceof ConflictException) throw error;
-
       this.logger.error(`Sign up failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException(error['message'] ?? 'Inscription impossible');
     }

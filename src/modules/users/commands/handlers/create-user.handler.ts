@@ -1,9 +1,9 @@
-import { BadRequestException, ConflictException, Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { randomInt } from 'crypto';
 import { CommandHandler, EventBus, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { mapRoleIds } from '../../common/user-mappers';
+import { mapRoleIds } from '../../helpers/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserById } from '../../queries';
@@ -25,18 +25,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, IUserRespo
   async execute(command: CreateUser): Promise<IUserResponse> {
     const { email, name, password: suppliedPassword, avatar, roles } = command;
     const hasPassword = Boolean(suppliedPassword);
-    const generatedPassword = hasPassword ? undefined : this.generatePassword();
+    const generatedPassword = hasPassword ? undefined : randomInt(0, 1_000_000).toString().padStart(6, '0');
     const password = suppliedPassword ?? generatedPassword;
 
     try {
-      const existingUser = await this.repository.findOne({
-        where: { email }
-      });
-
-      if (existingUser) {
-        throw new ConflictException('Cet utilisateur existe déjà');
-      }
-
       const userRoles = roles ? mapRoleIds(roles) : [await this.queryBus.execute(new FindRoleByName('user'))];
       const user = this.repository.create({
         email,
@@ -52,14 +44,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUser, IUserRespo
 
       return await this.queryBus.execute(new FindUserById(createdUser.id));
     } catch (error) {
-      if (error instanceof ConflictException) throw error;
-
-      this.logger.error(`Create user failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Create user failed email="${email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException("Création de l'utilisateur impossible");
     }
-  }
-
-  private generatePassword(): string {
-    return randomInt(0, 1_000_000).toString().padStart(6, '0');
   }
 }

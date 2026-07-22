@@ -1,8 +1,8 @@
-import { BadRequestException, ConflictException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { mapRoleIds } from '../../common/user-mappers';
+import { mapRoleIds } from '../../helpers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { FindUserById } from '../../queries';
@@ -22,37 +22,20 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUser, IUserRespo
     const { email, name, password, avatar, roles } = command;
 
     try {
-      const user = await this.repository.findOne({
-        where: { id: command.id }
+      const user = await this.repository.findOneOrFail({ where: { email } });
+
+      const newUser = this.repository.merge(user, {
+        email,
+        name,
+        password,
+        avatar,
+        roles: roles ? mapRoleIds(roles) : undefined
       });
 
-      if (!user) {
-        throw new NotFoundException('Aucun utilisateur trouvé');
-      }
+      const updatedUser = await this.repository.save(newUser);
 
-      if (email && email !== user.email) {
-        const existingUser = await this.repository.findOne({
-          where: { email }
-        });
-
-        if (existingUser) {
-          throw new ConflictException('Un utilisateur avec cette adresse email existe déjà');
-        }
-      }
-
-      const updatedUser = await this.repository.save(
-        this.repository.merge(user, {
-          email,
-          name,
-          password,
-          avatar,
-          roles: roles ? mapRoleIds(roles) : undefined
-        })
-      );
       return this.queryBus.execute(new FindUserById(updatedUser.id));
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ConflictException) throw error;
-
       this.logger.error(
         `Update user failed id="${command.id}": ${error instanceof Error ? error.message : String(error)}`
       );

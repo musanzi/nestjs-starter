@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,20 +21,11 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRole, Role> {
 
     try {
       const role = await this.queryBus.execute(new FindRoleById(id));
+      const updatedRole = this.repository.merge(role, { name });
 
-      if (name && name !== role.name) {
-        const existingRole = await this.repository.findOne({
-          where: { name }
-        });
-
-        if (existingRole) {
-          throw new ConflictException('Ce rôle existe déjà');
-        }
-      }
-
-      return await this.repository.save(this.repository.merge(role, { name }));
+      return await this.repository.save(updatedRole);
     } catch (error) {
-      if (error instanceof ConflictException || error instanceof NotFoundException) throw error;
+      if (error instanceof NotFoundException) throw error;
 
       this.logger.error(`Update role failed id="${id}": ${error instanceof Error ? error.message : String(error)}`);
       throw new BadRequestException('Mise à jour du rôle impossible');

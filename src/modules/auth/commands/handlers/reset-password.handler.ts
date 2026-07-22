@@ -22,6 +22,7 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPassword, IUse
     try {
       const secret = this.configService.get<string>('JWT_SECRET');
       const payload = await this.jwtService.verifyAsync(token, { secret });
+
       return await this.commandBus.execute(new UpdateUser(payload.sub, undefined, undefined, password));
     } catch (error) {
       this.logger.error(`Reset password failed: ${error instanceof Error ? error.message : String(error)}`);

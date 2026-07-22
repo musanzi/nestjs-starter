@@ -1,6 +1,6 @@
 import { Provider } from '@nestjs/common';
 import { GoogleRedirectHandler } from './google-redirect.handler';
-import { ProfileHandler } from './profile.handler';
+import { ProfileHandler } from './get-profile.handler';
 import { SignInHandler } from './sign-in.handler';
 import { ValidateCredentialsHandler } from './validate-credentials.handler';
 

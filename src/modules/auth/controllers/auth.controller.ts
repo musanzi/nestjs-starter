@@ -13,7 +13,7 @@ import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { GoogleAuthGuard } from '../guards/google-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { ForgotPassword, ResetPassword, SignOut, SignUp, UpdatePassword, UpdateProfile } from '../commands';
-import { GoogleRedirect, Profile, SignIn } from '../queries';
+import { GoogleRedirect, GetProfile, SignIn } from '../queries';
 
 @Controller('auth')
 export class AuthController extends AbstractController {
@@ -49,7 +49,7 @@ export class AuthController extends AbstractController {
 
   @Get('me')
   profile(@CurrentUser() user: User): Promise<IUserResponse> {
-    return this.queryHandler.execute(new Profile(user));
+    return this.queryHandler.execute(new GetProfile(user.email));
   }
 
   @Patch('me/update')

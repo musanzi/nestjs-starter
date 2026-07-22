@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { mapUsersRoles } from '../../common/user-mappers';
+import { mapUsersRoles } from '../../helpers/user-mappers';
 import { User } from '../../entities/user.entity';
 import { IUserResponse } from '../../interfaces';
 import { parsePaginationParams } from '@/shared/helpers';

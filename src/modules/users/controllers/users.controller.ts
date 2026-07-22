@@ -67,9 +67,7 @@ export class UsersController extends AbstractController {
   @Patch(':id')
   @HasRoles([Roles.ADMIN])
   update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
-    return this.commandHandler.execute(
-      new UpdateUser(id, dto.email, dto.name, dto.password, dto.avatar, dto.roles)
-    );
+    return this.commandHandler.execute(new UpdateUser(id, dto.email, dto.name, dto.password, dto.avatar, dto.roles));
   }
 
   @Delete(':id')

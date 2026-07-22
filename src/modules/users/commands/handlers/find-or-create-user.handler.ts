@@ -33,7 +33,9 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
 
       return await this.commandBus.execute(new CreateUser(email, name, password, avatar, roles));
     } catch (error) {
-      this.logger.error(`Find or create user failed email="${email}": ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Find or create user failed email="${email}": ${error instanceof Error ? error.message : String(error)}`
+      );
       throw new BadRequestException('Requête invalide');
     }
   }

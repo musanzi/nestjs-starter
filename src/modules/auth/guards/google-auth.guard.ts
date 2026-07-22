@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard, IAuthModuleOptions } from '@nestjs/passport';
 import { Request } from 'express';
-import { parseGoogleRedirectTarget } from '../helpers/google-redirect-target.helper';
+import { parseGoogleRedirectTarget } from '../helpers';
 
 @Injectable()
 export class GoogleAuthGuard extends AuthGuard('google') {
