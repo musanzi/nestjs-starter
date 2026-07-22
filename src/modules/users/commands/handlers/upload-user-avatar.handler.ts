@@ -28,9 +28,7 @@ export class UploadUserAvatarHandler implements ICommandHandler<UploadUserAvatar
         await promises.rm(`./uploads/profiles/${user.avatar}`, { force: true });
       }
 
-      await this.repository.update(user.id, {
-        avatar: file.filename
-      });
+      await this.repository.update(user.id, { avatar: file.filename });
 
       return await this.queryBus.execute(new FindUserById(user.id));
     } catch (error) {
