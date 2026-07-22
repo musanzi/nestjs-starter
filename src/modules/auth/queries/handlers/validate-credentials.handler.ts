@@ -3,7 +3,7 @@ import { IQueryHandler, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { compare } from 'bcryptjs';
 import { IUserResponse } from '@/modules/users/interfaces';
 import { ValidateCredentials } from '../impl';
-import { FindUserByEmail, FindUserByEmailWithPassword } from '@/modules/users/queries';
+import { FindUserByEmail } from '@/modules/users/queries';
 
 @QueryHandler(ValidateCredentials)
 export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredentials, IUserResponse> {
@@ -13,7 +13,7 @@ export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredent
     const unauthorized = new UnauthorizedException('Les identifiants saisis sont invalides');
 
     try {
-      const user = await this.queryBus.execute(new FindUserByEmailWithPassword(query.email));
+      const user = await this.queryBus.execute(new FindUserByEmail(query.email, true));
 
       if (!user?.password) throw unauthorized;
 
