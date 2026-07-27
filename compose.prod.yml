@@ -14,6 +14,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - starter-network
 
   db:
     image: postgres:18-alpine
@@ -24,8 +28,6 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
@@ -33,7 +35,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - starter-network
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - starter-network
 
 volumes:
   postgres_data:
+  redis_data:
   uploads_data:
+
+networks:
+  starter-network:
+    driver: bridge

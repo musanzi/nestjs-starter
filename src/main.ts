@@ -4,26 +4,11 @@ import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
 import passport from 'passport';
 import { Logger } from 'nestjs-pino';
-import connectPgSimple from 'connect-pg-simple';
-import { Pool } from 'pg';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { RedisStore } from 'connect-redis';
+import { createClient } from 'redis';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const PgSessionStore = connectPgSimple(session);
-  const sessionStore = new PgSessionStore({
-    pool: new Pool({
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      user: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      maxLifetimeSeconds: +process.env.SESSION_MAX_AGE
-    }),
-    tableName: 'session',
-    createTableIfMissing: true
-  });
-
+  const app = await NestFactory.create(AppModule);
   app.useLogger(app.get(Logger));
   app.enableCors({
     credentials: true,
@@ -35,10 +20,18 @@ async function bootstrap(): Promise<void> {
       transform: true
     })
   );
+
+  const redisClient = createClient({
+    url: process.env.REDIS_URL
+  });
+  await redisClient.connect();
+
   app.use(
     session({
-      store: sessionStore,
-      name: 'sid',
+      store: new RedisStore({
+        client: redisClient,
+        prefix: 'sess:'
+      }),
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET,
       resave: false,
