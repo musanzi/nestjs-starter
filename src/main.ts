@@ -24,6 +24,9 @@ async function bootstrap(): Promise<void> {
   const redisClient = createClient({
     url: process.env.REDIS_URL
   });
+  redisClient.on('error', (error) => {
+    console.error('Redis client error', error);
+  });
   await redisClient.connect();
 
   app.use(
