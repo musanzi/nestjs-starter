@@ -20,7 +20,7 @@ export class ValidateCredentialsHandler implements IQueryHandler<ValidateCredent
       const isPasswordValid = await compare(query.password, user.password);
       if (!isPasswordValid) throw unauthorized;
 
-      return user;
+      return await this.queryBus.execute(new FindUserByEmail(query.email));
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw unauthorized;
