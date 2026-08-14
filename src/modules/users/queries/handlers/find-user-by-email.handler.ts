@@ -20,7 +20,10 @@ export class FindUserByEmailHandler implements IQueryHandler<FindUserByEmail, IU
     const { email, includePassword } = query;
 
     try {
-      const query = this.repository.createQueryBuilder('u').where('u.email = :email', { email });
+      const query = this.repository
+        .createQueryBuilder('u')
+        .where('u.email = :email', { email })
+        .innerJoinAndSelect('u.roles', 'roles');
 
       if (includePassword) {
         query.addSelect('u.password');
