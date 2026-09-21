@@ -1,15 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
-import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse
-} from '@nestjs/swagger';
+import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
 import { User } from '../../users/entities/user.entity';
 import { IUserResponse, UserResponse } from '../../users/interfaces';
@@ -29,7 +20,6 @@ export class AuthController extends AbstractController {
   @Public()
   @ApiOperation({ summary: 'Register a new user' })
   @ApiCreatedResponse({ type: UserResponse, description: 'User registered' })
-  @ApiBadRequestResponse({ description: 'Invalid input' })
   signUp(@Body() dto: SignUpDto): Promise<IUserResponse> {
     return this.commandHandler.execute(new SignUp(dto));
   }
@@ -40,7 +30,6 @@ export class AuthController extends AbstractController {
   @ApiOperation({ summary: 'Sign in with email and password' })
   @ApiBody({ type: SignInDto })
   @ApiOkResponse({ type: UserResponse, description: 'Signed in' })
-  @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   signIn(@Req() req: Request): Promise<IUserResponse> {
     return this.queryHandler.execute(new SignIn(req));
   }
@@ -60,37 +49,29 @@ export class AuthController extends AbstractController {
   }
 
   @Post('signout')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Sign out the current user' })
   @ApiOkResponse({ description: 'Signed out' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   signOut(@Req() req: Request): Promise<void> {
     return this.commandHandler.execute(new SignOut(req));
   }
 
   @Get('me')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get the current user profile' })
   @ApiOkResponse({ type: UserResponse, description: 'Current user profile' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   profile(@CurrentUser() user: User): Promise<IUserResponse> {
     return this.queryHandler.execute(new GetProfile(user.email));
   }
 
   @Patch('me/update')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update the current user profile' })
   @ApiOkResponse({ type: UserResponse, description: 'Profile updated' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   updateProfile(@CurrentUser() user: User, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
     return this.commandHandler.execute(new UpdateProfile(user, dto));
   }
 
   @Patch('password/update')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update the current user password' })
   @ApiOkResponse({ type: UserResponse, description: 'Password updated' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   updatePassword(@CurrentUser() user: User, @Body() dto: UpdatePasswordDto): Promise<IUserResponse> {
     return this.commandHandler.execute(new UpdatePassword(user, dto));
   }
@@ -99,7 +80,6 @@ export class AuthController extends AbstractController {
   @Public()
   @ApiOperation({ summary: 'Request a password reset email' })
   @ApiOkResponse({ description: 'Password reset email sent' })
-  @ApiBadRequestResponse({ description: 'Invalid input' })
   forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
     return this.commandHandler.execute(new ForgotPassword(dto));
   }
@@ -108,7 +88,6 @@ export class AuthController extends AbstractController {
   @Public()
   @ApiOperation({ summary: 'Reset password with a token' })
   @ApiOkResponse({ type: UserResponse, description: 'Password reset' })
-  @ApiBadRequestResponse({ description: 'Invalid or expired token' })
   resetPassword(@Body() dto: ResetPasswordDto): Promise<IUserResponse> {
     return this.commandHandler.execute(new ResetPassword(dto));
   }

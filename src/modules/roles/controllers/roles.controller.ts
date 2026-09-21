@@ -1,14 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiForbiddenResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-  ApiUnauthorizedResponse
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
 import { CreateRoleDto, UpdateRoleDto } from '../dto';
 import { IFilterRoles, RoleResponse } from '../interfaces';
@@ -26,8 +17,6 @@ export class RolesController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Create a role (admin only)' })
   @ApiCreatedResponse({ type: RoleResponse, description: 'Role created' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   create(@Body() dto: CreateRoleDto): Promise<Role> {
     return this.commandHandler.execute(new CreateRole(dto));
   }
@@ -42,8 +31,6 @@ export class RolesController extends AbstractController {
       example: [[{ id: 'b7f2c1e0-4a5d-4c8e-9f1a-2b3c4d5e6f7a', name: 'admin' }], 1]
     }
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'take', required: false, example: 10 })
@@ -56,8 +43,6 @@ export class RolesController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Find a role by id (admin only)' })
   @ApiOkResponse({ type: RoleResponse, description: 'Role found' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   findOne(@Param('id') id: string): Promise<Role> {
     return this.queryHandler.execute(new FindRoleById(id));
   }
@@ -66,8 +51,6 @@ export class RolesController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Update a role (admin only)' })
   @ApiOkResponse({ type: RoleResponse, description: 'Role updated' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<Role> {
     return this.commandHandler.execute(new UpdateRole(id, updateRoleDto));
   }
@@ -76,8 +59,6 @@ export class RolesController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Delete a role (admin only)' })
   @ApiOkResponse({ description: 'Role deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   remove(@Param('id') id: string): Promise<void> {
     return this.commandHandler.execute(new DeleteRole(id));
   }

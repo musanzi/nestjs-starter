@@ -17,12 +17,10 @@ import {
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
-  ApiTags,
-  ApiUnauthorizedResponse
+  ApiTags
 } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
 import { createCsvUploadOptions } from '@/shared/helpers';
@@ -44,8 +42,6 @@ export class UsersController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Create a user (admin only)' })
   @ApiCreatedResponse({ type: UserResponse, description: 'User created' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   create(@Body() dto: CreateUserDto): Promise<IUserResponse> {
     return this.commandHandler.execute(new CreateUser(dto));
   }
@@ -60,8 +56,6 @@ export class UsersController extends AbstractController {
       example: [[{ id: 'b7f2c1e0-4a5d-4c8e-9f1a-2b3c4d5e6f7a', email: 'john.doe@example.com' }], 1]
     }
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'take', required: false, example: 10 })
@@ -82,8 +76,6 @@ export class UsersController extends AbstractController {
     }
   })
   @ApiOkResponse({ description: 'Users imported' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   importCsv(@UploadedFile() file: Express.Multer.File): Promise<void> {
     return this.commandHandler.execute(new ImportUsersCsv(file));
   }
@@ -95,8 +87,6 @@ export class UsersController extends AbstractController {
     description: 'CSV file',
     schema: { type: 'string', format: 'binary' }
   })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'take', required: false, example: 10 })
@@ -116,7 +106,6 @@ export class UsersController extends AbstractController {
     }
   })
   @ApiOkResponse({ type: UserResponse, description: 'Avatar uploaded' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   uploadImage(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File): Promise<IUserResponse> {
     return this.commandHandler.execute(new UploadUserAvatar(user.id, file));
   }
@@ -125,8 +114,6 @@ export class UsersController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Find a user by email (admin only)' })
   @ApiOkResponse({ type: UserResponse, description: 'User found' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   findOneByEmail(@Param('email') email: string): Promise<IUserResponse> {
     return this.queryHandler.execute(new FindUserByEmail(email));
   }
@@ -135,8 +122,6 @@ export class UsersController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Update a user (admin only)' })
   @ApiOkResponse({ type: UserResponse, description: 'User updated' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<IUserResponse> {
     return this.commandHandler.execute(new UpdateUser(id, dto));
   }
@@ -145,8 +130,6 @@ export class UsersController extends AbstractController {
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'Delete a user (admin only)' })
   @ApiOkResponse({ description: 'User deleted' })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiForbiddenResponse({ description: 'Requires admin role' })
   remove(@Param('id') id: string): Promise<void> {
     return this.commandHandler.execute(new DeleteUser(id));
   }
