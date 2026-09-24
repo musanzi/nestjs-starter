@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -15,6 +15,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { RolesModule } from './modules/roles/roles.module';
 import { UsersModule } from './modules/users/users.module';
 import { StatsModule } from './modules/stats/stats.module';
+import { CacheInterceptor, CacheManagerOptions, CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
+import { Keyv } from 'keyv';
+import { KeyvCacheableMemory } from 'cacheable';
 
 @Module({
   imports: [
@@ -24,6 +28,17 @@ import { StatsModule } from './modules/stats/stats.module';
     }),
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60000, limit: 50 }]
+    }),
+    CacheModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        stores: [
+          new Keyv({
+            store: new KeyvCacheableMemory({ ttl: 60000, lruSize: 5000 })
+          }),
+          createKeyv(configService.get('REDIS_URL'))
+        ] as unknown as CacheManagerOptions['stores']
+      })
     }),
     LoggerModule.forRoot({
       pinoHttp: {
@@ -74,7 +89,8 @@ import { StatsModule } from './modules/stats/stats.module';
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
-    { provide: APP_GUARD, useClass: ThrottlerGuard }
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_INTERCEPTOR, useClass: CacheInterceptor }
   ]
 })
 export class AppModule {}
