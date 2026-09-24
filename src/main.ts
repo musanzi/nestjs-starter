@@ -53,8 +53,6 @@ async function bootstrap(): Promise<void> {
   const config = new DocumentBuilder()
     .setTitle('Starter API DOC')
     .setDescription('The starter API documentation')
-    .setVersion('1.0.0')
-    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
