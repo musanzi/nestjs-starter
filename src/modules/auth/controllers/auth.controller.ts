@@ -12,6 +12,7 @@ import { GoogleAuthGuard } from '../guards/google-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { ForgotPassword, ResetPassword, SignOut, SignUp, UpdatePassword, UpdateProfile } from '../commands';
 import { GoogleRedirect, GetProfile, SignIn } from '../queries';
+import { NoCache } from '@/shared/decorators';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -56,6 +57,7 @@ export class AuthController extends AbstractController {
   }
 
   @Get('me')
+  @NoCache()
   @ApiOperation({ summary: 'Get the current user profile' })
   @ApiOkResponse({ type: UserResponse, description: 'Current user profile' })
   profile(@CurrentUser() user: User): Promise<IUserResponse> {
