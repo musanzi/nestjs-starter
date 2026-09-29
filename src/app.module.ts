@@ -19,6 +19,7 @@ import { CacheManagerOptions, CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 import { Keyv } from 'keyv';
 import { KeyvCacheableMemory } from 'cacheable';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { KeyvCacheableMemory } from 'cacheable';
     }),
     CacheModule.registerAsync({
       inject: [ConfigService],
+      isGlobal: true,
       useFactory: async (configService: ConfigService) => ({
         ttl: 60000,
         stores: [
@@ -81,6 +83,7 @@ import { KeyvCacheableMemory } from 'cacheable';
         }
       })
     }),
+    HealthModule,
     DatabaseModule,
     AuthModule,
     UsersModule,
