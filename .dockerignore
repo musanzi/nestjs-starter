@@ -1,14 +1,40 @@
+# Dependencies & build output
 node_modules
+.pnpm-store
 dist
 coverage
-.pnpm-store
+
+# Git & CI
 .git
+.gitignore
+.github
+.husky
+
+# Env & secrets
 .env
+.env.*
+
+# Docker itself
+Dockerfile
+.dockerignore
+compose*.yml
+
+# Uploaded files, DB backups & logs (runtime data, not source)
 uploads
+backups
 logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Tooling config not needed inside the image
+.prettierrc
+eslint.config.mjs
+commitlint.config.js
+
+# OS / editor noise
 .DS_Store
+.vscode
+.idea
