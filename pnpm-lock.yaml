@@ -95,9 +95,6 @@ importers:
       html-to-text:
         specifier: ^9.0.5
         version: 9.0.5
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       keyv:
         specifier: ^5.6.0
         version: 5.6.0
@@ -213,6 +210,9 @@ importers:
       globals:
         specifier: ^16.4.0
         version: 16.5.0
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       lint-staged:
         specifier: ^17.0.7
         version: 17.0.7
