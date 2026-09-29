@@ -53,17 +53,6 @@ services:
     networks:
       - starter-network
 
-  adminer:
-    image: adminer:latest
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - starter-network
-
 volumes:
   postgres_data:
   redis_data:
