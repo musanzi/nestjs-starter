@@ -6,24 +6,32 @@ RUN corepack enable
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-FROM base AS dependencies
-
 RUN pnpm install --frozen-lockfile
 
-FROM dependencies AS development
+FROM base AS development
 
-COPY . .
+ENV NODE_ENV=development
 
 CMD ["pnpm", "start:dev"]
 
-FROM dependencies AS build
+FROM base AS build
 
 COPY . .
 RUN pnpm build
-RUN pnpm prune --prod
+RUN pnpm prune --prod --ignore-scripts
 
-FROM build AS production
+FROM node:24-alpine AS production
 
 ENV NODE_ENV=production
 
-CMD ["pnpm", "start:prod"]
+WORKDIR /app
+
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+
+RUN mkdir -p uploads && chown -R node:node uploads
+
+USER node
+
+CMD ["node", "dist/src/main"]
