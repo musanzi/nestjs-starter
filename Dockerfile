@@ -10,8 +10,7 @@ RUN pnpm install --frozen-lockfile
 
 FROM base AS development
 
-ENV NODE_ENV=development
-
+COPY . .
 CMD ["pnpm", "start:dev"]
 
 FROM base AS build
