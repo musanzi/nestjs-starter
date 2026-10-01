@@ -9,6 +9,8 @@ services:
       - .env
     ports:
       - ${PORT}:${PORT}
+    volumes:
+      - uploads_data:/app/uploads
     develop:
       watch:
         - action: sync
@@ -60,6 +62,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  uploads_data:
 
 networks:
   starter-network:
