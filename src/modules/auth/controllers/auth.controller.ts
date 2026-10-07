@@ -2,14 +2,12 @@ import { Body, Controller, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs
 import { Request, Response } from 'express';
 import { ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/entities';
 import { IUserResponse, UserResponse } from '../../users/interfaces';
 import { UpdateUserDto } from '../../users/dto';
 import { ForgotPasswordDto, ResetPasswordDto, SignInDto, SignUpDto, UpdatePasswordDto } from '../dto';
-import { Public } from '../decorators/public.decorator';
-import { LocalAuthGuard } from '../guards/local-auth.guard';
-import { GoogleAuthGuard } from '../guards/google-auth.guard';
-import { CurrentUser } from '../decorators/current-user.decorator';
+import { CurrentUser, Public } from '../decorators';
+import { GoogleAuthGuard, LocalAuthGuard } from '../guards';
 import { ForgotPassword, ResetPassword, SignOut, SignUp, UpdatePassword, UpdateProfile } from '../commands';
 import { GoogleRedirect, GetProfile, SignIn } from '../queries';
 

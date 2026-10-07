@@ -1,5 +1,5 @@
-import { Role } from '../../roles/entities/role.entity';
-import { User } from '../entities/user.entity';
+import { Role } from '../../roles/entities';
+import { User } from '../entities';
 import { IUserResponse } from '../interfaces';
 
 export function mapRoleIds(roleIds?: string[] | null): Pick<Role, 'id'>[] | undefined {

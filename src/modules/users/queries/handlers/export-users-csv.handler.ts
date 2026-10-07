@@ -3,7 +3,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'fast-csv';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/user.entity';
+import { User } from '../../entities';
 import { ExportUsersCsv } from '../impl';
 
 @QueryHandler(ExportUsersCsv)

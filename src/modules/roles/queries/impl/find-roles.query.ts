@@ -1,5 +1,5 @@
 import { Query } from '@nestjs/cqrs';
-import { Role } from '../../entities/role.entity';
+import { Role } from '../../entities';
 import { FilterRolesDto } from '../../dto';
 
 export class FindRoles extends Query<[Role[], number]> {

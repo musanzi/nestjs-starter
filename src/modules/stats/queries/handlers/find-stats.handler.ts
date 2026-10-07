@@ -1,8 +1,8 @@
 import { BadRequestException, Logger } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { DataSource } from 'typeorm';
-import { Role } from '@/modules/roles/entities/role.entity';
-import { User } from '@/modules/users/entities/user.entity';
+import { Role } from '@/modules/roles/entities';
+import { User } from '@/modules/users/entities';
 import { IStatItem } from '../../interfaces';
 import { FindStats } from '../impl';
 

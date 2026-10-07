@@ -4,7 +4,7 @@ import { promises } from 'fs';
 import { IUserResponse } from '../../interfaces';
 import { UploadUserAvatar } from '../impl';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/user.entity';
+import { User } from '../../entities';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindUserById } from '../../queries';
 

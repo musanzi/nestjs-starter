@@ -2,8 +2,8 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { mapUserRoles } from '../../helpers/user-mappers';
-import { User } from '../../entities/user.entity';
+import { mapUserRoles } from '../../helpers';
+import { User } from '../../entities';
 import { IUserResponse } from '../../interfaces';
 import { FindUserById } from '../impl';
 

@@ -17,7 +17,7 @@ import { AbstractController } from '@/shared/abstracts';
 import { createCsvUploadOptions } from '@/shared/helpers';
 import { CreateUserDto, FilterUsersDto, UpdateUserDto } from '../dto';
 import { IUserResponse, UserResponse } from '../interfaces';
-import { User } from '../entities/user.entity';
+import { User } from '../entities';
 import { CurrentUser, HasRoles } from '@/modules/auth/decorators';
 import { Roles } from '@/modules/auth/enums';
 import { createDiskUploadOptions } from '@/shared/helpers';

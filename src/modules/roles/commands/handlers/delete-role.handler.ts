@@ -2,7 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Role } from '../../entities/role.entity';
+import { Role } from '../../entities';
 import { FindRoleById } from '../../queries';
 import { DeleteRole } from '../impl';
 

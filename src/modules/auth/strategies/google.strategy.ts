@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-google-oauth20';
-import { IGoogleProfile } from '../interfaces/google-profile.interface';
+import { IGoogleProfile } from '../interfaces';
 import { CommandBus } from '@nestjs/cqrs';
 import { FindOrCreateUser } from '@/modules/users/commands';
 import { IUserResponse } from '@/modules/users/interfaces';

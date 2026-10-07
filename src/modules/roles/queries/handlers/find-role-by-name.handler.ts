@@ -2,7 +2,7 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Role } from '../../entities/role.entity';
+import { Role } from '../../entities';
 import { FindRoleByName } from '../impl';
 
 @QueryHandler(FindRoleByName)

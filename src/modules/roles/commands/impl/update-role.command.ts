@@ -1,6 +1,6 @@
 import { Command } from '@nestjs/cqrs';
 import { UpdateRoleDto } from '../../dto';
-import { Role } from '../../entities/role.entity';
+import { Role } from '../../entities';
 
 export class UpdateRole extends Command<Role> {
   constructor(

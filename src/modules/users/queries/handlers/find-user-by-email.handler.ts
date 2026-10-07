@@ -2,7 +2,7 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/user.entity';
+import { User } from '../../entities';
 import { IUserResponse } from '../../interfaces';
 import { FindUserByEmail } from '../impl';
 import { mapUserRoles } from '../../helpers';

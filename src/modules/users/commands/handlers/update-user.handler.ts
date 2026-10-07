@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { mapRoleIds } from '../../helpers';
-import { User } from '../../entities/user.entity';
+import { User } from '../../entities';
 import { IUserResponse } from '../../interfaces';
 import { FindUserById } from '../../queries';
 import { UpdateUser } from '../impl';

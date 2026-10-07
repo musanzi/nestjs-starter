@@ -1,5 +1,5 @@
 import { IEvent } from '@nestjs/cqrs';
-import { User } from '@/modules/users/entities/user.entity';
+import { User } from '@/modules/users/entities';
 
 type WelcomeUser = Pick<User, 'name' | 'email'>;
 

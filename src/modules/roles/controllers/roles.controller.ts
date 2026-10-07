@@ -3,7 +3,7 @@ import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestj
 import { AbstractController } from '@/shared/abstracts';
 import { CreateRoleDto, FilterRolesDto, UpdateRoleDto } from '../dto';
 import { RoleResponse } from '../interfaces';
-import { Role } from '../entities/role.entity';
+import { Role } from '../entities';
 import { HasRoles } from '@/modules/auth/decorators';
 import { Roles } from '@/modules/auth/enums';
 import { CreateRole, DeleteRole, UpdateRole } from '../commands';

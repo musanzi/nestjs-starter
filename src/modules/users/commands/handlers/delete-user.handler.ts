@@ -2,7 +2,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/user.entity';
+import { User } from '../../entities';
 import { DeleteUser } from '../impl';
 import { FindUserById } from '../../queries';
 

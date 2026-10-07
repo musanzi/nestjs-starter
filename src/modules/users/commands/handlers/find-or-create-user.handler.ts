@@ -3,7 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { IUserResponse } from '../../interfaces';
 import { CreateUser, FindOrCreateUser, UpdateUser } from '../impl';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/user.entity';
+import { User } from '../../entities';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @CommandHandler(FindOrCreateUser)

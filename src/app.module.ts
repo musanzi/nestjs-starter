@@ -1,25 +1,24 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthModule } from './modules/auth/auth.module';
-import { DatabaseModule } from './modules/database/database.module';
+import { AuthModule } from './modules/auth';
+import { DatabaseModule } from './modules/database';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthGuard } from './modules/auth/guards/auth.guard';
-import { RolesGuard } from './modules/auth/guards/roles.guard';
+import { AuthGuard, RolesGuard } from './modules/auth/guards';
 import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RolesModule } from './modules/roles/roles.module';
-import { UsersModule } from './modules/users/users.module';
-import { StatsModule } from './modules/stats/stats.module';
+import { RolesModule } from './modules/roles';
+import { UsersModule } from './modules/users';
+import { StatsModule } from './modules/stats';
 import { CacheManagerOptions, CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 import { Keyv } from 'keyv';
 import { KeyvCacheableMemory } from 'cacheable';
-import { HealthModule } from './modules/health/health.module';
+import { HealthModule } from './modules/health';
 
 @Module({
   imports: [

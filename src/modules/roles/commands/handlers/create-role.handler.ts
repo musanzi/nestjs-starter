@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Role } from '../../entities/role.entity';
+import { Role } from '../../entities';
 import { CreateRole } from '../impl';
 
 @CommandHandler(CreateRole)

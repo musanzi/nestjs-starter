@@ -1,8 +1,8 @@
 import { hash } from 'bcryptjs';
 import dataSource from '../orm.config';
 import { Roles } from '../../auth/enums';
-import { Role } from '../../roles/entities/role.entity';
-import { User } from '../../users/entities/user.entity';
+import { Role } from '../../roles/entities';
+import { User } from '../../users/entities';
 
 const seedUsers = [
   {

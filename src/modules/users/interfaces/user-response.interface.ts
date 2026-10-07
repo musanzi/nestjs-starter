@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { User } from '../entities/user.entity';
+import { User } from '../entities';
 
 export type IUserResponse = Omit<User, 'roles'> & {
   roles: string[];
