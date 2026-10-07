@@ -69,7 +69,6 @@ import { HealthModule } from './modules/health/health.module';
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        isGlobal: true,
         transport: {
           host: config.get('MAIL_HOST'),
           port: +config.get('MAIL_PORT'),

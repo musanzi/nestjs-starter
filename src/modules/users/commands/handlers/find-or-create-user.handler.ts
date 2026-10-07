@@ -22,7 +22,7 @@ export class FindOrCreateUserHandler implements ICommandHandler<FindOrCreateUser
     try {
       const existingUser = await this.repository.findOne({
         where: { email },
-        relations: ['roles']
+        relations: { roles: true }
       });
 
       if (existingUser) {

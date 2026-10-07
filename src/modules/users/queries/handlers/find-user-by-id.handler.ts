@@ -20,7 +20,7 @@ export class FindUserByIdHandler implements IQueryHandler<FindUserById, IUserRes
     try {
       const user = await this.repository.findOneOrFail({
         where: { id: query.id },
-        relations: ['roles']
+        relations: { roles: true }
       });
       return mapUserRoles(user);
     } catch (error) {

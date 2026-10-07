@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
-import { CreateRoleDto, UpdateRoleDto } from '../dto';
-import { IFilterRoles, RoleResponse } from '../interfaces';
+import { CreateRoleDto, FilterRolesDto, UpdateRoleDto } from '../dto';
+import { RoleResponse } from '../interfaces';
 import { Role } from '../entities/role.entity';
 import { HasRoles } from '@/modules/auth/decorators';
 import { Roles } from '@/modules/auth/enums';
@@ -10,7 +10,6 @@ import { CreateRole, DeleteRole, UpdateRole } from '../commands';
 import { FindRoleById, FindRoles } from '../queries';
 
 @ApiTags('roles')
-@ApiBearerAuth()
 @Controller('roles')
 export class RolesController extends AbstractController {
   @Post()
@@ -31,11 +30,7 @@ export class RolesController extends AbstractController {
       example: [[{ id: 'b7f2c1e0-4a5d-4c8e-9f1a-2b3c4d5e6f7a', name: 'admin' }], 1]
     }
   })
-  @ApiQuery({ name: 'page', required: false, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, example: 10 })
-  @ApiQuery({ name: 'take', required: false, example: 10 })
-  @ApiQuery({ name: 'q', required: false, example: 'admin' })
-  findAll(@Query() query: IFilterRoles): Promise<[Role[], number]> {
+  findAll(@Query() query: FilterRolesDto): Promise<[Role[], number]> {
     return this.queryHandler.execute(new FindRoles(query));
   }
 

@@ -12,20 +12,11 @@ import {
   UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiTags
-} from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
 import { createCsvUploadOptions } from '@/shared/helpers';
-import { CreateUserDto, UpdateUserDto } from '../dto';
-import { IFilterUsers, IUserResponse, UserResponse } from '../interfaces';
+import { CreateUserDto, FilterUsersDto, UpdateUserDto } from '../dto';
+import { IUserResponse, UserResponse } from '../interfaces';
 import { User } from '../entities/user.entity';
 import { CurrentUser, HasRoles } from '@/modules/auth/decorators';
 import { Roles } from '@/modules/auth/enums';
@@ -35,7 +26,6 @@ import { CreateUser, DeleteUser, ImportUsersCsv, UpdateUser, UploadUserAvatar } 
 import { ExportUsersCsv, FindUserByEmail, FindUsers } from '../queries';
 
 @ApiTags('users')
-@ApiBearerAuth()
 @Controller('users')
 export class UsersController extends AbstractController {
   @Post()
@@ -56,11 +46,7 @@ export class UsersController extends AbstractController {
       example: [[{ id: 'b7f2c1e0-4a5d-4c8e-9f1a-2b3c4d5e6f7a', email: 'john.doe@example.com' }], 1]
     }
   })
-  @ApiQuery({ name: 'page', required: false, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, example: 10 })
-  @ApiQuery({ name: 'take', required: false, example: 10 })
-  @ApiQuery({ name: 'q', required: false, example: 'john' })
-  findAll(@Query() query: IFilterUsers): Promise<[IUserResponse[], number]> {
+  findAll(@Query() query: FilterUsersDto): Promise<[IUserResponse[], number]> {
     return this.queryHandler.execute(new FindUsers(query));
   }
 
@@ -87,11 +73,7 @@ export class UsersController extends AbstractController {
     description: 'CSV file',
     schema: { type: 'string', format: 'binary' }
   })
-  @ApiQuery({ name: 'page', required: false, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, example: 10 })
-  @ApiQuery({ name: 'take', required: false, example: 10 })
-  @ApiQuery({ name: 'q', required: false, example: 'john' })
-  async exportCSV(@Query() query: IFilterUsers, @Res() res: Response): Promise<void> {
+  async exportCSV(@Query() query: FilterUsersDto, @Res() res: Response): Promise<void> {
     await this.queryHandler.execute(new ExportUsersCsv(query, res));
   }
 
