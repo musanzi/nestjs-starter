@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
+import { ApiPaginatedResponse } from '@/shared/decorators';
 import { CreateRoleDto, FilterRolesDto, UpdateRoleDto } from '../dto';
 import { RoleResponse } from '../interfaces';
 import { Role } from '../entities';
@@ -23,13 +24,10 @@ export class RolesController extends AbstractController {
   @Get()
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'List roles with pagination (admin only)' })
-  @ApiOkResponse({
-    description: 'Paginated roles as a [items, total] tuple',
-    schema: {
-      type: 'array',
-      example: [[{ id: 'b7f2c1e0-4a5d-4c8e-9f1a-2b3c4d5e6f7a', name: 'admin' }], 1]
-    }
-  })
+  @ApiPaginatedResponse(
+    RoleResponse,
+    'Roles as a [items, total] tuple. With no query parameters, returns all roles. Otherwise, defaults to page 1 and 20 items per page.'
+  )
   findAll(@Query() query: FilterRolesDto): Promise<[Role[], number]> {
     return this.queryHandler.execute(new FindRoles(query));
   }

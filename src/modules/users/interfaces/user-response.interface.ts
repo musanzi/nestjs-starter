@@ -21,7 +21,7 @@ export class UserResponse {
   @ApiProperty({ example: 'John Doe' })
   name: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/avatar.png', nullable: true })
+  @ApiPropertyOptional({ example: 'https://example.com/avatar.png', oneOf: [{ type: 'string' }, { type: 'null' }] })
   avatar: string;
 
   @ApiProperty({ example: ['user'], type: [String] })

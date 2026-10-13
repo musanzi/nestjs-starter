@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './modules/auth';
 import { DatabaseModule } from './modules/database';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -19,6 +19,8 @@ import { createKeyv } from '@keyv/redis';
 import { Keyv } from 'keyv';
 import { KeyvCacheableMemory } from 'cacheable';
 import { HealthModule } from './modules/health';
+import { ApiExceptionFilter } from './shared/filters';
+import { ApiResponseInterceptor } from './shared/interceptors';
 
 @Module({
   imports: [
@@ -89,6 +91,8 @@ import { HealthModule } from './modules/health';
     StatsModule
   ],
   providers: [
+    { provide: APP_FILTER, useClass: ApiExceptionFilter },
+    { provide: APP_INTERCEPTOR, useClass: ApiResponseInterceptor },
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: ThrottlerGuard }

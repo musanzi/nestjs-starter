@@ -14,8 +14,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '@/shared/abstracts';
+import { ApiPaginatedResponse } from '@/shared/decorators';
 import { createCsvUploadOptions } from '@/shared/helpers';
-import { CreateUserDto, FilterUsersDto, UpdateUserDto } from '../dto';
+import { CreateUserDto, ExportUsersDto, FilterUsersDto, UpdateUserDto } from '../dto';
 import { IUserResponse, UserResponse } from '../interfaces';
 import { User } from '../entities';
 import { CurrentUser, HasRoles } from '@/modules/auth/decorators';
@@ -39,13 +40,10 @@ export class UsersController extends AbstractController {
   @Get()
   @HasRoles([Roles.ADMIN])
   @ApiOperation({ summary: 'List users with pagination (admin only)' })
-  @ApiOkResponse({
-    description: 'Paginated users as a [items, total] tuple',
-    schema: {
-      type: 'array',
-      example: [[{ id: 'b7f2c1e0-4a5d-4c8e-9f1a-2b3c4d5e6f7a', email: 'john.doe@example.com' }], 1]
-    }
-  })
+  @ApiPaginatedResponse(
+    UserResponse,
+    'Paginated users as a [items, total] tuple. Defaults to page 1 and 20 items per page.'
+  )
   findAll(@Query() query: FilterUsersDto): Promise<[IUserResponse[], number]> {
     return this.queryHandler.execute(new FindUsers(query));
   }
@@ -73,7 +71,7 @@ export class UsersController extends AbstractController {
     description: 'CSV file',
     schema: { type: 'string', format: 'binary' }
   })
-  async exportCSV(@Query() query: FilterUsersDto, @Res() res: Response): Promise<void> {
+  async exportCSV(@Query() query: ExportUsersDto, @Res() res: Response): Promise<void> {
     await this.queryHandler.execute(new ExportUsersCsv(query, res));
   }
 

@@ -116,11 +116,13 @@ Feature modules follow CQRS and barrel exports. Reads live under `queries`, writ
 ## Runtime Notes
 
 - Requests are validated with a global `ValidationPipe` using `transform: true`.
-- Responses are wrapped by `TransformInterceptor`.
+- JSON responses are wrapped by the global `ApiResponseInterceptor` as `{ success: true, statusCode, data }`. Empty results use `data: null`; pagination tuples remain inside `data`.
+- The global `ApiExceptionFilter` returns `{ success: false, statusCode, message, error }`. HTTP exception messages and validation message arrays are preserved; unexpected errors are logged and return a generic 500 response.
+- Direct responses (CSV downloads and OAuth redirects), streamed files, and 204/304 responses retain their existing behavior.
 - CORS is credentialed and reflects the request origin (`origin: true`).
 - Sessions use `express-session`, Passport, and a PostgreSQL session store.
 - The session cookie is named `sid`; `secure` is enabled when `NODE_ENV=production`.
-- The session table is created automatically by `connect-pg-simple` when it is missing.
+
 - Global guards are registered for authentication, roles, and throttling.
 - Throttling is configured at 50 requests per 60 seconds.
 - `@Public()` marks unauthenticated routes.
@@ -147,9 +149,9 @@ Protected routes require an authenticated session. Admin routes require the `adm
 ### Users
 
 - `POST /users` admin
-- `GET /users` admin, supports `q`, `page`, and `limit` query params
+- `GET /users` admin, supports `q`, `page`, `limit`, and `take` query params
 - `POST /users/import/csv` admin, multipart field `file`
-- `GET /users/export/csv` admin, supports `q`, `page`, and `limit` query params
+- `GET /users/export/csv` admin, supports `q` and exports all matching users
 - `POST /users/profile/avatar` authenticated, multipart field `avatar`
 - `GET /users/:email` admin
 - `PATCH /users/:id` admin
@@ -158,7 +160,7 @@ Protected routes require an authenticated session. Admin routes require the `adm
 ### Roles
 
 - `POST /roles` admin
-- `GET /roles` admin, supports `q`, `page`, and `limit` query params
+- `GET /roles` admin, supports `q`, `page`, `limit`, and `take` query params
 - `GET /roles/:id` admin
 - `PATCH /roles/:id` admin
 - `DELETE /roles/:id` admin
@@ -166,3 +168,15 @@ Protected routes require an authenticated session. Admin routes require the `adm
 ### Stats
 
 - `GET /stats` admin, returns user and role totals as `{ label, total }` items
+
+### Pagination and OpenAPI
+
+API documentation is available at `/docs`, with the OpenAPI 3.1 document at `/openapi.json`.
+The `/users` and `/roles` responses use `{ success: true, statusCode: 200, data: [items, total] }`.
+The schemas define the tuple positions explicitly: `items` contains `UserResponse` or `RoleResponse` objects,
+and `total` is the number of matching records before pagination. Client generators must support OpenAPI 3.1 tuple schemas (`prefixItems`).
+
+`page` is a positive integer starting at 1. `limit` accepts integers from 1 to 100 and defaults to 20.
+`take` is an alias used when `limit` is absent; `limit` takes precedence when both are supplied.
+With no query parameters, `/roles` returns all roles. Any query parameter enables pagination with the defaults above.
+Invalid pagination parameters return HTTP 400 with `{ success: false, statusCode, message, error }`.

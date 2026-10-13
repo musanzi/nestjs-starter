@@ -6,8 +6,9 @@ import passport from 'passport';
 import { Logger } from 'nestjs-pino';
 import { RedisStore } from 'connect-redis';
 import { createClient } from 'redis';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { createOpenApiDocument } from './shared/helpers/create-openapi-document';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -50,12 +51,13 @@ async function bootstrap(): Promise<void> {
   app.use(passport.initialize({}));
   app.use(passport.session());
 
-  const config = new DocumentBuilder()
-    .setTitle('Starter API DOC')
-    .setDescription('The starter API documentation')
-    .build();
+  const document = createOpenApiDocument(app);
 
-  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('openapi', app, document, {
+    ui: false,
+    raw: ['json'],
+    jsonDocumentUrl: 'openapi.json'
+  });
 
   app.use(
     '/docs',

@@ -13,6 +13,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps}/**/*.ts\" --fix",
+    "test": "node --test -r ts-node/register -r tsconfig-paths/register test/*.spec.ts",
     "typeorm": "node ./node_modules/typeorm/cli",
     "db:migrate": "pnpm typeorm migration:generate ./src/modules/database/migrations/$name -d ./src/modules/database/orm.config.ts",
     "db:up": "pnpm typeorm migration:run -d ./src/modules/database/orm.config.ts",

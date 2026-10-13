@@ -1,10 +1,10 @@
 import { Query } from '@nestjs/cqrs';
 import { Response } from 'express';
-import { FilterUsersDto } from '../../dto';
+import { ExportUsersDto } from '../../dto';
 
 export class ExportUsersCsv extends Query<void> {
   constructor(
-    public readonly params: FilterUsersDto,
+    public readonly params: ExportUsersDto,
     public readonly response: Response
   ) {
     super();
