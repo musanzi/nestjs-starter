@@ -48,7 +48,7 @@ Both Compose files run PostgreSQL with `postgres:18-alpine`, read `.env`, requir
 Start the development stack:
 
 ```bash
-docker compose -f compose.dev.yml -p starter-backend up --build
+docker compose -f compose.dev.yml -p starter-api up --build
 ```
 
 The API is available on `http://localhost:$PORT`. Adminer is available on `http://localhost:8080`.
@@ -56,10 +56,10 @@ The API is available on `http://localhost:$PORT`. Adminer is available on `http:
 Run migrations and seeds in the development API container:
 
 ```bash
-docker compose -f compose.dev.yml -p starter-backend exec api pnpm build
-docker compose -f compose.dev.yml -p starter-backend exec api pnpm db:migrate
-docker compose -f compose.dev.yml -p starter-backend exec api pnpm db:up
-docker compose -f compose.dev.yml -p starter-backend exec api pnpm db:seed
+docker compose -f compose.dev.yml -p starter-api exec api pnpm build
+docker compose -f compose.dev.yml -p starter-api exec api pnpm db:migrate
+docker compose -f compose.dev.yml -p starter-api exec api pnpm db:up
+docker compose -f compose.dev.yml -p starter-api exec api pnpm db:seed
 ```
 
 Seed credentials for local development:
@@ -70,7 +70,7 @@ Seed credentials for local development:
 Start the production-style stack:
 
 ```bash
-docker compose -f compose.prod.yml -p starter-backend up --build
+docker compose -f compose.prod.yml -p starter-api up --build
 ```
 
 ## Scripts
