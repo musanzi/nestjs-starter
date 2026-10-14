@@ -1,6 +1,6 @@
 ## Module
 
-When creating a feature, follow the CQRS pattern:
+Act as the senior NestJS engineer, when creating a feature, follow the CQRS pattern:
 
 - Use queries for read operations whenever appropriate.
 - Use commands for write or state-changing operations.
