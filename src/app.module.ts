@@ -11,6 +11,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CqrsModule } from '@nestjs/cqrs';
+import { CompaniesModule } from './modules/companies';
 import { RolesModule } from './modules/roles';
 import { UsersModule } from './modules/users';
 import { StatsModule } from './modules/stats';
@@ -88,7 +89,8 @@ import { ApiResponseInterceptor } from './shared/interceptors';
     AuthModule,
     UsersModule,
     RolesModule,
-    StatsModule
+    StatsModule,
+    CompaniesModule
   ],
   providers: [
     { provide: APP_FILTER, useClass: ApiExceptionFilter },
