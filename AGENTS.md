@@ -18,7 +18,7 @@ Act as a senior NestJS engineer, when creating a feature, follow the CQRS patter
 
 ### Rules
 
-Do not access another module's repository directly from within a module. Instead, create a query or command in the module that owns the repository, then use that query or command from the module that requires the data or operation. Don't generate tests.
+Do not access another module's repository directly from within a module. Instead, create a query or command in the module that owns the repository, then use that query or command from the module that requires the data or operation.
 
 Refer to the existing codebase for:
 
@@ -28,4 +28,4 @@ Refer to the existing codebase for:
 - CQRS implementation patterns
 - Code quality standards
 
-Keep implementations simple and practical. Avoid unnecessary abstractions, overengineering, and unrealistic edge cases. Handle edge cases that are reasonably expected in the application's actual usage and don't generate migrations.
+Keep implementations simple and practical. Avoid unnecessary abstractions, overengineering, and unrealistic edge cases. Handle edge cases that are reasonably expected in the application's actual usage and don't generate migrations and tests.
