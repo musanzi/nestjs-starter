@@ -18,7 +18,7 @@ Act as a senior NestJS engineer, when creating a feature, follow the CQRS patter
 
 ### Rules
 
-Do not access another module's repository directly from within a module. Instead, create a query or command in the module that owns the repository, then use that query or command from the module that requires the data or operation.
+Do not access another module's repository directly from within a module. Instead, create a query or command in the module that owns the repository, then use that query or command from the module that requires the data or operation. Don't generate tests.
 
 Refer to the existing codebase for:
 
